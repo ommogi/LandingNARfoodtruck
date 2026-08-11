@@ -1,6 +1,6 @@
 // @ts-check
 import { defineConfig } from 'astro/config';
-import node from '@astrojs/node';
+import vercel from '@astrojs/vercel';
 import sitemap from '@astrojs/sitemap';
 import tailwindcss from '@tailwindcss/vite';
 
@@ -12,8 +12,10 @@ export default defineConfig({
   site: 'https://www.narfoodtruck.com',
   // Todo se prerenderiza salvo /api/presupuesto, que declara `prerender = false`.
   output: 'static',
-  // Cambiar por @astrojs/vercel o @astrojs/netlify segun el hosting final.
-  adapter: node({ mode: 'standalone' }),
+  // Las paginas salen como HTML estatico y /api/presupuesto como funcion.
+  // El adaptador de node dejaba el resultado en dist/server + dist/client, que
+  // Vercel no sabe servir: de ahi el 404 de todo el sitio.
+  adapter: vercel(),
   // Genera sitemap-index.xml con lastmod en cada build: no hay que mantenerlo
   // a mano al anadir paginas.
   integrations: [
