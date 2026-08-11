@@ -21,11 +21,75 @@ import { closeModal, isOpen, onEscape, openModal, track } from './modal';
 
 declare global {
   interface Window {
-    /** La define el script inline de BaseLayout cuando hay GTM. */
+    /** La define el script inline de BaseLayout cuando hay ID de GA4. */
     gtag?: (...args: unknown[]) => void;
     /** Reabre el panel. La usa el boton de la politica de cookies. */
     narAbrirPreferencias?: () => void;
   }
+}
+
+/* --------------------------------------------------- Google Analytics 4 */
+
+/** Astro sustituye las variables PUBLIC_* tambien en los scripts de cliente. */
+const GA4_ID = import.meta.env.PUBLIC_GA4_ID;
+
+let ga4Loaded = false;
+
+/**
+ * Carga gtag.js. Se llama solo cuando hay consentimiento de analitica: hasta
+ * entonces no se hace ni una peticion a Google.
+ *
+ * Al usar GA4 directamente (sin Tag Manager) hay que reenviar a mano los
+ * eventos que `track()` empuja a dataLayer: gtag.js no los lee solo, que es
+ * justo lo que si hacia GTM.
+ */
+const loadGa4 = () => {
+  if (ga4Loaded || !GA4_ID) return;
+  ga4Loaded = true;
+
+  const script = document.createElement('script');
+  script.async = true;
+  script.src = `https://www.googletagmanager.com/gtag/js?id=${GA4_ID}`;
+  document.head.appendChild(script);
+
+  window.gtag?.('js', new Date());
+  window.gtag?.('config', GA4_ID);
+
+  forwardDataLayer();
+};
+
+/** Nombres que no son eventos de negocio y no deben llegar a GA4. */
+const INTERNAL_EVENTS = new Set(['gtm.js', 'gtm.dom', 'gtm.load']);
+
+/** Indice del ultimo elemento de dataLayer ya reenviado. */
+let forwarded = 0;
+
+/**
+ * Reenvia a GA4 los eventos de `track()`. Cubre los que ya se acumularon
+ * antes de aceptar (el usuario pudo navegar con el banner abierto) y engancha
+ * los siguientes envolviendo `push`.
+ */
+function forwardDataLayer() {
+  const layer = (window.dataLayer ?? []) as Record<string, unknown>[];
+
+  const send = (entry: unknown) => {
+    // Los `arguments` de gtag() son array-like: los ignora este reenviador,
+    // que solo mira los objetos {event, ...params} que empuja track().
+    if (!entry || typeof entry !== 'object' || Array.isArray(entry)) return;
+    const { event, ...params } = entry as { event?: unknown };
+    if (typeof event !== 'string' || INTERNAL_EVENTS.has(event)) return;
+    window.gtag?.('event', event, params);
+  };
+
+  for (; forwarded < layer.length; forwarded++) send(layer[forwarded]);
+
+  const original = layer.push.bind(layer);
+  layer.push = (...items: Record<string, unknown>[]) => {
+    const result = original(...items);
+    forwarded = layer.length;
+    items.forEach(send);
+    return result;
+  };
 }
 
 const banner = document.querySelector<HTMLElement>('[data-consent-banner]');
@@ -82,6 +146,10 @@ if (banner && modal) {
       analytics_storage: choice.analytics ? 'granted' : 'denied',
       functionality_storage: choice.maps ? 'granted' : 'denied',
     });
+
+    // gtag.js solo entra en escena si hay permiso. No se descarga al revocar
+    // —no se puede—, pero Consent Mode ya le impide escribir cookies.
+    if (choice.analytics) loadGa4();
   };
 
   /**
@@ -201,8 +269,10 @@ if (banner && modal) {
   const stored = read();
 
   if (stored) {
-    // Ya decidio: se respeta y no se le vuelve a preguntar. Consent Mode ya lo
-    // aplico el script inline, pero el mapa depende de este modulo.
+    // Ya decidio: se respeta y no se le vuelve a preguntar. El script inline
+    // ya restauro las senales de Consent Mode, pero cargar gtag.js y el mapa
+    // depende de este modulo.
+    if (stored.analytics) loadGa4();
     applyMaps(stored.maps);
     syncToggles(stored);
   } else {

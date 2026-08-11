@@ -119,27 +119,6 @@ export function webPageNode({ title, description, canonical }: WebPageInput) {
   };
 }
 
-/* --------------------------------------------------- Migas */
-
-export interface BreadcrumbItem {
-  name: string;
-  /** Ruta relativa, por ejemplo "/el-truck". */
-  path: string;
-}
-
-export function breadcrumbNode(items: BreadcrumbItem[], canonical: string) {
-  return {
-    '@type': 'BreadcrumbList',
-    '@id': `${canonical}#breadcrumb`,
-    itemListElement: items.map((item, index) => ({
-      '@type': 'ListItem',
-      position: index + 1,
-      name: item.name,
-      item: new URL(item.path, site.url).href,
-    })),
-  };
-}
-
 /* --------------------------------------------------- Servicio y precios */
 
 /**

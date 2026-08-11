@@ -1,38 +1,42 @@
-# Analítica: Google Analytics 4 vía Google Tag Manager
+# Analítica: Google Analytics 4
 
 La web ya está instrumentada. `src/scripts/modal.ts` define `track()`, que empuja cada evento a
-`window.dataLayer`, y hay más de treinta puntos de medición repartidos por las páginas. GTM lee
-`dataLayer` de forma nativa, así que **no hay que tocar código para medir**: todo el trabajo que
-queda es de configuración en los paneles de Google.
+`window.dataLayer`, y hay más de treinta puntos de medición repartidos por las páginas.
 
-Este documento explica qué configurar y por qué.
+**No se usa Google Tag Manager.** GA4 se carga directamente con `gtag.js`, y `src/scripts/consent.ts`
+reenvía los eventos de `dataLayer` a GA4. La ventaja es que no hay ningún panel que configurar:
+funciona en cuanto despliegas.
 
 ---
 
 ## 1. Antes de empezar
 
-1. Crea una propiedad de **Google Analytics 4** y anota su ID de medición (`G-XXXXXXXXXX`).
-2. Crea un contenedor de **Google Tag Manager** para `narfoodtruck.com` y anota su ID
-   (`GTM-XXXXXXX`).
-3. Define la variable de entorno en el hosting:
+Solo hace falta una cosa: el ID de medición de la propiedad de **Google Analytics 4**
+(`G-XXXXXXXXXX`), en una variable de entorno:
 
-   ```
-   PUBLIC_GTM_ID=GTM-XXXXXXX
-   ```
+```
+PUBLIC_GA4_ID=G-XXXXXXXXXX
+```
 
-   En Vercel: *Settings → Environment Variables*, solo en Production. Déjala **sin definir en
-   Preview y Development**, para que las pruebas no contaminen los datos.
+En Vercel: *Settings → Environment Variables*, solo en **Production**. Déjala sin definir en Preview
+y Development para que las pruebas no contaminen los datos.
 
-Sin esa variable la web no carga ningún script de analítica. Es intencionado: permite desplegar y
-probar sin medir nada.
+Sin esa variable la web no carga ningún script de analítica.
 
 ---
 
-## 2. Consentimiento: lo que ya está resuelto en el código
+## 2. Cómo funciona la carga
 
-`src/layouts/BaseLayout.astro` emite, **antes** del snippet de GTM, un bloque de Consent Mode v2 con
-todas las señales denegadas salvo `security_storage`. Cuando el usuario decide,
-`src/scripts/consent.ts` emite un `consent update`.
+El orden importa y está resuelto en el código:
+
+1. `src/layouts/BaseLayout.astro` emite, en la cabecera y de forma síncrona, un bloque de Consent
+   Mode v2 con **todas las señales denegadas** salvo `security_storage`. Define `gtag()` y
+   `dataLayer`, pero **no descarga nada de Google**.
+2. Si el navegador ya guardaba una decisión, la restaura en ese mismo instante.
+3. `src/scripts/consent.ts` descarga `gtag.js` **solo cuando hay consentimiento de analítica**.
+   Quien rechaza no genera ni una petición a Google.
+4. Al cargarlo, engancha el reenviador: los eventos de `track()` pasan a GA4 como eventos con sus
+   parámetros.
 
 Correspondencia entre las categorías del banner y las señales de Google:
 
@@ -44,44 +48,38 @@ Correspondencia entre las categorías del banner y las señales de Google:
 Las señales de publicidad (`ad_storage`, `ad_user_data`, `ad_personalization`) se quedan denegadas
 siempre porque hoy no hay ninguna etiqueta de Google Ads.
 
-> **Si algún día se añade Google Ads:** no basta con crear la etiqueta en GTM. Hay que añadir una
-> categoría nueva al banner (`src/lib/consent.ts`), gestionar sus señales en `consent.ts` y
-> documentar las cookies en `/cookies`. El consentimiento solo es válido si es informado.
+> **Si algún día se añade Google Ads:** hay que añadir una categoría nueva al banner
+> (`src/lib/consent.ts`), gestionar sus señales en `consent.ts` y documentar las cookies en
+> `/cookies`. El consentimiento solo es válido si es informado.
 
-**En GTM, cada etiqueta debe declarar sus comprobaciones de consentimiento adicionales.** En la
-configuración de la etiqueta, *Consentimiento adicional obligatorio* → `analytics_storage`. Sin
-esto, GTM dispararía las etiquetas ignorando la decisión del usuario y toda la implementación
-legal quedaría en nada.
+### No pegues el snippet de Google en la cabecera
+
+Google, al crear la propiedad, ofrece un fragmento «Google tag» para pegar en el `<head>`. **No lo
+uses en este proyecto.** Hace tres cosas incompatibles con lo que hay montado:
+
+- Carga `gtag.js` y llama a `gtag('config', ...)` de inmediato, saltándose el consentimiento y
+  escribiendo cookies `_ga` antes de que el usuario decida.
+- Duplicaría la medición con la carga que ya hace `consent.ts`.
+- Como Astro procesa los `<script>` sin `is:inline` como módulos TypeScript, da errores de
+  compilación (`Cannot find name 'dataLayer'`).
+
+Todo lo que ese fragmento hace ya está cubierto por `PUBLIC_GA4_ID`.
 
 ---
 
-## 3. Configuración en GTM
+## 3. Eventos: no hay nada que configurar
 
-### 3.1 Etiqueta base
+El reenviador de `src/scripts/consent.ts` convierte cada objeto `{event, ...params}` de `dataLayer`
+en una llamada `gtag('event', nombre, params)`. Los eventos llegan a GA4 con su nombre tal cual y
+sus parámetros como parámetros de evento.
 
-- **Tipo:** Google Tag (GA4)
-- **ID de medición:** `G-XXXXXXXXXX`
-- **Activador:** Initialization - All Pages
-- **Consentimiento adicional obligatorio:** `analytics_storage`
+Lo único que conviene hacer en el panel de GA4 es marcar como **eventos clave** los dos que
+representan un lead real: `lead_success` y `booking_whatsapp`
+(*Administrar → Eventos clave*).
 
-Esto ya da páginas vistas, sesiones y fuentes de tráfico.
-
-### 3.2 Eventos personalizados
-
-Para cada evento que quieras medir:
-
-1. **Activador** → *Evento personalizado* → nombre exacto del evento (columna «Evento en
-   dataLayer» de la tabla de abajo).
-2. **Etiqueta** → *GA4 Event* → nombre del evento en GA4 y, si aplica, sus parámetros.
-3. Marca las comprobaciones de consentimiento.
-
-Para los parámetros, crea variables de capa de datos con el mismo nombre que la clave: `config`,
-`filter`, `step`, `estado`, `type`, `length`, `origin`.
-
-**Atajo recomendado:** en lugar de crear una etiqueta por evento, crea **una sola** etiqueta GA4
-Event cuyo nombre sea la variable integrada `{{Event}}` y asóciala a un activador de expresión
-regular que cubra los eventos que te interesan. Ahorra decenas de etiquetas y todos los eventos
-llegan con su nombre correcto.
+Si quieres usar los parámetros (`config`, `filter`, `step`...) en informes, regístralos como
+**dimensiones personalizadas** en *Administrar → Definiciones personalizadas*. Sin eso los recibe
+igual, pero no puedes segmentar por ellos.
 
 ---
 
@@ -92,7 +90,7 @@ llegan con su nombre correcto.
 | Evento en dataLayer | Parámetros | Cuándo se dispara | ¿Conversión? |
 |---|---|---|---|
 | `form_open` | — | Se abre el modal de presupuesto | |
-| `form_start` | — | El usuario escribe en el primer campo | |
+| `form_start` | — | El foco entra por primera vez en un campo | |
 | `form_submit` | — | Pulsa enviar y pasa la validación | |
 | `lead_success` | — | El servidor confirma la solicitud | **Sí** |
 | `form_error` | `type` (`client` \| `server`) | Falla la validación o el envío | |

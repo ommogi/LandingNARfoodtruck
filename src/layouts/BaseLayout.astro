@@ -9,13 +9,7 @@ import Footer from '../components/Footer.astro';
 import CookieBanner from '../components/CookieBanner.astro';
 import { site } from '../config/site';
 import { CONSENT_STORAGE_KEY } from '../lib/consent';
-import {
-  breadcrumbNode,
-  organizationNode,
-  webPageNode,
-  websiteNode,
-  type BreadcrumbItem,
-} from '../lib/schema';
+import { organizationNode, webPageNode, websiteNode } from '../lib/schema';
 
 interface Props {
   title: string;
@@ -30,8 +24,6 @@ interface Props {
    * al grafo comun de negocio + sitio + pagina que monta este layout.
    */
   schemas?: Record<string, unknown>[];
-  /** Migas para el BreadcrumbList. "Inicio" se anade solo. */
-  breadcrumbs?: BreadcrumbItem[];
   /** Texto alternativo de la imagen social. */
   ogImageAlt?: string;
 }
@@ -43,7 +35,6 @@ const {
   noindex = false,
   leadSource = 'landing-home',
   schemas = [],
-  breadcrumbs = [],
   ogImageAlt = 'Food truck NAR iluminado y abierto durante un evento nocturno',
 } = Astro.props;
 
@@ -51,21 +42,21 @@ const canonical = new URL(path, site.url).href;
 const ogImage = new URL('/og-nar-foodtruck.jpg', site.url).href;
 
 /**
- * ID publico del contenedor de Google Tag Manager. Sin el, no se emite ningun
- * script de analitica: en desarrollo y en previsualizaciones la web funciona
+ * ID de medicion de Google Analytics 4 (G-XXXXXXXXXX). Sin el no se emite
+ * nada de analitica: en desarrollo y en previsualizaciones la web funciona
  * igual y no ensucia los datos de produccion.
+ *
+ * Solo controla el bloque de Consent Mode. La carga de gtag.js la decide
+ * src/scripts/consent.ts cuando el usuario acepta.
  */
-const gtmId = import.meta.env.PUBLIC_GTM_ID;
+const ga4Id = import.meta.env.PUBLIC_GA4_ID;
 
-/* Un unico bloque JSON-LD por pagina: negocio + sitio + pagina, mas las migas
-   y lo que aporte cada pagina. Los nodos se referencian por @id. */
+/* Un unico bloque JSON-LD por pagina: negocio + sitio + pagina, mas lo que
+   aporte cada pagina. Los nodos se referencian por @id. */
 const graph = [
   organizationNode(),
   websiteNode(),
   webPageNode({ title, description, canonical }),
-  ...(breadcrumbs.length
-    ? [breadcrumbNode([{ name: 'Inicio', path: '/' }, ...breadcrumbs], canonical)]
-    : []),
   ...schemas,
 ];
 
@@ -80,21 +71,23 @@ const schema = { '@context': 'https://schema.org', '@graph': graph };
 
     {
       /*
-       * Consent Mode v2. Tiene que ejecutarse SIEMPRE antes del snippet de GTM
-       * y de forma sincrona: si GTM carga primero, GA4 escribe cookies antes de
-       * que el usuario haya decidido nada. Por eso va `is:inline` y aqui
-       * arriba, no en un modulo procesado por Astro.
+       * Consent Mode v2. Va aqui arriba, `is:inline` y sincrono, para que el
+       * estado por defecto quede fijado antes de que nada pueda medir.
        *
-       * Arranca todo denegado y, si el navegador ya guardo una decision, la
-       * aplica en el acto para que un visitante recurrente no pierda la
-       * primera vista de pagina.
+       * Arranca todo denegado. gtag.js NO se carga aqui: lo inyecta
+       * src/scripts/consent.ts solo si el usuario acepta la analitica. Asi una
+       * visita que rechaza no llega a pedir nada a Google.
+       *
+       * Si el navegador ya guardo una decision, se aplica en el acto para que
+       * un visitante recurrente no pierda la primera vista de pagina.
        */
-      gtmId && (
+      ga4Id && (
         <script
           is:inline
           set:html={`
 window.dataLayer = window.dataLayer || [];
 function gtag(){dataLayer.push(arguments);}
+window.gtag = gtag;
 gtag('consent', 'default', {
   ad_storage: 'denied',
   ad_user_data: 'denied',
@@ -116,20 +109,6 @@ try {
 } catch (e) {
   /* localStorage bloqueado (modo privado, cookies de terceros): se queda en denegado. */
 }
-`}
-        />
-      )
-    }
-
-    {
-      gtmId && (
-        <script
-          is:inline
-          set:html={`
-(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});
-var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';
-j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
-})(window,document,'script','dataLayer',${JSON.stringify(gtmId)});
 `}
         />
       )
@@ -158,16 +137,8 @@ j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNo
     <meta name="twitter:image" content={ogImage} />
     <meta name="twitter:image:alt" content={ogImageAlt} />
 
-    <script type="application/ld+json" set:html={JSON.stringify(schema)} />
-    <!-- Google tag (gtag.js) -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-MNRN94QBRF"></script>
-    <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
-
-      gtag('config', 'G-MNRN94QBRF');
-    </script>
+    {/* `is:inline` explicito: no es un script que Astro deba procesar, es JSON. */}
+    <script is:inline type="application/ld+json" set:html={JSON.stringify(schema)} />
 
     {/* Cada pagina puede anadir aqui su propio schema o metadatos extra. */}
     <slot name="head" />
@@ -183,12 +154,8 @@ j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNo
 
     {/*
       Va en todas las paginas, tambien en las legales: el usuario tiene que
-      poder decidir esté donde esté. Se renderiza aunque no haya GTM para que
-      siga gobernando el mapa de Google, que es contenido de terceros.
-
-      No se incluye el <noscript> de GTM a proposito: ese iframe dispara las
-      etiquetas saltandose Consent Mode, y quien no tiene JavaScript tampoco
-      puede consentir.
+      poder decidir esté donde esté. Se renderiza aunque no haya analitica
+      configurada, porque tambien gobierna el mapa de Google.
     */}
     <CookieBanner />
 
