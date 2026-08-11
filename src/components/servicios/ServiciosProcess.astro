@@ -1,0 +1,78 @@
+---
+/**
+ * Timeline de seis pasos. Misma pieza visual que "Asi trabajamos" de la home
+ * (circulo, numero y conector punteado), con una columna mas.
+ */
+import Icon from '../Icon.astro';
+import SectionHeading from '../SectionHeading.astro';
+
+const steps = [
+  {
+    icon: 'bolt',
+    title: 'Asesoramiento',
+    text: 'Te ayudamos a definir la mejor opción para tu evento.',
+  },
+  {
+    icon: 'pencil',
+    title: 'Diseñamos la experiencia',
+    text: 'Creamos una propuesta a medida según tus necesidades.',
+  },
+  {
+    icon: 'truck',
+    title: 'Entrega y montaje',
+    text: 'Transportamos el truck y lo dejamos listo para tu evento.',
+  },
+  {
+    icon: 'check-circle',
+    title: 'Todo listo',
+    text: 'Tú te encargas de lo importante: disfrutar de tu evento.',
+  },
+  {
+    icon: 'phone',
+    title: 'Asistencia durante el evento',
+    text: 'Estamos disponibles para lo que necesites.',
+  },
+  {
+    icon: 'wrench',
+    title: 'Desmontaje y recogida',
+    text: 'Nos encargamos de retirar el truck y dejar todo en orden.',
+  },
+] as const;
+
+/* El ::after es el conector punteado entre pasos, solo en escritorio. */
+const step = [
+  'relative p-2.5 text-center',
+  "not-last:after:absolute not-last:after:top-[52px] not-last:after:left-[calc(50%+58px)] not-last:after:w-[calc(100%-116px)] not-last:after:border-t-2 not-last:after:border-dashed not-last:after:border-rust/35 not-last:after:content-['']",
+  'max-b1100:after:hidden',
+].join(' ');
+---
+
+<section class="section" aria-labelledby="servicios-process-title">
+  <div class="container">
+    <SectionHeading id="servicios-process-title" title="Un servicio 360° para cada evento" />
+    <p class="mx-auto -mt-6 mb-[34px] max-w-[620px] text-center text-[15px] text-muted">
+      Desde la idea inicial hasta el último invitado, cuidamos cada detalle.
+    </p>
+
+    <ol
+      class="m-0 grid list-none grid-cols-6 gap-[18px] p-0 max-b1100:grid-cols-3 max-b1100:gap-7 max-b820:grid-cols-2 max-b560:grid-cols-1 max-b560:gap-5"
+    >
+      {
+        steps.map((item, i) => (
+          <li class={step} data-reveal>
+            <div class="relative mx-auto mb-3.5 w-[92px]">
+              <span class="absolute -top-1 -left-0.5 z-2 grid size-8 place-items-center rounded-full bg-rust font-display text-[17px] font-bold text-white">
+                {i + 1}
+              </span>
+              <div class="grid size-[92px] place-items-center rounded-full bg-[#eee7e2] text-night">
+                <Icon name={item.icon} size={34} />
+              </div>
+            </div>
+            <h3 class="m-0 mb-1.5 text-[17px] leading-[1.15] font-bold">{item.title}</h3>
+            <p class="m-0 text-[13px] leading-[1.5] text-muted">{item.text}</p>
+          </li>
+        ))
+      }
+    </ol>
+  </div>
+</section>

@@ -1,0 +1,136 @@
+---
+import LegalLayout from '../layouts/LegalLayout.astro';
+import { site } from '../config/site';
+
+/*
+ * La tabla de cookies tiene que reflejar lo que la web instala de verdad. Si
+ * se anaden etiquetas nuevas en Google Tag Manager (Ads, remarketing, mapas de
+ * calor...), hay que ampliarla aqui y anadir la categoria al banner: el
+ * consentimiento solo vale si es informado.
+ */
+
+/** Estilos de la tabla: LegalLayout solo da formato a texto corrido. */
+const cell = 'border border-line px-3 py-2.5 align-top text-[14px]';
+const head = `${cell} bg-bg-2 text-left font-semibold text-night`;
+
+const ownCookies = [
+  {
+    name: '_ga',
+    provider: 'Google Analytics',
+    purpose: 'Distingue usuarios para poder contar visitantes únicos.',
+    duration: '2 años',
+  },
+  {
+    name: '_ga_<ID>',
+    provider: 'Google Analytics',
+    purpose: 'Mantiene el estado de la sesión de análisis.',
+    duration: '2 años',
+  },
+];
+---
+
+<LegalLayout
+  title={`Política de cookies | ${site.name}`}
+  description="Qué cookies usa NAR Food Truck Events, para qué sirven y cómo cambiar tu decisión en cualquier momento."
+  path="/cookies"
+  heading="Política de cookies"
+>
+  <h2>Qué es una cookie</h2>
+  <p>
+    Una cookie es un archivo pequeño que una web guarda en tu navegador. Sirve para que el sitio
+    recuerde información entre páginas o entre visitas. Algunas son imprescindibles para que la web
+    funcione; otras, como las de analítica, no lo son y por eso solo se instalan si nos das permiso.
+  </p>
+
+  <h2>Tu decisión</h2>
+  <p>
+    La primera vez que entras te preguntamos qué permites. Hasta que respondes no se instala ninguna
+    cookie de analítica ni se carga el mapa de Google. Puedes cambiar de opinión cuando quieras:
+  </p>
+  <p>
+    <button
+      class="button button-primary min-h-[44px] px-5 text-[15px]"
+      type="button"
+      data-consent-open
+    >
+      Cambiar mis preferencias
+    </button>
+  </p>
+  <p>
+    También puedes borrar las cookies ya instaladas desde la configuración de tu navegador. Si las
+    borras, volveremos a preguntarte en la siguiente visita.
+  </p>
+
+  <h2>Cookies técnicas</h2>
+  <p>
+    Son las imprescindibles para navegar y enviar el formulario de presupuesto. No sirven para
+    seguirte ni para elaborar perfiles, y por eso no requieren consentimiento. Tu decisión sobre las
+    cookies se guarda en el almacenamiento local de tu navegador, no en una cookie, y no sale de tu
+    dispositivo.
+  </p>
+
+  <h2>Cookies de analítica</h2>
+  <p>
+    Solo se instalan si aceptas la categoría <strong>Analítica</strong>. Usamos Google Analytics 4 a
+    través de Google Tag Manager para saber qué páginas se visitan y qué secciones resultan útiles.
+    Los informes que consultamos son agregados: no identifican a nadie.
+  </p>
+
+  <div class="my-4 overflow-x-auto">
+    <table class="w-full border-collapse text-muted">
+      <thead>
+        <tr>
+          <th class={head}>Cookie</th>
+          <th class={head}>Proveedor</th>
+          <th class={head}>Finalidad</th>
+          <th class={head}>Duración</th>
+        </tr>
+      </thead>
+      <tbody>
+        {
+          ownCookies.map((cookie) => (
+            <tr>
+              <td class={`${cell} font-mono`}>{cookie.name}</td>
+              <td class={cell}>{cookie.provider}</td>
+              <td class={cell}>{cookie.purpose}</td>
+              <td class={cell}>{cookie.duration}</td>
+            </tr>
+          ))
+        }
+      </tbody>
+    </table>
+  </div>
+
+  <p>
+    El responsable del tratamiento de estos datos es Google Ireland Limited. Puedes consultar cómo
+    los trata en su
+    <a href="https://policies.google.com/privacy" target="_blank" rel="noopener noreferrer">
+      política de privacidad
+    </a>.
+  </p>
+
+  <h2>Mapa de Google Maps</h2>
+  <p>
+    La página de <a href="/contacto">contacto</a> puede mostrar un mapa incrustado con nuestra zona
+    de servicio. <strong>No se carga hasta que lo autorizas</strong>: mientras tanto verás un aviso
+    con un botón para mostrarlo.
+  </p>
+  <p>
+    Si lo cargas, tu navegador se conecta a servidores de Google, que recibirá tu dirección IP y
+    datos del dispositivo y del navegador, y podrá instalar sus propias cookies (por ejemplo
+    <code>NID</code>, con una duración aproximada de seis meses) para recordar tus preferencias del
+    mapa. Son cookies de terceros: las instala Google y nosotros no podemos leerlas ni controlarlas.
+  </p>
+
+  <h2>Qué no usamos</h2>
+  <p>
+    No usamos cookies de publicidad, de remarketing ni de redes sociales. Las fuentes tipográficas y
+    los vídeos se sirven desde nuestro propio dominio, sin llamadas a terceros.
+  </p>
+
+  <h2>Cambios en esta política</h2>
+  <p>
+    Si añadimos nuevas herramientas, actualizaremos esta página y volveremos a pedirte
+    consentimiento antes de instalar nada nuevo.
+  </p>
+</LegalLayout>

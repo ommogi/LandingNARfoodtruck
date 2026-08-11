@@ -1,0 +1,125 @@
+---
+/**
+ * Hero de /servicios: misma estructura de ficha que /el-truck (texto a la
+ * izquierda, foto a la derecha y tira de datos bajo el texto). El rotulo
+ * "Tu evento, tu marca, nuestro truck" es HTML sobre la foto, no texto
+ * incrustado en la imagen, para que sea legible y traducible.
+ */
+import { Image } from 'astro:assets';
+import heroImage from '../../assets/hero-foodtruck.png';
+import Icon from '../Icon.astro';
+
+const stats = [
+  {
+    icon: 'truck',
+    title: 'Trucks equipados',
+    text: 'Unidades modernas y listas para usar.',
+  },
+  {
+    icon: 'shield',
+    title: 'Alquiler seguro',
+    text: 'Proceso fácil, seguro y sin complicaciones.',
+  },
+  {
+    icon: 'clock',
+    title: 'Montaje rápido',
+    text: 'Listo para servir en menos de 60 minutos.',
+  },
+  {
+    icon: 'pin',
+    title: 'Cobertura total',
+    text: 'Te acompañamos en todo el evento.',
+  },
+] as const;
+
+const stat = [
+  'border-r border-line px-3.5 text-center',
+  'first:pl-0 last:border-r-0 last:pr-0',
+  'max-b620:even:border-r-0 max-b620:even:pr-0 max-b620:odd:pl-0',
+].join(' ');
+---
+
+<section id="servicios" class="section pt-[34px]" aria-labelledby="servicios-hero-title">
+  <div
+    class="container grid grid-cols-[0.92fr_1.08fr] items-start gap-x-[46px] gap-y-[34px] max-b980:grid-cols-1"
+  >
+    <div class="self-center" data-reveal>
+      <p class="eyebrow eyebrow-rust">
+        Nuestros servicios
+        <span class="ml-1 inline-block align-[1px]" aria-hidden="true">
+          <Icon name="star" size={13} fill="currentColor" />
+        </span>
+      </p>
+
+      <h1
+        id="servicios-hero-title"
+        class="m-0 text-[clamp(38px,4.6vw,62px)] leading-[0.95] font-bold text-night"
+      >
+        Nos encargamos de todo para que
+        <em class="block text-rust not-italic">solo disfrutes.</em>
+      </h1>
+
+      <p class="mt-5 mb-[26px] max-w-[460px] text-[15.5px] text-muted">
+        Alquilamos food trucks equipados y listos para tu evento. Tú eliges cómo y qué servir,
+        nosotros nos encargamos del resto para que todo salga perfecto.
+      </p>
+
+      <div class="flex flex-wrap gap-3.5 print:hidden">
+        <button
+          class="button button-primary max-b620:w-full"
+          type="button"
+          data-booking-open
+          data-track="cta_servicios_hero"
+        >
+          <Icon name="calendar" size={20} />
+          Consultar disponibilidad
+        </button>
+        <a
+          class="button button-line max-b620:w-full"
+          href="/configuraciones"
+          data-track="servicios_configuraciones_hero"
+        >
+          <Icon name="grid" size={20} />
+          Ver configuraciones
+        </a>
+      </div>
+
+      <ul
+        class="mx-0 mt-10 mb-0 grid list-none grid-cols-4 p-0 max-b620:grid-cols-2 max-b620:gap-y-[22px]"
+      >
+        {
+          stats.map((item) => (
+            <li class={stat}>
+              <Icon name={item.icon} size={30} class="mx-auto text-night" />
+              <h2 class="mt-2.5 mb-1.5 text-[13px] leading-[1.2] font-bold tracking-[0.01em]">
+                {item.title}
+              </h2>
+              <p class="m-0 text-[11px] leading-[1.45] text-muted">{item.text}</p>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+
+    {/* En movil manda la foto: se coloca sobre el texto. */}
+    <div class="relative max-b980:order-first" data-reveal>
+      <Image
+        src={heroImage}
+        alt="Food truck NAR iluminado y abierto durante un evento nocturno"
+        widths={[640, 960, 1280]}
+        sizes="(max-width: 980px) 100vw, 54vw"
+        loading="eager"
+        fetchpriority="high"
+        class="aspect-4/3 w-full rounded-card object-cover shadow-card"
+      />
+
+      {/* Pizarra de bienvenida: refuerza el mensaje sin quemar texto en la foto. */}
+      <p
+        class="absolute bottom-6 left-6 m-0 rounded-[10px] bg-[rgb(10_28_38_/_88%)] px-5 py-4 font-display text-[19px] leading-[1.15] font-bold tracking-[0.02em] text-white uppercase max-b620:bottom-4 max-b620:left-4 max-b620:px-4 max-b620:py-3 max-b620:text-[15px] max-b480:hidden"
+      >
+        Tu evento,<br />tu marca,<br />nuestro truck
+        <span class="mt-1.5 block text-rust" aria-hidden="true">★</span>
+      </p>
+    </div>
+  </div>
+</section>

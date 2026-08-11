@@ -1,0 +1,97 @@
+---
+import Icon from '../Icon.astro';
+import { site } from '../../config/site';
+
+/**
+ * Franja de cierre: zona de servicio, mapa y ultimo empujon al formulario.
+ *
+ * El iframe de Google Maps es la unica peticion a terceros de la web, y ya no
+ * se carga sola: el `src` vive en `data-src` hasta que src/scripts/consent.ts
+ * confirma que el usuario acepto la categoria de mapas. Mientras tanto se ve
+ * el marcador con el boton para cargarlo.
+ */
+const coverage = [
+  'Eventos privados',
+  'Empresas',
+  'Bodas y celebraciones',
+  'Ferias y festivales',
+  `Toda la ${site.region}`,
+] as const;
+
+const mapSrc = `https://maps.google.com/maps?q=${encodeURIComponent(`${site.locality},España`)}&z=10&output=embed`;
+---
+
+<section class="section pt-0" aria-labelledby="contact-location-title">
+  <div
+    class="container grid grid-cols-[0.9fr_1.1fr_0.9fr] overflow-hidden rounded-card shadow-card max-b900:grid-cols-1"
+    data-reveal
+  >
+    <div class="bg-night p-8 text-white max-b560:p-[22px]">
+      <p class="m-0 mb-4 text-rust">
+        <Icon name="pin" size={38} title="Ubicación" />
+      </p>
+      <h2 class="m-0 mb-2 text-[clamp(22px,2.6vw,28px)] font-bold" id="contact-location-title">
+        Estamos en {site.locality}
+      </h2>
+      <p class="m-0 mb-5 text-sm text-white/70">Damos servicio en {site.areaServedLong}.</p>
+
+      <ul class="m-0 grid list-none gap-2 p-0">
+        {
+          coverage.map((item) => (
+            <li class="grid grid-cols-[20px_1fr] items-center gap-2.5 text-[13px] text-white/85">
+              <Icon name="check-circle" size={18} class="text-rust" />
+              {item}
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+
+    <div class="relative min-h-[300px] bg-bg-2" data-consent="maps">
+      <iframe
+        class="block size-full min-h-[300px] border-0"
+        data-src={mapSrc}
+        title={`Mapa de la zona de servicio: ${site.areaServed}`}
+        loading="lazy"
+        referrerpolicy="no-referrer-when-downgrade"
+        hidden></iframe>
+
+      {/* Se oculta en cuanto hay consentimiento. Sin JS se queda visible: es
+          la version honesta, porque el mapa tampoco podria cargarse. */}
+      <div
+        class="grid min-h-[300px] place-items-center p-6 text-center"
+        data-consent-placeholder
+      >
+        <div class="grid justify-items-center gap-3">
+          <span class="grid size-11 place-items-center rounded-full bg-rust/10 text-rust">
+            <Icon name="pin" size={22} />
+          </span>
+          <p class="m-0 max-w-[320px] text-sm text-muted">
+            El mapa lo sirve Google, que recibirá tu dirección IP y datos del navegador. Necesitamos
+            tu permiso para cargarlo.
+          </p>
+          <button class="button button-line min-h-[44px] px-5 text-[15px]" type="button" data-consent-open>
+            Ver el mapa
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="grid content-center bg-bg-1 p-8 max-b560:p-[22px]">
+      <h2 class="m-0 mb-3 text-[clamp(22px,2.6vw,28px)] leading-[1.05] font-bold text-night">
+        ¿Tienes una fecha en mente?
+      </h2>
+      <p class="m-0 mb-6 text-sm text-muted">
+        Solicita presupuesto hoy y recibe una propuesta personalizada en menos de 24 horas.
+      </p>
+      <a
+        class="button button-primary justify-self-start max-b560:w-full"
+        href="#formulario"
+        data-track="cta_contact_location_click"
+      >
+        <Icon name="send" size={20} />
+        Solicitar presupuesto
+      </a>
+    </div>
+  </div>
+</section>

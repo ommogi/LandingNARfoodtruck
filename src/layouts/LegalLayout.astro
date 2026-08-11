@@ -1,0 +1,32 @@
+---
+import BaseLayout from './BaseLayout.astro';
+
+interface Props {
+  title: string;
+  description: string;
+  path: string;
+  heading: string;
+}
+
+const { title, description, path, heading } = Astro.props;
+---
+
+<BaseLayout title={title} description={description} path={path} noindex>
+  <section class="section pt-14">
+    <div
+      class="container max-w-[760px] [&_h2]:mt-8 [&_h2]:mb-2.5 [&_h2]:text-2xl [&_li]:text-[15px] [&_li]:text-muted [&_p]:my-4 [&_p]:text-[15px] [&_p]:text-muted [&_ul]:my-4 [&_ul]:list-disc [&_ul]:pl-10"
+    >
+      <h1 class="m-0 mb-[22px] text-[clamp(34px,5vw,52px)]">{heading}</h1>
+
+      <p
+        class="rounded-lg border-l-4 border-rust bg-rust/8 px-[18px] py-4 text-[15px]"
+      >
+        <strong>Texto pendiente.</strong> Este contenido debe redactarlo el titular real de la web
+        (responsable, finalidad, base jurídica, destinatarios, plazos de conservación y derechos)
+        antes de publicar. No publicar la web con este aviso visible.
+      </p>
+
+      <slot />
+    </div>
+  </section>
+</BaseLayout>

@@ -1,0 +1,47 @@
+---
+/**
+ * El <video> no lleva src: se asigna al abrir el modal para que el archivo
+ * no se descargue hasta que el usuario lo pide (seccion 18 de la guia).
+ * Al ser un video propio no se cargan cookies de terceros.
+ */
+import Icon from './Icon.astro';
+---
+
+<div
+  class="fixed inset-0 z-[1000] grid place-items-center p-5 print:hidden"
+  hidden
+  data-video-modal
+  role="dialog"
+  aria-modal="true"
+  aria-labelledby="video-title"
+>
+  <div
+    class="absolute inset-0 bg-black/78 backdrop-blur-[5px]"
+    data-video-close
+    data-modal-backdrop
+  >
+  </div>
+  <div
+    class="relative z-1 w-[min(960px,100%)] rounded-2xl bg-black p-3.5 shadow-[0_30px_100px_rgb(0_0_0_/_45%)]"
+    data-modal-panel
+  >
+    <button
+      class="absolute -top-[46px] -right-1.5 grid size-11 cursor-pointer place-items-center rounded-full border-0 bg-white text-ink max-b560:-top-[50px] max-b560:right-0"
+      type="button"
+      data-video-close
+      aria-label="Cerrar vídeo"
+    >
+      <Icon name="close" size={22} />
+    </button>
+    <h2 id="video-title" class="sr-only">Vídeo de NAR Food Truck Events</h2>
+    <div class="aspect-video">
+      <video
+        class="size-full rounded-lg bg-black"
+        data-video-player
+        controls
+        playsinline
+        preload="none"
+        data-src="/video/nar-evento.mp4"></video>
+    </div>
+  </div>
+</div>

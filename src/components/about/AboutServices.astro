@@ -1,0 +1,82 @@
+---
+/**
+ * "Mas que food trucks": el resto de servicios de la empresa junto a una foto.
+ * Los items usan la misma tira icono + titulo + texto que FaqPerks.astro.
+ */
+import { Image } from 'astro:assets';
+import servicesImage from '../../assets/gallery-02.png';
+import Icon from '../Icon.astro';
+import SectionHeading from '../SectionHeading.astro';
+
+const services = [
+  {
+    icon: 'clipboard',
+    title: 'Revisión de equipos',
+    text: 'Chequeos y mantenimiento para máxima seguridad.',
+  },
+  {
+    icon: 'shield',
+    title: 'Certificación de andamios',
+    text: 'Cumplimos con todas las normativas vigentes.',
+  },
+  {
+    icon: 'truck',
+    title: 'Alquiler de furgonetas',
+    text: 'Vehículos disponibles para cada tipo de transporte.',
+  },
+  {
+    icon: 'store',
+    title: 'Alquiler de food trucks',
+    text: 'Food trucks equipados y listos para tu evento.',
+  },
+  {
+    icon: 'grid',
+    title: 'Y mucho más',
+    text: 'Un amplio catálogo de productos y servicios para profesionales y particulares.',
+  },
+] as const;
+
+const service = 'grid grid-cols-[auto_1fr] items-start gap-x-3.5 gap-y-1';
+---
+
+<section class="section" aria-labelledby="services-title">
+  <div
+    class="container grid grid-cols-[1fr_1.05fr] items-center gap-x-[46px] gap-y-[30px] max-b980:grid-cols-1"
+  >
+    <div data-reveal>
+      <SectionHeading id="services-title" title="Más que food trucks" />
+
+      <p class="m-0 mb-8 text-[14.5px] leading-[1.7] text-muted">
+        Hemos ampliado nuestros servicios para ofrecer soluciones completas y adaptadas a cada
+        necesidad.
+      </p>
+
+      <ul
+        class="m-0 grid list-none grid-cols-2 gap-x-[26px] gap-y-[26px] p-0 max-b620:grid-cols-1 max-b620:gap-y-5"
+      >
+        {
+          services.map((item) => (
+            <li class={service}>
+              <Icon name={item.icon} size={30} class="row-span-2 text-night" />
+              <b class="font-display text-[15px] font-bold tracking-[0.03em] text-night uppercase">
+                {item.title}
+              </b>
+              <small class="text-xs leading-[1.5] text-muted">{item.text}</small>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+
+    <div data-reveal>
+      <Image
+        src={servicesImage}
+        alt="Food truck NAR abierto y decorado con guirnaldas durante una celebración al aire libre"
+        widths={[640, 960, 1280]}
+        sizes="(max-width: 980px) 100vw, 52vw"
+        loading="lazy"
+        class="aspect-4/3 w-full rounded-card object-cover shadow-card"
+      />
+    </div>
+  </div>
+</section>

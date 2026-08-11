@@ -1,0 +1,80 @@
+---
+/**
+ * Calendario del paso 1. Aqui solo va el esqueleto: la rejilla de dias y las
+ * opciones del selector de mes las pinta src/scripts/booking.ts en el navegador.
+ *
+ * Se genera en cliente a proposito: el sitio es estatico y un calendario
+ * renderizado en el build quedaria anclado al mes en que se desplego.
+ */
+import Icon from '../Icon.astro';
+import { DIAS } from '../../data/disponibilidad';
+
+const navButton =
+  'grid size-11 place-items-center rounded-lg border border-line bg-white text-ink disabled:cursor-not-allowed disabled:opacity-40 not-disabled:cursor-pointer not-disabled:hover:border-night';
+
+/*
+ * No hay marca de "disponible": el calendario no puede afirmar que una fecha
+ * este libre mientras fechasOcupadas se mantenga a mano en
+ * src/data/disponibilidad.ts. Solo se senala lo que si consta.
+ */
+const leyenda = [
+  { color: 'bg-rust', text: 'Poca disponibilidad' },
+  { color: 'bg-line', text: 'No disponible' },
+];
+---
+
+<div class="grid gap-4">
+  <div class="flex flex-wrap items-end justify-between gap-3">
+    <div>
+      <h3 class="m-0 text-[22px] leading-none font-bold text-blue">
+        Selecciona la fecha de tu evento
+      </h3>
+      <p class="mt-1.5 mb-0 text-[13px] text-muted">
+        Elige tu fecha y te confirmamos la disponibilidad en menos de 24 horas.
+      </p>
+    </div>
+
+    <div class="flex items-center gap-2">
+      <button class={navButton} type="button" data-cal-prev aria-label="Mes anterior">
+        <Icon name="chevron-left" size={20} />
+      </button>
+      <select
+        class="min-h-11 min-w-[180px] cursor-pointer rounded-lg border border-line bg-white px-3 font-semibold"
+        data-cal-month
+        aria-label="Mes del calendario"
+      >
+      </select>
+      <button class={navButton} type="button" data-cal-next aria-label="Mes siguiente">
+        <Icon name="chevron-right" size={20} />
+      </button>
+    </div>
+  </div>
+
+  <div class="overflow-hidden rounded-xl border border-line">
+    <div
+      class="grid grid-cols-7 border-b border-line bg-bg-2 text-center text-[11px] font-bold tracking-[0.04em] text-muted uppercase"
+    >
+      {DIAS.map((dia) => <span class="py-2.5">{dia}</span>)}
+    </div>
+
+    {/* Lo rellena renderMes() en src/scripts/booking.ts. */}
+    <div
+      class="grid grid-cols-7"
+      data-cal-grid
+      role="group"
+      aria-label="Días del mes"
+    >
+    </div>
+  </div>
+
+  <ul class="m-0 flex list-none flex-wrap gap-x-6 gap-y-2 p-0 text-[12.5px] text-muted">
+    {
+      leyenda.map((item) => (
+        <li class="flex items-center gap-2">
+          <span class:list={['size-2.5 rounded-full', item.color]} aria-hidden="true" />
+          {item.text}
+        </li>
+      ))
+    }
+  </ul>
+</div>

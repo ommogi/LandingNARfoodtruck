@@ -1,0 +1,202 @@
+---
+import Icon from '../Icon.astro';
+import { contact, eventTypes } from '../../config/site';
+
+/**
+ * Bloque principal de conversion: el formulario a la izquierda y, a la derecha,
+ * las razones para confiar mas el telefono para quien prefiere llamar.
+ * El formulario lo conecta `scripts/landing.ts` a traves de [data-lead-form].
+ */
+const reasons = [
+  { title: 'Respuesta en menos de 24 horas', text: 'Te enviamos tu propuesta rápidamente.' },
+  { title: 'Alquiler de food truck', text: 'Equipado y listo para tu evento.' },
+  { title: 'Adaptable a cualquier evento', text: 'Nos ajustamos a tu tipo de ocasión.' },
+  { title: 'Transporte, montaje', text: 'Y recogida incluidos.' },
+  { title: 'Presupuesto rápido', text: 'Y sin compromiso.' },
+] as const;
+
+const fieldLabel = 'grid gap-1.5 text-sm font-semibold text-night';
+
+const fieldControl = [
+  'w-full min-h-[46px] rounded-lg border border-line bg-white px-3 py-[11px] text-[15px] font-normal text-ink',
+  'placeholder:text-muted/70',
+  'is-invalid:border-[#b42318] is-invalid:shadow-[0_0_0_3px_rgb(180_35_24_/_12%)]',
+].join(' ');
+---
+
+<section class="section pt-0" id="formulario" aria-labelledby="contact-form-title">
+  <div class="container grid grid-cols-[1.55fr_1fr] items-start gap-6 max-b900:grid-cols-1">
+    <!-- Formulario -->
+    <div class="rounded-card bg-white/95 p-[34px] shadow-card max-b560:p-[22px]" data-reveal>
+      <h2 class="m-0 mb-6 text-[clamp(22px,2.6vw,28px)] font-bold text-night" id="contact-form-title">
+        Cuéntanos sobre tu evento
+      </h2>
+
+      <form data-lead-form novalidate>
+        <div class="grid grid-cols-2 gap-4 max-b620:grid-cols-1">
+          <label class={fieldLabel}>
+            <span>Nombre y apellidos <abbr class="text-rust no-underline" title="obligatorio">*</abbr></span>
+            <input
+              class={fieldControl}
+              name="name"
+              autocomplete="name"
+              placeholder="Tu nombre"
+              required
+              minlength="2"
+              maxlength="80"
+            />
+          </label>
+
+          <label class={fieldLabel}>
+            <span>Email <abbr class="text-rust no-underline" title="obligatorio">*</abbr></span>
+            <input
+              class={fieldControl}
+              type="email"
+              name="email"
+              autocomplete="email"
+              placeholder="tu@email.com"
+              required
+            />
+          </label>
+
+          <label class={fieldLabel}>
+            <span>Teléfono <abbr class="text-rust no-underline" title="obligatorio">*</abbr></span>
+            <span class="relative block">
+              <input
+                class={`${fieldControl} pr-11`}
+                type="tel"
+                name="phone"
+                autocomplete="tel"
+                placeholder="Tu número de teléfono"
+                required
+                minlength="6"
+                maxlength="40"
+              />
+              <Icon
+                name="whatsapp"
+                size={20}
+                class="pointer-events-none absolute top-1/2 right-3 -translate-y-1/2 text-muted"
+              />
+            </span>
+          </label>
+
+          <label class={fieldLabel}>
+            <span>Fecha del evento <abbr class="text-rust no-underline" title="obligatorio">*</abbr></span>
+            <input class={fieldControl} type="date" name="date" required />
+          </label>
+
+          <label class={fieldLabel}>
+            <span>Tipo de evento <abbr class="text-rust no-underline" title="obligatorio">*</abbr></span>
+            <select class={fieldControl} name="eventType" required>
+              <option value="">Selecciona una opción</option>
+              {eventTypes.map((type) => <option>{type}</option>)}
+            </select>
+          </label>
+
+          <label class={fieldLabel}>
+            <span>
+              Número aprox. de invitados
+              <abbr class="text-rust no-underline" title="obligatorio">*</abbr>
+            </span>
+            <input
+              class={fieldControl}
+              type="number"
+              name="guests"
+              inputmode="numeric"
+              placeholder="Ej: 80 personas"
+              required
+              min="1"
+              max="5000"
+            />
+          </label>
+        </div>
+
+        <label class={`${fieldLabel} mt-4`}>
+          <span>Mensaje</span>
+          <textarea
+            class={`${fieldControl} min-h-[110px] resize-y`}
+            name="message"
+            placeholder="Cuéntanos los detalles de tu evento..."
+            maxlength="1500"></textarea>
+        </label>
+
+        {/* Honeypot anti-spam: oculto visualmente y fuera del orden de tabulación. */}
+        <label class="absolute -left-[9999px]" aria-hidden="true">
+          Web
+          <input name="website" tabindex="-1" autocomplete="off" />
+        </label>
+
+        <label class="mt-4 grid grid-cols-[auto_1fr] items-start gap-2.5 text-[13px] text-muted">
+          <input class="mt-0.5 size-[18px]" type="checkbox" name="consent" required />
+          <span>
+            He leído y acepto la
+            <a class="text-rust underline" href="/privacidad" target="_blank" rel="noopener">
+              Política de Privacidad
+            </a>
+            y el tratamiento de mis datos.
+          </span>
+        </label>
+
+        <div class="mt-6 flex flex-wrap items-center gap-x-7 gap-y-4">
+          <button class="button button-primary" type="submit" data-track="cta_contact_form_submit">
+            <Icon name="send" size={20} />
+            Solicitar presupuesto
+          </button>
+
+          <p class="m-0 flex items-center gap-2.5 text-xs leading-[1.4] text-muted">
+            <Icon name="lock" size={22} class="text-night" />
+            <span>Tus datos están seguros.<br />No compartimos tu información.</span>
+          </p>
+        </div>
+
+        <p
+          class="form-status m-0 mt-3 min-h-6 text-sm font-semibold is-error:text-[#b42318] is-success:text-[#17663a]"
+          data-form-status
+          role="status"
+          aria-live="polite"
+        >
+        </p>
+      </form>
+    </div>
+
+    <!-- Razones y telefono -->
+    <aside
+      class="h-full rounded-card bg-[linear-gradient(135deg,#16232b,#0a1c26)] p-8 text-white max-b560:p-[22px]"
+      aria-labelledby="contact-reasons-title"
+      data-reveal
+    >
+      <h2 class="m-0 mb-6 text-[clamp(22px,2.6vw,28px)] font-bold" id="contact-reasons-title">
+        ¿Por qué elegirnos?
+      </h2>
+
+      <ul class="m-0 grid list-none gap-4 p-0">
+        {
+          reasons.map((reason) => (
+            <li class="grid grid-cols-[24px_1fr] items-start gap-3">
+              <Icon name="check-circle" size={24} class="mt-0.5 text-rust" />
+              <div>
+                <b class="block text-[15px] font-bold">{reason.title}</b>
+                <span class="text-[13px] text-white/70">{reason.text}</span>
+              </div>
+            </li>
+          ))
+        }
+      </ul>
+
+      <div class="mt-7 grid grid-cols-[auto_1fr] items-center gap-4 rounded-xl border border-white/20 p-5">
+        <Icon name="phone" size={34} />
+        <div>
+          <p class="m-0 text-[13px] text-white/70">¿Prefieres llamarnos?</p>
+          <a
+            class="font-display text-[clamp(24px,3vw,30px)] font-bold hover:text-rust"
+            href={`tel:${contact.phoneRaw}`}
+            data-track="cta_contact_phone_click"
+          >
+            {contact.phone}
+          </a>
+          <p class="m-0 text-[13px] text-white/70">Lunes a Viernes de 9:00 a 18:00</p>
+        </div>
+      </div>
+    </aside>
+  </div>
+</section>

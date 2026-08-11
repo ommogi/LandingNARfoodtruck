@@ -1,0 +1,119 @@
+---
+import { Image } from 'astro:assets';
+import logo from '../assets/logo-nar-horizontal.png';
+import {
+  site,
+  contact,
+  social,
+  footerNavColumns,
+  legalNav,
+} from '../config/site';
+import InstagramIcon from './icons/InstagramIcon.astro';
+import WhatsappIcon from './icons/WhatsappIcon.astro';
+
+const year = new Date().getFullYear();
+
+/*
+ * La rejilla estira los bloques (items-stretch) para que las divisorias
+ * verticales midan todas lo mismo. Los enlaces se alinean arriba para que las
+ * tres columnas empiecen a la misma altura.
+ */
+const column =
+  'flex flex-col justify-start text-sm not-italic text-muted max-b1180:text-[13px]';
+/* El relleno vertical da area tactil sin separar visualmente de mas. */
+const columnLink =
+  'flex min-h-10 items-center whitespace-nowrap hover:text-rust';
+/* Los iconos sociales son de marca y no cambian de color al pasar el raton:
+   el feedback lo dan el circulo de fondo y esta escala, que desaparece con
+   movimiento reducido. */
+const socialIcon = 'transition-transform duration-200 ease-out motion-safe:group-hover:scale-[1.06]';
+---
+
+<footer id="contacto" class="mt-[30px] bg-bg-2">
+  {/*
+    Las divisorias verticales entre secciones son un `border-l` en cada bloque
+    menos el primero. El canal de 30px ya no lo da `gap-x`, sino 15px de
+    relleno a cada lado: asi la linea queda centrada entre bloque y bloque y no
+    pegada al texto. Por debajo de 1100px la rejilla se apila y las divisorias
+    se retiran (una linea vertical entre filas distintas no separa nada).
+  */}
+  <div
+    class="container grid grid-cols-[max-content_repeat(3,minmax(max-content,1fr))_max-content_max-content_max-content] items-stretch gap-x-0 gap-y-[30px] py-[34px] [&>*+*]:border-l [&>*+*]:border-line [&>*]:px-[15px] [&>*:first-child]:pl-0 [&>*:last-child]:pr-0 max-b1180:[&>*]:px-2.5 max-b1100:grid-cols-3 max-b1100:items-start max-b1100:gap-x-[30px] max-b1100:gap-y-[34px] max-b1100:[&>*+*]:border-l-0 max-b1100:[&>*]:px-0 max-b620:grid-cols-2 max-b620:text-left"
+  >
+    <div class="flex items-center max-b1100:col-span-3 max-b620:col-span-2">
+      <Image
+        src={logo}
+        alt={site.name}
+        widths={[190, 380]}
+        sizes="190px"
+        loading="lazy"
+        class="h-auto w-[190px]"
+      />
+    </div>
+
+    {
+      footerNavColumns.map((group) => (
+        <nav class={column} aria-label={group.label}>
+          {group.items.map((item) => (
+            <a class={columnLink} href={item.href}>
+              {item.label}
+            </a>
+          ))}
+        </nav>
+      ))
+    }
+
+    <div class="flex items-center gap-3.5 text-ink">
+      <a
+        class="group grid size-11 place-items-center rounded-full transition-[background-color] duration-200 ease-out hover:bg-rust/8"
+        href={social.instagram}
+        target="_blank"
+        rel="noopener noreferrer"
+        aria-label="Instagram de NAR"
+      >
+        <InstagramIcon size={30} class={socialIcon} />
+      </a>
+      <a
+        class="group grid size-11 place-items-center rounded-full transition-[background-color] duration-200 ease-out hover:bg-rust/8"
+        href={social.whatsapp}
+        target="_blank"
+        rel="noopener noreferrer"
+        aria-label="WhatsApp de NAR"
+      >
+        <WhatsappIcon size={30} class={socialIcon} />
+      </a>
+    </div>
+
+    <address class={column}>
+      <a class={columnLink} href={`mailto:${contact.email}`}>{contact.email}</a>
+      <a class={columnLink} href={`tel:${contact.phoneRaw}`}>{contact.phone}</a>
+      <span class="flex min-h-10 items-center">{contact.address}</span>
+    </address>
+
+    <p
+      class="m-0 flex flex-col justify-center font-display text-[17px] leading-[1.25] font-bold tracking-[0.04em] text-night uppercase max-b1100:col-span-3 max-b1100:text-center max-b620:col-span-2"
+    >
+      Experiencias<br />sobre ruedas<br />desde {site.foundingYear}
+    </p>
+  </div>
+
+  <div class="bg-night text-white/72">
+    <div
+      class="container flex flex-wrap items-center justify-between gap-x-6 gap-y-2.5 py-3.5 text-xs max-b620:justify-start"
+    >
+      <span>© {year} {site.name.toUpperCase()}. Todos los derechos reservados.</span>
+      <nav class="flex flex-wrap gap-x-5" aria-label="Información legal">
+        {
+          legalNav.map((item) => (
+            <a
+              class="flex min-h-8 items-center hover:text-white hover:underline"
+              href={item.href}
+            >
+              {item.label}
+            </a>
+          ))
+        }
+      </nav>
+    </div>
+  </div>
+</footer>

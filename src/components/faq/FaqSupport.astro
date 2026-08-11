@@ -1,0 +1,43 @@
+---
+import Icon from '../Icon.astro';
+
+/**
+ * Salida para quien no ha encontrado su respuesta en el acordeon: lleva a
+ * /contacto en lugar de abrir el modal, porque aqui la intencion es preguntar,
+ * no reservar todavia.
+ */
+---
+
+<section class="pb-2.5" aria-labelledby="faq-support-title">
+  <div class="container">
+    <div
+      class="grid grid-cols-[auto_1fr_auto] items-center gap-7 rounded-[14px] border border-line bg-white/56 px-7 py-[25px] max-b820:grid-cols-[auto_1fr] max-b820:gap-y-5 max-b560:grid-cols-1 max-b560:text-center"
+      data-reveal
+    >
+      <div class="grid place-items-center text-night max-b560:justify-items-center" aria-hidden="true">
+        <Icon name="headset" size={46} />
+      </div>
+
+      <div>
+        <h2
+          id="faq-support-title"
+          class="m-0 mb-1 text-[clamp(22px,2.6vw,28px)] leading-[1.05] font-bold text-night"
+        >
+          ¿No encuentras la respuesta que buscas?
+        </h2>
+        <p class="m-0 text-sm text-muted">
+          Contáctanos y estaremos encantados de ayudarte. Te respondemos lo antes posible.
+        </p>
+      </div>
+
+      <a
+        class="button button-dark max-b820:col-span-full max-b560:w-full print:hidden"
+        href="/contacto"
+        data-track="cta_faq_support"
+      >
+        Contactar ahora
+        <Icon name="arrow" size={20} />
+      </a>
+    </div>
+  </div>
+</section>

@@ -1,0 +1,58 @@
+---
+/**
+ * Hero de /configuraciones. Misma familia que el de /el-truck (ficha de
+ * producto sobre el degradado crema), con el render de cotas a la derecha:
+ * la imagen ya trae rotulados 2,40 m y 5,40 m, no se dibujan en CSS.
+ */
+import { Image } from 'astro:assets';
+import { truckRender } from '../../data/configuraciones';
+import Icon from '../Icon.astro';
+---
+
+<section id="configuraciones" class="section pt-[22px]">
+  <div class="container">
+    <nav class="mb-[18px] flex gap-2 text-[12.5px] text-muted" aria-label="Ruta de navegación">
+      <a class="hover:text-rust" href="/">Inicio</a>
+      <span aria-hidden="true">/</span>
+      <span aria-current="page">Configuraciones</span>
+    </nav>
+
+    <div
+      class="grid grid-cols-[0.86fr_1.14fr] items-center gap-x-[46px] gap-y-[30px] max-b980:grid-cols-1"
+    >
+      <div data-reveal>
+        <p class="eyebrow eyebrow-rust">
+          Configura tu food truck
+          <span class="ml-1 inline-block align-[1px]" aria-hidden="true">
+            <Icon name="star" size={13} fill="currentColor" />
+          </span>
+        </p>
+
+        <h1 class="m-0 text-[clamp(34px,4.2vw,56px)] leading-[0.96] font-bold text-night">
+          Elige la configuración
+          <em class="block text-rust not-italic">que mejor se adapte</em>
+          <em class="block text-rust not-italic">a tu evento.</em>
+        </h1>
+
+        <p class="mt-[22px] mb-0 max-w-[440px] text-[14.5px] text-muted">
+          Personaliza el equipamiento interior de tu food truck según el tipo de cocina que
+          necesitas. Todas nuestras unidades incluyen instalación profesional y están listas para
+          trabajar.
+        </p>
+      </div>
+
+      {/* El render viene con fondo blanco: sin recorte ni sombra, solo escala. */}
+      <figure class="m-0 max-b980:order-first" data-reveal>
+        <Image
+          src={truckRender}
+          alt="Alzado del food truck con sus cotas: 5,40 metros de longitud total y 2,40 metros de altura total"
+          widths={[640, 960, 1280]}
+          sizes="(max-width: 980px) 100vw, 56vw"
+          loading="eager"
+          fetchpriority="high"
+          class="h-auto w-full"
+        />
+      </figure>
+    </div>
+  </div>
+</section>

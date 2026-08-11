@@ -1,0 +1,40 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import ServiciosHero from '../components/servicios/ServiciosHero.astro';
+import ServiciosProcess from '../components/servicios/ServiciosProcess.astro';
+import ServiciosIncludes from '../components/servicios/ServiciosIncludes.astro';
+import ServiciosBranding from '../components/servicios/ServiciosBranding.astro';
+import TruckFinalCta from '../components/truck/TruckFinalCta.astro';
+import QuoteFormModal from '../components/QuoteFormModal.astro';
+import BookingModal from '../components/booking/BookingModal.astro';
+import { site } from '../config/site';
+---
+
+<BaseLayout
+  title="Servicios de alquiler de food truck para eventos | NAR"
+  description={`Alquiler de food truck con transporte, montaje, equipamiento, personal de apoyo, permisos y rotulación personalizada. Nos encargamos de todo en ${site.areaServed}.`}
+  path="/servicios"
+  leadSource="landing-servicios"
+  breadcrumbs={[{ name: 'Servicios', path: '/servicios' }]}
+>
+  <ServiciosHero />
+  <ServiciosProcess />
+  <ServiciosIncludes />
+  <ServiciosBranding />
+  <TruckFinalCta
+    title="¿Tienes un evento en mente?"
+    claim="Cuéntanos tu idea y te enviamos una propuesta sin compromiso."
+    cta="Consultar disponibilidad"
+    track="cta_servicios_final"
+  />
+
+  <Fragment slot="overlays">
+    <QuoteFormModal />
+    <BookingModal />
+  </Fragment>
+</BaseLayout>
+
+<script>
+  import '../scripts/landing';
+  import '../scripts/booking';
+</script>

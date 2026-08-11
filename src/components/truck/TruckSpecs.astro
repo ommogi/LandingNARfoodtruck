@@ -1,0 +1,122 @@
+---
+/**
+ * "Disenado para impresionar": cotas, ficha tecnica y mosaico de detalles.
+ * La imagen de cotas ya trae los 2,40 m / 5,40 m rotulados, no se dibujan en CSS.
+ */
+import { Image } from 'astro:assets';
+import dimensions from '../../assets/truck-dimensions.png';
+import detailLamps from '../../assets/gallery/detalle-lamparas.jpg';
+import detailKitchen from '../../assets/gallery/interior-02.jpg';
+import detailCounter from '../../assets/gallery/interior-01.jpg';
+import detailWork from '../../assets/gallery/interior-03.jpg';
+import Icon from '../Icon.astro';
+import SectionHeading from '../SectionHeading.astro';
+
+const specs = [
+  {
+    icon: 'ruler',
+    title: 'Dimensiones',
+    text: '5,40 m (largo) x 2,40 m (alto)',
+  },
+  {
+    icon: 'weight',
+    title: 'Peso',
+    text: '2.000 kg',
+  },
+  {
+    icon: 'users',
+    title: 'Capacidad de servicio',
+    text: 'Hasta 150 personas/hora según formato y menú',
+  },
+  {
+    icon: 'kitchen',
+    title: 'Equipamiento destacado',
+    text:
+      'Plancha, fogones, freidora, neveras, congelador, campana extractora, fregadero doble, iluminación LED, almacenamiento y más.',
+  },
+] as const;
+
+const details = [
+  { src: detailLamps, alt: 'Lámparas térmicas colgantes y acabados interiores del food truck' },
+  { src: detailKitchen, alt: 'Campana extractora, fogones y plancha instalados en el interior' },
+  { src: detailCounter, alt: 'Vista general del interior profesional en acero inoxidable' },
+  { src: detailWork, alt: 'Encimeras y zona de trabajo del interior en acero inoxidable' },
+] as const;
+
+const detailImage = 'aspect-4/3 w-full rounded-xl object-cover';
+---
+
+<section class="section" aria-labelledby="specs-title">
+  <div class="container">
+    <div
+      class="rounded-card border border-[rgb(56_40_30_/_8%)] bg-white/96 px-[30px] pt-[34px] pb-10 shadow-card max-b560:px-[18px] max-b560:pt-[26px] max-b560:pb-[30px]"
+      data-reveal
+    >
+      <SectionHeading title="Diseñado para impresionar" id="specs-title" />
+      <p class="mx-auto mt-[-20px] mb-[34px] max-w-[640px] text-center text-[13.5px] leading-[1.6] text-muted">
+        Cada detalle de nuestro truck ha sido pensado para combinar funcionalidad, diseño y
+        eficiencia.<br />
+        La combinación perfecta para que tu evento sea inolvidable.
+      </p>
+
+      <div
+        class="grid grid-cols-[1.05fr_0.95fr_1.1fr] items-center gap-[34px] max-b1100:grid-cols-1 max-b1100:gap-[30px]"
+      >
+        <figure class="m-0 max-b1100:mx-auto max-b1100:max-w-[520px]">
+          <Image
+            src={dimensions}
+            alt="Alzado del food truck con sus cotas: 5,40 metros de largo y 2,40 metros de alto"
+            widths={[420, 760]}
+            sizes="(max-width: 1100px) 90vw, 32vw"
+            loading="lazy"
+          />
+        </figure>
+
+        <dl class="m-0 grid gap-[22px]">
+          {
+            specs.map((spec) => (
+              <div>
+                <dt class="grid grid-cols-[42px_1fr] items-center gap-3 font-display text-[17px] font-bold tracking-[0.02em] text-night uppercase">
+                  <span
+                    class="grid size-[42px] place-items-center rounded-[10px] border border-line text-night"
+                    aria-hidden="true"
+                  >
+                    <Icon name={spec.icon} size={22} />
+                  </span>
+                  {spec.title}
+                </dt>
+                <dd class="mt-[5px] mr-0 mb-0 ml-[54px] text-[12.5px] leading-[1.5] text-muted max-b560:ml-0">
+                  {spec.text}
+                </dd>
+              </div>
+            ))
+          }
+        </dl>
+
+        <div class="relative grid grid-cols-2 gap-2.5">
+          {
+            details.map((detail) => (
+              <Image
+                src={detail.src}
+                alt={detail.alt}
+                widths={[320, 640]}
+                sizes="(max-width: 1100px) 45vw, 17vw"
+                loading="lazy"
+                class={detailImage}
+              />
+            ))
+          }
+          {/* El boton monta sobre el borde inferior del mosaico, como en el diseno. */}
+          <a
+            class="button button-dark absolute right-0 -bottom-6 min-h-[46px] text-base shadow-[0_12px_28px_rgb(10_28_38_/_28%)] max-b1100:static max-b1100:col-span-2 max-b1100:mt-1 max-b1100:w-full print:hidden"
+            href="/#galeria"
+            data-track="truck_gallery_specs"
+          >
+            <Icon name="search" size={20} />
+            Ver galería técnica
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

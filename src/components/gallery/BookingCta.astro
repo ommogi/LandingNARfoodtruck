@@ -1,0 +1,68 @@
+---
+import Icon from '../Icon.astro';
+
+/**
+ * Franja de conversion previa al pie (seccion 4 de la guia) con el microcopy
+ * aprobado y el aviso comercial obligatorio: se alquila el vehiculo, no se
+ * presta servicio de cocina ni catering.
+ */
+const perks = [
+  { icon: 'clock', text: 'Respuesta en menos de 24h' },
+  { icon: 'users', text: 'Asesoramiento personalizado' },
+  { icon: 'shield', text: 'Sin compromiso de reserva' },
+] as const;
+---
+
+<section class="pb-10" aria-labelledby="booking-title">
+  <div class="container">
+    <div
+      class="grid grid-cols-[auto_1.35fr_1.2fr_auto] items-center gap-7 rounded-[14px] border border-line bg-white/56 px-7 py-[25px] max-b1100:grid-cols-[auto_1fr] max-b1100:gap-y-5 max-b560:grid-cols-1 max-b560:text-center"
+      data-reveal
+    >
+      <div class="grid place-items-center text-night max-b560:justify-items-center" aria-hidden="true">
+        <Icon name="calendar" size={46} />
+      </div>
+
+      <div>
+        <h2
+          id="booking-title"
+          class="m-0 mb-1 text-[clamp(24px,3vw,30px)] leading-[1.05] font-bold text-night"
+        >
+          ¿Tienes un evento en mente?
+        </h2>
+        <p class="m-0 text-sm text-muted">
+          Alquila el food truck perfecto para tu evento. Cuéntanos cuándo, dónde y durante cuánto
+          tiempo lo necesitas.
+        </p>
+      </div>
+
+      <ul
+        class="m-0 flex list-none gap-[22px] p-0 max-b1100:col-span-full max-b560:flex-col max-b560:gap-2 max-b560:text-left"
+      >
+        {
+          perks.map((perk) => (
+            <li class="grid max-w-[130px] grid-cols-[22px_1fr] items-center gap-2 text-xs leading-[1.35] text-muted max-b560:max-w-none">
+              <Icon name={perk.icon} size={22} class="text-night" />
+              {perk.text}
+            </li>
+          ))
+        }
+      </ul>
+
+      <button
+        class="button button-primary max-b1100:col-span-full max-b560:w-full print:hidden"
+        type="button"
+        data-booking-open
+        data-track="cta_gallery_click"
+      >
+        Consultar disponibilidad
+        <Icon name="calendar" size={20} />
+      </button>
+    </div>
+
+    <p class="mt-3.5 mb-0 text-xs text-muted">
+      Servicio de alquiler del vehículo. No incluye elaboración de alimentos, personal de cocina ni
+      catering.
+    </p>
+  </div>
+</section>

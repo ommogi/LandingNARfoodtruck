@@ -1,0 +1,80 @@
+---
+import { Image } from 'astro:assets';
+import hero from '../../assets/hero-foodtruck.png';
+import Icon from '../Icon.astro';
+import { site } from '../../config/site';
+
+const points = [
+  { icon: 'pin', text: site.areaServed },
+  { icon: 'bolt', text: 'Montaje rápido en menos de 30 minutos' },
+  { icon: 'truck', text: 'Transporte, instalación y retirada incluidos' },
+] as const;
+---
+
+{/* Unica seccion que no usa el degradado crema del body. */}
+<section
+  id="inicio"
+  class="relative grid min-h-[640px] items-center overflow-hidden bg-[#080808] text-white max-b820:min-h-[660px]"
+>
+  <div class="absolute inset-0">
+    <Image
+      src={hero}
+      alt=""
+      widths={[640, 960, 1280, 1920]}
+      sizes="100vw"
+      loading="eager"
+      fetchpriority="high"
+      aria-hidden="true"
+      class="size-full object-cover object-center max-b820:object-[62%_center]"
+    />
+  </div>
+  <div
+    class="absolute inset-0 bg-[linear-gradient(90deg,rgb(10_28_38_/_92%)_0%,rgb(10_28_38_/_70%)_38%,rgb(0_0_0_/_14%)_72%,rgb(0_0_0_/_26%)_100%)] max-b820:bg-[linear-gradient(90deg,rgb(10_28_38_/_93%),rgb(10_28_38_/_62%))]"
+    aria-hidden="true"
+  >
+  </div>
+
+  <div class="container relative z-2 pt-16 pb-[84px] max-b560:pt-[46px] max-b560:pb-16">
+    <div class="max-w-[630px]">
+      <p class="eyebrow">Alquiler de food trucks para eventos</p>
+      <h1
+        class="m-0 text-[clamp(52px,6.2vw,92px)] leading-[0.91] font-bold tracking-[-0.02em] max-b820:text-[clamp(46px,11vw,72px)]"
+      >
+        Haz que tu evento sea imposible <em class="block text-rust not-italic">de olvidar.</em>
+      </h1>
+      <p class="my-[22px] max-w-[600px] text-lg text-white/90 max-b560:text-base">
+        Food trucks premium totalmente equipados para bodas, empresas, ferias y eventos privados en
+        {' '}{site.locality}. Nosotros nos encargamos de todo para que tú solo disfrutes.
+      </p>
+
+      <ul
+        class="mx-0 mt-7 mb-8 flex list-none gap-[30px] p-0 max-b820:grid max-b820:grid-cols-2 max-b820:gap-4 max-b560:grid-cols-1 max-b560:gap-3"
+      >
+        {
+          points.map((point) => (
+            <li class="grid max-w-[190px] grid-cols-[26px_1fr] items-center gap-2.5 text-[13px] leading-[1.35] max-b560:max-w-none">
+              <Icon name={point.icon} size={26} class="text-rust" />
+              <strong class="font-semibold">{point.text}</strong>
+            </li>
+          ))
+        }
+      </ul>
+
+      <div class="flex flex-wrap gap-3.5 max-b560:grid print:hidden">
+        <button
+          class="button button-primary max-b560:w-full"
+          type="button"
+          data-form-open
+          data-track="cta_hero_click"
+        >
+          <Icon name="calendar" size={20} />
+          Solicitar presupuesto
+        </button>
+        <button class="button button-ghost max-b560:w-full" type="button" data-video-open>
+          <Icon name="play" size={20} />
+          Ver vídeo
+        </button>
+      </div>
+    </div>
+  </div>
+</section>

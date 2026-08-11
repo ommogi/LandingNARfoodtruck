@@ -1,0 +1,28 @@
+---
+import Icon from './Icon.astro';
+
+interface Props {
+  title: string;
+  id?: string;
+  light?: boolean;
+}
+
+const { title, id, light = false } = Astro.props;
+---
+
+<header class="mb-[34px] text-center">
+  <h2
+    class:list={[
+      'm-0 text-[clamp(30px,4vw,44px)] leading-[1.05] font-bold',
+      light && 'text-white',
+    ]}
+    id={id}
+  >
+    {title}
+  </h2>
+  <span class="mt-2 flex items-center justify-center gap-2.5 text-rust" aria-hidden="true">
+    <i class="block h-0.5 w-[54px] bg-current"></i>
+    <Icon name="star" size={16} fill="currentColor" />
+    <i class="block h-0.5 w-[54px] bg-current"></i>
+  </span>
+</header>

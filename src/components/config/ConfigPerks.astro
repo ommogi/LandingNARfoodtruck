@@ -1,0 +1,30 @@
+---
+/**
+ * Franja de garantias que cierra la pagina, antes del pie.
+ */
+import Icon from '../Icon.astro';
+import { perks } from '../../data/configuraciones';
+---
+
+<section class="section pt-0" aria-label="Lo que incluye cualquier configuración">
+  <div class="container">
+    <ul
+      class="m-0 grid list-none grid-cols-4 gap-6 border-t border-line p-0 pt-7 max-b900:grid-cols-2 max-b560:grid-cols-1"
+      data-reveal
+    >
+      {
+        perks.map((perk) => (
+          <li class="grid grid-cols-[44px_1fr] items-start gap-3.5">
+            <Icon name={perk.icon} size={34} class="text-night" />
+            <div>
+              <b class="block text-[13px] font-bold tracking-[0.02em] text-night uppercase">
+                {perk.title}
+              </b>
+              <small class="text-[12px] leading-[1.45] text-muted">{perk.text}</small>
+            </div>
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+</section>

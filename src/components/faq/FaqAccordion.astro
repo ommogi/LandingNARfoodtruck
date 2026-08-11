@@ -1,0 +1,103 @@
+---
+import Icon from '../Icon.astro';
+import SectionHeading from '../SectionHeading.astro';
+import { faqFilters, faqItems } from '../../data/faq';
+
+/**
+ * Listado completo de preguntas en dos columnas. El acordeon usa
+ * <details>/<summary> nativos: accesible y funcional sin JS.
+ * Los filtros por categoria y el buscador del hero los gobierna
+ * src/scripts/faq.ts; si el JS no carga, se ven todas las preguntas.
+ */
+
+/* `is-active` lo mueve src/scripts/faq.ts, igual que en la galeria. */
+const filterButton = [
+  'inline-flex min-h-[52px] cursor-pointer items-center justify-center gap-2.5 rounded-full border-0 bg-transparent px-3.5',
+  'font-display text-[15px] font-bold tracking-[0.03em] text-night uppercase',
+  'transition-[background-color,color] duration-200 ease-out hover:text-rust',
+  'is-active:bg-night is-active:text-white',
+  'max-b560:min-w-[140px]',
+].join(' ');
+
+/* `faq-item` es el gancho que usa src/scripts/faq.ts para filtrar y buscar. */
+const item =
+  'faq-item group h-fit scroll-mt-[110px] rounded-[12px] border border-line bg-white shadow-[0_6px_18px_rgb(10_28_38_/_4%)]';
+
+/* Ancla estable por pregunta: permite enlazar /faq#que-medidas-tiene-el-truck. */
+const DIACRITICS = new RegExp('[\\u0300-\\u036f]', 'g');
+
+const slug = (value: string) =>
+  value
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(DIACRITICS, '')
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '')
+    .slice(0, 60);
+---
+
+<section id="preguntas" class="section pt-[34px]" aria-labelledby="faq-list-title">
+  <div class="container">
+    <SectionHeading title="Preguntas frecuentes" id="faq-list-title" />
+
+    <div
+      class="mb-[26px] flex flex-wrap justify-center gap-1.5 max-b560:flex-nowrap max-b560:overflow-x-auto print:hidden"
+      role="toolbar"
+      aria-label="Filtrar preguntas por categoría"
+      data-faq-filters
+    >
+      {
+        faqFilters.map((filter, i) => (
+          <button
+            class:list={[filterButton, i === 0 && 'is-active']}
+            type="button"
+            data-filter={filter.value}
+            aria-pressed={i === 0 ? 'true' : 'false'}
+          >
+            <Icon name={filter.icon} size={20} />
+            {filter.label}
+          </button>
+        ))
+      }
+    </div>
+
+    <div
+      class="grid grid-cols-2 items-start gap-x-[26px] gap-y-2.5 max-b980:grid-cols-1"
+      data-faq-list
+    >
+      {
+        faqItems.map((faq) => (
+          <details class={item} id={slug(faq.question)} data-category={faq.category}>
+            <summary class="flex cursor-pointer list-none items-center gap-3.5 px-[18px] py-[15px] text-[14.5px] font-semibold hover:text-rust [&::-webkit-details-marker]:hidden">
+              <span
+                class="grid size-[26px] flex-none place-items-center rounded-full bg-night font-display text-sm font-bold text-white"
+                aria-hidden="true"
+              >
+                ?
+              </span>
+              <span class="faq-question flex-1">{faq.question}</span>
+              <span
+                class="grid flex-none place-items-center text-muted transition-transform duration-200 ease-out group-open:rotate-180 motion-reduce:transition-none"
+                aria-hidden="true"
+              >
+                <Icon name="chevron" size={18} />
+              </span>
+            </summary>
+            <p class="faq-answer m-0 px-[18px] pb-4 pl-[58px] text-[13.5px] leading-[1.65] text-muted max-b560:pl-[18px]">
+              {faq.answer}
+            </p>
+          </details>
+        ))
+      }
+    </div>
+
+    {/* Lo muestra src/scripts/faq.ts cuando la busqueda no encuentra nada. */}
+    <p class="mt-6 mb-0 text-center text-sm text-muted" data-faq-empty hidden>
+      No hemos encontrado ninguna pregunta con esa búsqueda. Escríbenos y te respondemos
+      personalmente.
+    </p>
+
+    {/* Anuncia a los lectores de pantalla cuantas preguntas quedan visibles. */}
+    <p class="sr-only" role="status" data-faq-live></p>
+  </div>
+</section>

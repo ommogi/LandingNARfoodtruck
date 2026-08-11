@@ -1,0 +1,47 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Hero from '../components/home/Hero.astro';
+import Benefits from '../components/home/Benefits.astro';
+import Process from '../components/home/Process.astro';
+import VideoEvents from '../components/home/VideoEvents.astro';
+import Gallery from '../components/home/Gallery.astro';
+import Reasons from '../components/home/Reasons.astro';
+import FinalCta from '../components/home/FinalCta.astro';
+import VideoModal from '../components/VideoModal.astro';
+import QuoteFormModal from '../components/QuoteFormModal.astro';
+import Lightbox from '../components/gallery/Lightbox.astro';
+import { site } from '../config/site';
+import { processSteps } from '../data/proceso';
+import { howToNode } from '../lib/schema';
+
+/* Los mismos pasos que pinta home/Process.astro. Las ofertas con precio van
+   solo en /configuraciones, que es donde los precios se ven en pantalla. */
+const canonical = new URL('/', site.url).href;
+const schemas = [howToNode(processSteps, canonical)];
+---
+
+<BaseLayout
+  title={`Alquiler de food trucks para eventos en ${site.locality} | NAR`}
+  description={`Food trucks premium para bodas, empresas, ferias y eventos privados en ${site.locality}. Transporte, montaje y retirada incluidos. Presupuesto en menos de 24 horas.`}
+  path="/"
+  schemas={schemas}
+>
+  <Hero />
+  <Benefits />
+  <Process />
+  <VideoEvents />
+  <Gallery />
+  <Reasons />
+  <FinalCta />
+
+  <Fragment slot="overlays">
+    <VideoModal />
+    <QuoteFormModal />
+    <Lightbox />
+  </Fragment>
+</BaseLayout>
+
+<script>
+  import '../scripts/landing';
+  import '../scripts/home-gallery';
+</script>

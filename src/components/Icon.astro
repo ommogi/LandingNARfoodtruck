@@ -1,0 +1,33 @@
+---
+/**
+ * Iconos de Lucide con API estable para toda la web.
+ * Decorativos por defecto: se ocultan a lectores de pantalla salvo que se pase `title`.
+ * Los componentes viven en ./icons.ts para que los archivos de datos puedan tipar
+ * sus campos `icon` contra `IconName`.
+ */
+import { icons, type IconName } from './icons';
+
+interface Props {
+  name: IconName;
+  size?: number;
+  title?: string;
+  /** Relleno opcional; util para la estrella de adorno y el rating. */
+  fill?: string;
+  class?: string;
+}
+
+const { name, size = 24, title, fill, class: className } = Astro.props;
+const Glyph = icons[name];
+/* `fill` solo se pasa si viene definido: un `fill={undefined}` pisaria el
+   `fill="none"` por defecto de Lucide y el icono saldria relleno de negro. */
+const fillAttr = fill ? { fill } : {};
+---
+
+<Glyph
+  size={size}
+  {...fillAttr}
+  class={className}
+  role={title ? 'img' : undefined}
+  aria-hidden={title ? undefined : 'true'}
+  aria-label={title}
+/>

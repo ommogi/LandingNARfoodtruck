@@ -1,0 +1,69 @@
+---
+import { Image } from 'astro:assets';
+import Icon from '../Icon.astro';
+import heroImage from '../../assets/gallery/truck-exterior-01.jpg';
+
+/**
+ * Hero de /contacto: la promesa a la izquierda, el truck iluminado a la derecha
+ * y tres garantias que responden a las dudas previas a rellenar el formulario.
+ */
+const guarantees = [
+  { icon: 'clock', text: 'Respuesta en<br />menos de 24 h' },
+  { icon: 'shield', text: 'Sin compromiso' },
+  { icon: 'users', text: 'Atención<br />personalizada' },
+] as const;
+---
+
+<section class="pt-[26px] pb-2.5" aria-labelledby="contact-hero-title">
+  <div
+    class="container grid grid-cols-[0.85fr_1.15fr] items-center gap-[clamp(28px,4.5vw,58px)] max-b900:grid-cols-1"
+  >
+    <div>
+      <p class="eyebrow flex items-center gap-2 text-night">
+        <span class="text-rust" aria-hidden="true">★</span>
+        Contacto
+      </p>
+
+      <h1
+        class="m-0 mb-[18px] text-[clamp(40px,4.6vw,62px)] leading-[0.92] font-bold text-night"
+        id="contact-hero-title"
+      >
+        Hablemos de
+        <em class="block text-rust not-italic">tu evento.</em>
+      </h1>
+
+      <p class="m-0 max-w-[440px] text-[17px] text-muted">
+        Cuéntanos qué tienes en mente y te enviaremos una propuesta personalizada en menos de 24
+        horas.
+      </p>
+
+      <a class="button button-primary mt-7" href="#formulario" data-track="cta_contact_hero_click">
+        <Icon name="send" size={20} />
+        Solicitar presupuesto
+      </a>
+
+      <ul class="mt-8 mb-0 flex list-none flex-wrap gap-x-7 gap-y-4 p-0">
+        {
+          guarantees.map((item) => (
+            <li class="flex items-center gap-2.5 text-xs leading-[1.35] text-muted">
+              <Icon name={item.icon} size={26} class="text-night" />
+              <span set:html={item.text} />
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+
+    <figure class="m-0 max-b900:order-first">
+      <Image
+        class="aspect-video w-full rounded-card object-cover shadow-card"
+        src={heroImage}
+        alt="Food truck azul NAR iluminado de noche con la ventana de servicio abierta"
+        widths={[640, 960, 1280]}
+        sizes="(max-width: 900px) 100vw, 55vw"
+        loading="eager"
+        fetchpriority="high"
+      />
+    </figure>
+  </div>
+</section>

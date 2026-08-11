@@ -1,0 +1,33 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import GalleryHero from '../components/gallery/GalleryHero.astro';
+import GalleryGrid from '../components/gallery/GalleryGrid.astro';
+import BookingCta from '../components/gallery/BookingCta.astro';
+import Lightbox from '../components/gallery/Lightbox.astro';
+import QuoteFormModal from '../components/QuoteFormModal.astro';
+import BookingModal from '../components/booking/BookingModal.astro';
+---
+
+<BaseLayout
+  title="Galería | Alquiler de food truck NAR"
+  description="Alquila un food truck equipado para bodas, eventos, ferias y acciones de marca. Consulta fechas y configuraciones disponibles."
+  path="/galeria"
+  leadSource="landing-galeria"
+  breadcrumbs={[{ name: 'Galería', path: '/galeria' }]}
+>
+  <GalleryHero />
+  <GalleryGrid />
+  <BookingCta />
+
+  <Fragment slot="overlays">
+    <QuoteFormModal />
+    <BookingModal />
+    <Lightbox />
+  </Fragment>
+</BaseLayout>
+
+<script>
+  import '../scripts/landing';
+  import '../scripts/booking';
+  import '../scripts/gallery';
+</script>

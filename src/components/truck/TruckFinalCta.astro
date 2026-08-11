@@ -1,0 +1,82 @@
+---
+import { Image } from 'astro:assets';
+import ctaBackground from '../../assets/gallery-06.jpg';
+import Icon from '../Icon.astro';
+
+/**
+ * Banda oscura de cierre. Los textos son props para poder reutilizarla en otras
+ * paginas (/faq) sin duplicar el bloque; por defecto usa el copy de /el-truck.
+ */
+interface Props {
+  title?: string;
+  claim?: string;
+  cta?: string;
+  /** Nombre del evento que se envia a dataLayer al pulsar el boton. */
+  track?: string;
+  /**
+   * Que dialogo abre el boton: el asistente de reserva con calendario
+   * ("disponibilidad") o el formulario simple de presupuesto ("presupuesto").
+   * Debe ir en linea con el texto del CTA.
+   */
+  modo?: 'disponibilidad' | 'presupuesto';
+}
+
+const {
+  title = '¿Listo para sorprender a tus invitados?',
+  claim = 'Hablemos y hagámoslo realidad.',
+  cta = 'Comprobar disponibilidad',
+  track = 'cta_truck_final',
+  modo = 'disponibilidad',
+} = Astro.props;
+
+const openAttr = modo === 'presupuesto' ? { 'data-form-open': true } : { 'data-booking-open': true };
+---
+
+<section id="reservar" class="section pt-0 print:hidden">
+  <div class="container">
+    <div
+      class="relative grid grid-cols-[1fr_auto] items-center gap-[30px] overflow-hidden rounded-card bg-[linear-gradient(135deg,#16232b,#0a1c26)] px-11 py-[30px] text-white max-b820:grid-cols-1 max-b820:p-[26px]"
+      data-reveal
+    >
+      {/* El ::after vela la foto para que el texto mantenga contraste AA. */}
+      <div
+        class="absolute inset-0 opacity-22 after:absolute after:inset-0 after:bg-[linear-gradient(90deg,rgb(10_28_38_/_92%)_20%,rgb(10_28_38_/_45%)_100%)] after:content-[''] max-b820:after:bg-[rgb(10_28_38_/_82%)]"
+        aria-hidden="true"
+      >
+        <Image
+          src={ctaBackground}
+          alt=""
+          widths={[960, 1440]}
+          sizes="100vw"
+          loading="lazy"
+          aria-hidden="true"
+          class="size-full object-cover"
+        />
+      </div>
+
+      <div class="relative z-2">
+        <h2 class="m-0 mb-1.5 text-[clamp(24px,3vw,36px)] leading-[1.05] font-bold">
+          {title}
+        </h2>
+        <p class="m-0 text-[clamp(19px,2.2vw,26px)] italic text-rust">
+          {claim}
+        </p>
+      </div>
+
+      <div
+        class="relative z-2 grid justify-items-center gap-2 max-b820:justify-items-stretch"
+      >
+        <button
+          class="button button-primary max-b820:w-full"
+          type="button"
+          {...openAttr}
+          data-track={track}
+        >
+          <Icon name="calendar" size={20} />
+          {cta}
+        </button>
+        <small class="text-xs text-white/80 max-b820:text-center">Respuesta en menos de 24 h</small>
+      </div>
+    </div>
+  </div>
+</section>

@@ -1,0 +1,105 @@
+---
+/**
+ * Columna oscura del asistente de reserva: explica que hace el formulario y
+ * recuerda que NAR alquila el vehiculo, no presta servicio de cocina.
+ *
+ * Los textos son constantes y no props: solo se usa dentro de BookingModal.
+ * Se oculta por debajo de 900px, donde el asistente pasa a una sola columna.
+ */
+import { Image } from 'astro:assets';
+import fondo from '../../assets/gallery-06.jpg';
+import Icon from '../Icon.astro';
+import type { IconName } from '../icons';
+
+const bloques: { icon: IconName; title: string; lines: string[] }[] = [
+  {
+    icon: 'calendar',
+    title: '¿Cómo funciona?',
+    lines: [
+      'Selecciona la fecha de tu evento para comprobar si nuestro food truck está disponible.',
+    ],
+  },
+  {
+    icon: 'shield',
+    title: 'Importante',
+    lines: [
+      'Somos una empresa de alquiler de food truck.',
+      'No ofrecemos servicio de cocina ni personal.',
+      'Tú eliges el catering y el equipo.',
+    ],
+  },
+];
+
+const perks: { icon: IconName; title: string; text: string }[] = [
+  {
+    icon: 'truck',
+    title: 'Solo alquiler',
+    text: 'Alquiler del food truck completamente equipado.',
+  },
+  {
+    icon: 'bolt',
+    title: 'Todo incluido',
+    text: 'El vehículo incluye agua, electricidad y gas.',
+  },
+  {
+    icon: 'clock',
+    title: 'Respuesta rápida',
+    text: 'Te respondemos en menos de 24 horas.',
+  },
+];
+---
+
+<aside
+  class="relative isolate flex flex-col justify-between overflow-hidden rounded-card bg-night px-8 py-9 text-white max-b900:hidden"
+>
+  {/* La foto queda muy velada: el texto de la columna manda contraste AA. */}
+  <div
+    class="absolute inset-0 -z-1 opacity-30 after:absolute after:inset-0 after:bg-[linear-gradient(180deg,rgb(10_28_38_/_88%),rgb(10_28_38_/_96%))] after:content-['']"
+    aria-hidden="true"
+  >
+    <Image src={fondo} alt="" widths={[420, 680]} sizes="340px" class="size-full object-cover" />
+  </div>
+
+  <div>
+    <span class="mb-5 block h-[3px] w-[74px] bg-rust" aria-hidden="true"></span>
+
+    <p class="m-0 font-display text-[34px] leading-[1.05] font-bold uppercase">
+      Tu evento,<br />nuestro food truck<br />
+      <span class="text-rust">Comprueba disponibilidad</span>
+    </p>
+
+    <ul class="mx-0 mt-8 mb-0 grid list-none gap-6 p-0">
+      {
+        bloques.map((bloque) => (
+          <li class="grid grid-cols-[52px_1fr] items-start gap-3.5">
+            <span class="grid size-13 place-items-center rounded-full bg-rust" aria-hidden="true">
+              <Icon name={bloque.icon} size={26} />
+            </span>
+            <div>
+              <h3 class="m-0 mb-1.5 text-lg leading-none font-bold text-rust">{bloque.title}</h3>
+              {bloque.lines.map((line) => (
+                <p class="m-0 text-[13px] leading-[1.5] text-white/85">{line}</p>
+              ))}
+            </div>
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+
+  <ul
+    class="mx-0 mt-9 mb-0 grid list-none grid-cols-3 gap-3 border-t border-white/12 p-0 pt-7 text-center"
+  >
+    {
+      perks.map((perk) => (
+        <li>
+          <Icon name={perk.icon} size={28} class="mx-auto text-rust" />
+          <p class="mt-2.5 mb-1 font-display text-[13px] leading-none font-bold uppercase">
+            {perk.title}
+          </p>
+          <p class="m-0 text-[11px] leading-[1.4] text-white/70">{perk.text}</p>
+        </li>
+      ))
+    }
+  </ul>
+</aside>

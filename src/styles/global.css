@@ -1,0 +1,705 @@
+/* Sistema visual NAR Food Truck Events (seccion 3 de la guia aprobada) */
+
+@import 'tailwindcss';
+
+@theme {
+  --color-rust: #a63921;
+  --color-rust-dark: #842b19;
+  --color-blue: #034c8c;
+  --color-blue-light: #0367a6;
+  --color-night: #0a1c26;
+  --color-ink: #171717;
+  --color-charcoal: #121212;
+  --color-muted: #5d5d5d;
+  --color-line: #ded8d3;
+  --color-bg-1: #f7f5f3;
+  --color-bg-2: #f2eeeb;
+  --color-bg-3: #f6f3f0;
+
+  --font-display: 'Barlow Condensed', 'Arial Narrow', Arial, sans-serif;
+  --font-body: 'Inter Variable', Inter, Arial, Helvetica, sans-serif;
+
+  /*
+   * Breakpoints del diseno actual. Se usan siempre en modo descendente
+   * (`max-b820:`, `max-b560:`...) porque el CSS original es desktop-first.
+   * El sufijo es el ancho en px para poder mapear 1:1 con el CSS anterior.
+   */
+  --breakpoint-b480: 480px;
+  --breakpoint-b560: 560px;
+  --breakpoint-b620: 620px;
+  --breakpoint-b700: 700px;
+  --breakpoint-b820: 820px;
+  --breakpoint-b900: 900px;
+  --breakpoint-b980: 980px;
+  --breakpoint-b1024: 1024px;
+  --breakpoint-b1100: 1100px;
+  --breakpoint-b1180: 1180px;
+
+  --radius-card: 18px;
+  --shadow-card: 0 16px 44px rgb(25 18 14 / 10%);
+
+  /*
+   * Curvas de animacion. Las nativas del navegador son demasiado debiles para
+   * UI, asi que se sobrescriben las de Tailwind: todo `ease-out` del marcado
+   * pasa a la curva fuerte sin tocar los componentes.
+   * Nunca `ease-in` en UI: empieza lento justo cuando el usuario esta mirando.
+   */
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+  --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
+  --ease-drawer: cubic-bezier(0.32, 0.72, 0, 1);
+}
+
+/* Clases de estado que togglea el JS de src/scripts/*.ts */
+@custom-variant is-open (&.is-open);
+@custom-variant is-active (&.is-active);
+@custom-variant is-scrolled (&.is-scrolled);
+@custom-variant is-invalid (&.is-invalid);
+@custom-variant is-error (&.is-error);
+@custom-variant is-success (&.is-success);
+
+:root {
+  --container: 1280px;
+  --header-h: 78px;
+
+  /* Permite transicionar `height: auto` en el acordeon del FAQ. */
+  interpolate-size: allow-keywords;
+}
+
+@layer base {
+  * {
+    box-sizing: border-box;
+  }
+
+  html {
+    scroll-behavior: smooth;
+    scroll-padding-top: 96px;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    margin: 0;
+    color: var(--color-ink);
+    font-family: var(--font-body);
+    line-height: 1.55;
+    /* Fondo general obligatorio. El hero es la unica seccion que se sale de el. */
+    background: linear-gradient(
+      180deg,
+      var(--color-bg-1) 0%,
+      var(--color-bg-2) 35%,
+      var(--color-bg-3) 100%
+    );
+    background-attachment: fixed;
+    overflow-x: hidden;
+  }
+
+  body.modal-open {
+    overflow: hidden;
+  }
+
+  img {
+    display: block;
+    max-width: 100%;
+    height: auto;
+  }
+
+  a {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  button,
+  input,
+  select,
+  textarea {
+    font: inherit;
+  }
+
+  h1,
+  h2,
+  h3 {
+    font-family: var(--font-display);
+    text-transform: uppercase;
+    letter-spacing: -0.01em;
+  }
+
+  :focus-visible {
+    outline: 3px solid rgb(166 57 33 / 55%);
+    outline-offset: 3px;
+    border-radius: 4px;
+  }
+
+  @media (max-width: 820px) {
+    :root {
+      --header-h: 70px;
+    }
+  }
+}
+
+/*
+ * Extiende el `container` nativo de Tailwind. `max-width: none` anula los
+ * max-width por breakpoint que este genera y que romperian el ancho del sitio.
+ */
+@utility container {
+  width: min(calc(100% - 40px), var(--container));
+  max-width: none;
+  margin-inline: auto;
+
+  @media (max-width: 820px) {
+    width: min(calc(100% - 28px), var(--container));
+  }
+}
+
+@layer components {
+  .section {
+    padding: 46px 0;
+
+    @media (max-width: 560px) {
+      padding: 34px 0;
+    }
+  }
+
+  .skip-link {
+    position: fixed;
+    left: 12px;
+    top: 8px;
+    z-index: 9999;
+    padding: 10px 16px;
+    border-radius: 6px;
+    color: #fff;
+    background: var(--color-rust);
+    font-weight: 600;
+    transform: translateY(-200%);
+
+    &:focus {
+      transform: none;
+    }
+  }
+
+  /*
+   * Panel desplegable del menu movil. Sustituye al toggle de `display`, que no
+   * se puede transicionar: `visibility` si, y ademas mantiene los enlaces fuera
+   * del orden de tabulacion mientras el menu esta cerrado.
+   * `is-open` lo pone setMenu() en src/scripts/modal.ts.
+   */
+  .nav-panel {
+    @media (max-width: 900px) {
+      visibility: hidden;
+      opacity: 0;
+      transform: translateY(-8px);
+      transition:
+        opacity 200ms var(--ease-out),
+        transform 200ms var(--ease-out),
+        visibility 200ms;
+
+      &.is-open {
+        visibility: visible;
+        opacity: 1;
+        transform: none;
+      }
+    }
+  }
+
+  .eyebrow {
+    margin: 0 0 12px;
+    font-family: var(--font-display);
+    font-size: 18px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+
+  .eyebrow-rust {
+    color: var(--color-rust);
+  }
+
+  /* Botones */
+  .button {
+    display: inline-flex;
+    min-height: 50px;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 12px 24px;
+    border: 1px solid transparent;
+    border-radius: 8px;
+    font-family: var(--font-display);
+    font-size: 18px;
+    font-weight: 700;
+    line-height: 1.1;
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+    cursor: pointer;
+    transition:
+      transform 160ms var(--ease-out),
+      background-color 200ms ease,
+      border-color 200ms ease,
+      box-shadow 200ms ease;
+
+    /* Feedback de pulsacion: `scale` arrastra tambien al texto y al icono, que
+     * es lo que hace que se lea como un boton fisico. */
+    &:active {
+      transform: scale(0.97);
+    }
+
+    /* El hover se gatea: en tactil un tap dispara un hover falso que se queda
+     * pegado con el boton elevado. */
+    @media (hover: hover) and (pointer: fine) {
+      &:hover {
+        transform: translateY(-2px);
+      }
+
+      &:active {
+        transform: translateY(-2px) scale(0.97);
+      }
+    }
+
+    & svg {
+      flex: none;
+    }
+  }
+
+  .button-primary {
+    color: #fff;
+    background: var(--color-rust);
+    box-shadow: 0 10px 24px rgb(166 57 33 / 22%);
+
+    &:hover {
+      background: var(--color-rust-dark);
+    }
+  }
+
+  .button-ghost {
+    color: #fff;
+    border-color: rgb(255 255 255 / 65%);
+    background: rgb(0 0 0 / 22%);
+
+    &:hover {
+      background: rgb(0 0 0 / 40%);
+    }
+  }
+
+  .button-light {
+    color: var(--color-rust);
+    background: #fff;
+
+    &:hover {
+      background: #fff5f2;
+    }
+  }
+
+  .button-outline {
+    color: var(--color-rust);
+    border-color: var(--color-rust);
+    background: rgb(255 255 255 / 60%);
+
+    &:hover {
+      color: #fff;
+      background: var(--color-rust);
+    }
+  }
+
+  /* Secundario sobre fondo claro: borde discreto, sin competir con el primario. */
+  .button-line {
+    color: var(--color-ink);
+    border-color: var(--color-line);
+    background: #fff;
+
+    &:hover {
+      border-color: var(--color-night);
+    }
+  }
+
+  .button-dark {
+    color: #fff;
+    background: var(--color-night);
+
+    &:hover {
+      background: #16232b;
+    }
+  }
+
+  .button-block {
+    width: 100%;
+  }
+
+  /* ---------------------------------------- Asistente de reserva
+   *
+   * El indicador de pasos y las celdas del calendario cambian de estado desde
+   * src/scripts/booking.ts. Se describen aqui, y no con utilidades en el JS,
+   * porque las celdas se construyen en tiempo de ejecucion: asi el marcado
+   * generado solo lleva clases semanticas y el estilo no depende de que el
+   * escaner de Tailwind mire dentro de los .ts.
+   */
+  .booking-step {
+    color: var(--color-muted);
+
+    & > span:first-child {
+      color: var(--color-muted);
+      background: var(--color-line);
+    }
+
+    &.is-active {
+      color: var(--color-ink);
+
+      & > span:first-child {
+        color: #fff;
+        background: var(--color-rust);
+      }
+    }
+  }
+
+  .cal-day {
+    display: grid;
+    align-content: center;
+    gap: 2px;
+    min-height: 78px;
+    padding: 6px 4px;
+    border: 0;
+    border-top: 1px solid var(--color-line);
+    border-left: 1px solid var(--color-line);
+    color: var(--color-ink);
+    background: #fff;
+    font-size: 17px;
+    font-weight: 600;
+    text-align: center;
+
+    /* Cierra la rejilla: sin borde exterior duplicado en la primera columna. */
+    &:nth-child(7n + 1) {
+      border-left: 0;
+    }
+
+    & small {
+      font-size: 9px;
+      font-weight: 700;
+      line-height: 1.1;
+      letter-spacing: 0.03em;
+      text-transform: uppercase;
+    }
+
+    &:not(:disabled) {
+      cursor: pointer;
+    }
+
+    &:not(:disabled):hover {
+      background: var(--color-bg-2);
+    }
+
+    /*
+     * `is-disponible` no se pinta: el calendario no afirma disponibilidad, solo
+     * marca lo que si consta (is-poca, :disabled). Ver src/data/disponibilidad.ts.
+     */
+    &.is-poca {
+      color: var(--color-rust);
+      background: rgb(166 57 33 / 7%);
+    }
+
+    /* Ocupados y fuera de plazo: mismo gris apagado, sin invitar al clic. */
+    &:disabled {
+      color: var(--color-muted);
+      background: #fff;
+      opacity: 0.55;
+    }
+
+    &.is-relleno {
+      color: var(--color-muted);
+      background: var(--color-bg-2);
+      opacity: 1;
+    }
+
+    &.is-selected,
+    &.is-selected:hover {
+      color: #fff;
+      background: var(--color-rust);
+    }
+
+    /*
+     * En movil se cae la etiqueta: "DISPONIBILIDAD" es una palabra larga que fija
+     * el ancho minimo de las siete columnas y desbordaria la rejilla. El color
+     * (con su leyenda) y el aria-label del boton siguen dando el estado.
+     */
+    @media (max-width: 620px) {
+      min-height: 54px;
+      padding: 4px 2px;
+      font-size: 15px;
+
+      & small {
+        display: none;
+      }
+    }
+  }
+}
+
+/* ------------------------------------------------------------------ Motion
+ *
+ * Solo se anima `transform` y `opacity` (van a la GPU y no cuestan layout).
+ * La unica excepcion es la altura del acordeon, donde no hay equivalente.
+ * Las duraciones de UI se quedan por debajo de 300ms.
+ */
+
+/* Reveal discreto al hacer scroll. `is-visible` lo pone src/scripts/landing.ts. */
+[data-reveal] {
+  opacity: 0;
+  transform: translateY(18px);
+  transition:
+    opacity 500ms var(--ease-out),
+    transform 500ms var(--ease-out);
+}
+
+[data-reveal].is-visible {
+  opacity: 1;
+  transform: none;
+}
+
+/*
+ * Entrada escalonada opt-in para rejillas: se combina con [data-reveal] en el
+ * contenedor y escalona sus hijos directos. Es decorativa, asi que solo toca
+ * opacidad y desplazamiento y nunca bloquea la interaccion mientras corre.
+ */
+/*
+ * El contenedor sigue llevando [data-reveal] porque es el gancho del
+ * IntersectionObserver, pero deja de animarse el mismo: quien entra son sus
+ * hijos, y superponer las dos animaciones se lee como un rebote.
+ */
+[data-reveal][data-reveal-stagger] {
+  opacity: 1;
+  transform: none;
+  transition: none;
+}
+
+[data-reveal-stagger] > * {
+  opacity: 0;
+}
+
+/* `reveal-in` solo declara `from`: el 100% lo toma del valor de base, asi que
+   este `opacity: 1` es lo que hace que el hijo termine visible. Sin el, la
+   animacion va de 0 a 0 y la tarjeta se queda en blanco. */
+[data-reveal-stagger].is-visible > * {
+  opacity: 1;
+  animation: reveal-in 300ms var(--ease-out) both;
+}
+
+[data-reveal-stagger].is-visible > :nth-child(2) {
+  animation-delay: 60ms;
+}
+
+[data-reveal-stagger].is-visible > :nth-child(3) {
+  animation-delay: 120ms;
+}
+
+[data-reveal-stagger].is-visible > :nth-child(4) {
+  animation-delay: 180ms;
+}
+
+[data-reveal-stagger].is-visible > :nth-child(5) {
+  animation-delay: 240ms;
+}
+
+/* A partir del sexto el retardo se congela: un stagger largo se hace lento. */
+[data-reveal-stagger].is-visible > :nth-child(n + 6) {
+  animation-delay: 300ms;
+}
+
+@keyframes reveal-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+}
+
+/*
+ * Modales. El panel escala desde 0.96 (nunca desde 0: nada aparece de la nada)
+ * y el fondo se funde a la vez para que se lean como una sola superficie.
+ * `data-state` lo gobierna src/scripts/modal.ts; los cuatro dialogos del sitio
+ * llevan role="dialog", asi que comparten esta receta.
+ */
+[role='dialog'] [data-modal-backdrop] {
+  opacity: 0;
+  transition: opacity 250ms var(--ease-out);
+}
+
+[role='dialog'] [data-modal-panel] {
+  opacity: 0;
+  /* Un modal no cuelga de ningun disparador: se queda centrado. */
+  transform: scale(0.96);
+  transform-origin: center;
+  transition:
+    opacity 250ms var(--ease-out),
+    transform 250ms var(--ease-out);
+}
+
+/*
+ * Mientras se funde la salida el dialogo sigue en el DOM unos milisegundos:
+ * el fondo no debe seguir tragandose los clics del usuario.
+ */
+[role='dialog'][data-state='closed'] {
+  pointer-events: none;
+}
+
+[role='dialog'][data-state='open'] [data-modal-backdrop] {
+  opacity: 1;
+}
+
+[role='dialog'][data-state='open'] [data-modal-panel] {
+  opacity: 1;
+  transform: none;
+}
+
+/*
+ * Acordeon del FAQ. Es la unica animacion que cuesta layout en cada frame, por
+ * eso se queda corta. Sin `::details-content` (navegadores antiguos) el
+ * <details> sigue funcionando: simplemente salta, como hasta ahora.
+ */
+.faq-item::details-content {
+  block-size: 0;
+  overflow: hidden;
+  transition:
+    block-size 200ms var(--ease-out),
+    content-visibility 200ms allow-discrete;
+}
+
+.faq-item[open]::details-content {
+  block-size: auto;
+}
+
+/* Mensaje de resultado del formulario: hoy el texto aparece de golpe. */
+[data-form-status].is-success,
+[data-form-status].is-error {
+  animation: status-in 300ms var(--ease-out) both;
+}
+
+@keyframes status-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+}
+
+/*
+ * Elementos que entran al filtrar una lista: las fotos de /galeria (al cambiar
+ * de filtro y al pulsar "ver mas fotos") y las preguntas de /faq. Lo gobierna
+ * src/scripts/enter.ts.
+ *
+ * Transicion y no keyframes a proposito: los filtros se pueden pulsar en rafaga
+ * y una transicion retoma desde el valor actual, mientras que unos keyframes
+ * reiniciarian desde cero y se leerian como un parpadeo.
+ *
+ * Solo se anima la entrada. La salida tendria que competir con el reflow de la
+ * lista, que salta igualmente al cambiar el numero de elementos.
+ *
+ * Corta (180ms) porque es una interaccion que el usuario repite: a esta
+ * frecuencia el movimiento tiene que ser casi imperceptible o estorba.
+ */
+.gallery-card,
+.faq-item {
+  transition:
+    opacity 180ms var(--ease-out),
+    transform 180ms var(--ease-out);
+}
+
+[data-entering] {
+  opacity: 0;
+  transform: translateY(8px);
+}
+
+/*
+ * Transicion entre paginas. Evita el parpadeo en blanco de la navegacion: el
+ * navegador retiene la pagina anterior hasta que la nueva esta lista y funde
+ * una con otra.
+ *
+ * Se usa la API nativa y no el <ClientRouter> de Astro a proposito: los scripts
+ * de src/scripts/*.ts registran sus listeners al importarse una sola vez, asi
+ * que un router de cliente los dejaria muertos tras la primera navegacion.
+ * Esto es CSS puro, cero JS, y en navegadores sin soporte la navegacion se
+ * comporta exactamente como hasta ahora.
+ */
+@view-transition {
+  navigation: auto;
+}
+
+::view-transition-old(root),
+::view-transition-new(root) {
+  /* Corto: una transicion de pagina larga se percibe como una web lenta. */
+  animation-duration: 220ms;
+  animation-timing-function: var(--ease-out);
+}
+
+/*
+ * El header es identico en todas las paginas. Con nombre propio queda fuera del
+ * fundido general y se mantiene en su sitio, de forma que la navegacion se lee
+ * como un cambio de contenido y no como un cambio de sitio. De paso, el
+ * subrayado del enlace activo funde de una pagina a la siguiente.
+ */
+[data-header] {
+  view-transition-name: site-header;
+}
+
+/*
+ * Movimiento reducido significa menos y mas suave, no cero: se conservan los
+ * fundidos, que orientan al usuario (de que modal viene, cual se cierra), y se
+ * quita todo desplazamiento y escala. Por eso hay reglas dirigidas en vez de
+ * un comodin que anulase tambien las transiciones utiles.
+ */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  /* src/scripts/landing.ts ya marca estos elementos como visibles al cargar. */
+  [data-reveal] {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+
+  [data-reveal-stagger] > * {
+    opacity: 1;
+    animation: none;
+  }
+
+  [role='dialog'] [data-modal-panel] {
+    /* El fundido se queda; la escala se va. */
+    transform: none;
+  }
+
+  .nav-panel {
+    transform: none;
+  }
+
+  .button:hover,
+  .button:active {
+    transform: none;
+  }
+
+  .faq-item::details-content {
+    transition: none;
+  }
+
+  [data-entering] {
+    /* El fundido se queda; el desplazamiento se va. */
+    transform: none;
+  }
+
+  [data-form-status].is-success,
+  [data-form-status].is-error {
+    animation: none;
+  }
+
+  /*
+   * El fundido entre paginas se queda: es solo opacidad y es justo lo que
+   * evita el tiron. Lo que se quita es el desplazamiento del header, que si
+   * interpola posicion y tamano.
+   */
+  ::view-transition-group(site-header) {
+    animation: none;
+  }
+}
+
+/*
+ * Los elementos que no deben imprimirse llevan `print:hidden` en el marcado
+ * (header, CTAs, modales, lightbox, filtros de galeria...).
+ */
+@media print {
+  body {
+    background: #fff;
+  }
+}

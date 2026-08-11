@@ -1,0 +1,94 @@
+---
+import { Image } from 'astro:assets';
+import Icon from '../Icon.astro';
+import { galleryHeroImage } from '../../data/gallery';
+
+/**
+ * Hero de /galeria (seccion 3 de la guia): texto a la izquierda, interior real
+ * a la derecha y cuatro ventajas que dejan claro que se alquila el vehiculo.
+ */
+const benefits = [
+  {
+    icon: 'calendar',
+    title: 'Alquiler flexible',
+    text: 'Por días, fines de semana o el tiempo que necesites',
+  },
+  {
+    icon: 'truck',
+    title: 'Truck equipado',
+    text: 'Listo para que tú decidas cómo usarlo',
+  },
+  {
+    icon: 'target',
+    title: 'Configuraciones',
+    text: 'Distintos formatos para cada necesidad',
+  },
+  {
+    icon: 'shield',
+    title: 'Sin complicaciones',
+    text: 'Entrega, recogida y soporte durante tu alquiler',
+  },
+] as const;
+
+const benefitItem = [
+  'grid justify-items-center gap-1.5 border-r border-line px-4 text-center',
+  'first:pl-0 last:border-r-0',
+  'max-b900:nth-[2n]:border-r-0 max-b900:first:pl-4',
+].join(' ');
+---
+
+<section class="pt-[22px] pb-2.5" aria-labelledby="gallery-hero-title">
+  <div class="container">
+    <div
+      class="grid grid-cols-[0.78fr_1.22fr] items-center gap-[clamp(28px,4.5vw,58px)] max-b900:grid-cols-1"
+    >
+      <div>
+        <p class="eyebrow flex items-center gap-2 text-night">
+          <span class="text-rust" aria-hidden="true">★</span>
+          Galería
+        </p>
+        {/* Ajustado para que "EL TRUCK PERFECTO" quepa en una linea, como el diseno. */}
+        <h1
+          id="gallery-hero-title"
+          class="m-0 mb-[18px] text-[clamp(40px,4.3vw,58px)] leading-[0.92] font-bold text-night"
+        >
+          El truck perfecto
+          <em class="block text-rust not-italic">para tu evento.</em>
+        </h1>
+        <p class="m-0 max-w-[520px] text-[17px] text-muted max-b560:text-base">
+          Alquila nuestro food truck y haz que tu evento sea único. Tú te encargas de la
+          experiencia, nosotros te damos el escenario.
+        </p>
+      </div>
+
+      {/* En movil la fotografia va primero (guia, seccion 4.3). */}
+      <figure class="m-0 aspect-video overflow-hidden rounded-card shadow-card max-b900:order-first">
+        <Image
+          src={galleryHeroImage}
+          alt="Interior de acero inoxidable del food truck NAR totalmente equipado"
+          widths={[640, 960, 1280]}
+          sizes="(max-width: 900px) 100vw, 55vw"
+          loading="eager"
+          fetchpriority="high"
+          class="size-full object-cover"
+        />
+      </figure>
+    </div>
+
+    <ul
+      class="mx-0 mt-[38px] mb-0 grid list-none grid-cols-4 p-0 max-b900:grid-cols-2 max-b900:gap-y-6"
+    >
+      {
+        benefits.map((benefit) => (
+          <li class={benefitItem}>
+            <Icon name={benefit.icon} size={30} class="mb-1.5 text-night" />
+            <b class="font-display text-[15px] font-bold tracking-[0.03em] text-night uppercase">
+              {benefit.title}
+            </b>
+            <small class="max-w-[200px] text-xs leading-[1.45] text-muted">{benefit.text}</small>
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+</section>

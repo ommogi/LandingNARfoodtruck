@@ -1,0 +1,80 @@
+---
+import Icon from '../Icon.astro';
+
+/**
+ * Visor de la galeria. La imagen se asigna al abrir, asi que las versiones
+ * grandes solo se descargan cuando el usuario amplia una fotografia.
+ * Gestion de foco, Escape y ARIA en scripts/modal.ts (guia, seccion 5).
+ */
+const roundButton =
+  'grid size-[46px] cursor-pointer place-items-center rounded-full border-0 bg-white/92 text-ink transition-colors duration-200 ease-out hover:bg-white';
+---
+
+<div
+  class="fixed inset-0 z-[1000] grid place-items-center p-5 print:hidden"
+  hidden
+  data-lightbox
+  role="dialog"
+  aria-modal="true"
+  aria-labelledby="lightbox-title"
+>
+  <div
+    class="absolute inset-0 bg-black/82 backdrop-blur-[5px]"
+    data-lightbox-close
+    data-modal-backdrop
+  >
+  </div>
+
+  <div
+    class="relative z-1 grid w-[min(1100px,100%)] grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-3.5 max-b820:grid-cols-2 max-b820:gap-3"
+    data-modal-panel
+  >
+    <h2 id="lightbox-title" class="sr-only">Fotografía ampliada del food truck</h2>
+
+    <button
+      class:list={[roundButton, 'absolute -top-[58px] right-0 z-2']}
+      type="button"
+      data-lightbox-close
+      aria-label="Cerrar visor"
+    >
+      <Icon name="close" size={22} />
+    </button>
+
+    <button
+      class:list={[roundButton, 'max-b820:col-start-1 max-b820:row-start-2 max-b820:justify-self-start']}
+      type="button"
+      data-lightbox-prev
+      aria-label="Foto anterior"
+    >
+      <Icon name="chevron-left" size={26} />
+    </button>
+
+    <figure class="m-0 max-b820:col-span-2 max-b820:col-start-1 max-b820:row-start-1">
+      <img
+        class="max-h-[76vh] w-full rounded-xl bg-black object-contain max-b820:max-h-[62vh]"
+        data-lightbox-image
+        alt=""
+      />
+      <figcaption
+        class="mt-3 flex items-baseline justify-between gap-[18px] text-[13px] text-white/85"
+      >
+        <span data-lightbox-caption></span>
+        <b
+          class="font-display text-[15px] tracking-[0.06em] whitespace-nowrap"
+          data-lightbox-counter
+          aria-hidden="true"></b>
+      </figcaption>
+    </figure>
+
+    <button
+      class:list={[roundButton, 'max-b820:col-start-2 max-b820:row-start-2 max-b820:justify-self-end']}
+      type="button"
+      data-lightbox-next
+      aria-label="Foto siguiente"
+    >
+      <Icon name="chevron-right" size={26} />
+    </button>
+  </div>
+
+  <p class="sr-only" aria-live="polite" data-lightbox-live></p>
+</div>

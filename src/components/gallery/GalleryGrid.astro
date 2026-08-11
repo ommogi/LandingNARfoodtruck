@@ -1,0 +1,98 @@
+---
+import { Image, getImage } from 'astro:assets';
+import Icon from '../Icon.astro';
+import { galleryFilters, galleryPhotos } from '../../data/gallery';
+
+/**
+ * Collage con filtros y "ver mas" (secciones 3.1 y 5 de la guia).
+ * Las versiones grandes se generan en build para alimentar el visor sin
+ * descargar los originales.
+ */
+const fullImages = await Promise.all(
+  galleryPhotos.map((photo) => getImage({ src: photo.src, width: 1600, format: 'webp' })),
+);
+
+/* `is-active` lo mueve src/scripts/gallery.ts al pulsar cada filtro. */
+const filterButton = [
+  'inline-flex min-h-[58px] cursor-pointer items-center justify-center gap-2.5 rounded-full border-0 bg-transparent px-2.5',
+  'font-display text-base font-bold tracking-[0.03em] text-night uppercase',
+  'transition-[background-color,color] duration-200 ease-out hover:text-rust',
+  'is-active:bg-night is-active:text-white',
+  'max-b560:min-w-[145px]',
+].join(' ');
+
+/* `gallery-card` es el gancho que usa src/scripts/gallery.ts para filtrar. */
+const card =
+  'gallery-card m-0 overflow-hidden rounded-[14px] bg-bg-2 shadow-[0_8px_20px_rgb(10_28_38_/_6%)]';
+---
+
+<section id="galeria" class="pt-[30px] pb-[46px]" aria-labelledby="gallery-title">
+  <div class="container">
+    <h2 id="gallery-title" class="sr-only">Galería del food truck</h2>
+
+    <div
+      class="mb-[30px] grid grid-cols-6 gap-1.5 max-b900:grid-cols-3 max-b560:flex max-b560:overflow-x-auto print:hidden"
+      role="toolbar"
+      aria-label="Filtrar fotografías"
+      data-gallery-filters
+    >
+      {
+        galleryFilters.map((filter, i) => (
+          <button
+            class:list={[filterButton, i === 0 && 'is-active']}
+            type="button"
+            data-filter={filter.value}
+            aria-pressed={i === 0 ? 'true' : 'false'}
+          >
+            <Icon name={filter.icon} size={20} />
+            {filter.label}
+          </button>
+        ))
+      }
+    </div>
+
+    <div
+      class="grid auto-rows-[230px] grid-cols-6 gap-3 max-b900:auto-rows-[220px] max-b900:grid-cols-2 max-b560:auto-rows-[250px] max-b560:grid-cols-1"
+      data-gallery-grid
+    >
+      {
+        galleryPhotos.map((photo, i) => (
+          <figure
+            class:list={[
+              card,
+              photo.wide ? 'col-span-3' : 'col-span-2',
+              'max-b900:col-span-1',
+            ]}
+            data-category={photo.category}
+          >
+            <button
+              class="group block size-full cursor-zoom-in border-0 p-0"
+              type="button"
+              data-lightbox-open
+              data-index={i}
+              data-full={fullImages[i].src}
+              aria-label={`Ampliar fotografía: ${photo.alt}`}
+            >
+              <Image
+                src={photo.src}
+                alt={photo.alt}
+                widths={[400, 700, 1000]}
+                sizes="(max-width: 560px) 100vw, (max-width: 900px) 50vw, 33vw"
+                loading={i < 4 ? 'eager' : 'lazy'}
+                class="size-full object-cover transition-transform duration-400 ease-out group-hover:scale-[1.035] group-focus-visible:scale-[1.035]"
+              />
+            </button>
+          </figure>
+        ))
+      }
+    </div>
+
+    {/* `gallery-more` lo localiza gallery.ts con closest() para ocultar el bloque. */}
+    <p class="gallery-more mt-6 mb-0 text-center print:hidden">
+      <button class="button button-outline" type="button" data-gallery-more>
+        <Icon name="image" size={20} />
+        Ver más fotos
+      </button>
+    </p>
+  </div>
+</section>

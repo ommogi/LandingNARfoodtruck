@@ -1,0 +1,31 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import ContactHero from '../components/contact/ContactHero.astro';
+import ContactProcess from '../components/contact/ContactProcess.astro';
+import ContactForm from '../components/contact/ContactForm.astro';
+import ContactLocation from '../components/contact/ContactLocation.astro';
+import QuoteFormModal from '../components/QuoteFormModal.astro';
+import { site } from '../config/site';
+---
+
+<BaseLayout
+  title={`Contacto | Alquiler de food truck en ${site.locality} | NAR`}
+  description={`Cuéntanos tu evento y recibe una propuesta personalizada en menos de 24 horas. Alquiler de food truck para bodas, empresas y ferias en ${site.locality}.`}
+  path="/contacto"
+  leadSource="landing-contacto"
+  breadcrumbs={[{ name: 'Contacto', path: '/contacto' }]}
+>
+  <ContactHero />
+  <ContactProcess />
+  <ContactForm />
+  <ContactLocation />
+
+  {/* El boton "Reservar fecha" del header abre este modal en todas las paginas. */}
+  <Fragment slot="overlays">
+    <QuoteFormModal />
+  </Fragment>
+</BaseLayout>
+
+<script>
+  import '../scripts/landing';
+</script>

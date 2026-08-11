@@ -1,0 +1,72 @@
+---
+import { Image, getImage } from 'astro:assets';
+import SectionHeading from '../SectionHeading.astro';
+import Icon from '../Icon.astro';
+
+import gallery01 from '../../assets/gallery-01.png';
+import gallery02 from '../../assets/gallery-02.png';
+import gallery03 from '../../assets/gallery-03.png';
+import gallery04 from '../../assets/gallery-04.jpg';
+import gallery05 from '../../assets/gallery-05.jpg';
+import gallery06 from '../../assets/gallery-06.jpg';
+
+const photos = [
+  { src: gallery01, alt: 'Food truck NAR iluminado en una plaza durante un evento nocturno' },
+  { src: gallery02, alt: 'Food truck NAR en una fiesta al aire libre decorada con globos y guirnaldas' },
+  { src: gallery03, alt: 'Lateral del food truck NAR con el logotipo iluminado' },
+  { src: gallery04, alt: 'Interior del food truck con cocina de acero inoxidable equipada' },
+  { src: gallery05, alt: 'Food truck NAR con iluminación LED al atardecer' },
+  { src: gallery06, alt: 'Ventana de servicio del food truck abierta y lista para el evento' },
+];
+
+/* Versiones grandes para el visor: se generan en build, asi ampliar una foto no
+   descarga el original. Mismo criterio que components/gallery/GalleryGrid.astro. */
+const fullImages = await Promise.all(
+  photos.map((photo) => getImage({ src: photo.src, width: 1600, format: 'webp' })),
+);
+
+const photoClass =
+  'h-[190px] w-full rounded-xl object-cover shadow-[0_5px_18px_rgb(0_0_0_/_8%)] transition-transform duration-250 ease-out group-hover:-translate-y-1 group-focus-visible:-translate-y-1 max-b560:h-[150px]';
+---
+
+<section id="galeria" class="section" aria-labelledby="gallery-title">
+  <div class="container">
+    <SectionHeading id="gallery-title" title="Nuestros food trucks en acción" />
+
+    <div
+      class="grid grid-cols-6 gap-3 max-b1100:grid-cols-3 max-b560:grid-cols-2"
+      data-reveal
+      data-reveal-stagger
+      data-home-gallery
+    >
+      {
+        photos.map((photo, i) => (
+          <button
+            class="group block w-full cursor-zoom-in rounded-xl border-0 bg-transparent p-0"
+            type="button"
+            data-lightbox-open
+            data-full={fullImages[i].src}
+            aria-label={`Ampliar fotografía: ${photo.alt}`}
+          >
+            <Image
+              src={photo.src}
+              alt={photo.alt}
+              widths={[320, 640, 960]}
+              sizes="(max-width: 560px) 50vw, (max-width: 1100px) 33vw, 16vw"
+              loading="lazy"
+              class={photoClass}
+            />
+          </button>
+        ))
+      }
+    </div>
+
+    <p class="mt-[26px] mb-0 text-center print:hidden">
+      <a class="button button-primary" href="/galeria" data-track="gallery_open">
+        <Icon name="image" size={20} />
+        Ver más fotos en la galería
+        <Icon name="arrow" size={20} />
+      </a>
+    </p>
+  </div>
+</section>

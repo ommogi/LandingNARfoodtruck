@@ -1,0 +1,91 @@
+---
+/**
+ * Personalizacion del exterior del truck. Panel perfilado en rust para que
+ * destaque sobre el degradado crema sin recurrir a otro bloque oscuro: la
+ * pagina ya cierra con la banda oscura de TruckFinalCta.
+ */
+import { Image } from 'astro:assets';
+import truckPersonalizado from '../../assets/truck-personalizado.png';
+import Icon from '../Icon.astro';
+
+const perks = [
+  {
+    icon: 'pencil',
+    title: 'Rotulación completa',
+    text: 'Del exterior del truck con acabados profesionales.',
+  },
+  {
+    icon: 'gem',
+    title: 'Diseño 100% personalizado',
+    text: 'Adaptado a tu identidad corporativa.',
+  },
+  {
+    icon: 'shield',
+    title: 'Vinilos de alta resistencia',
+    text: 'Materiales duraderos y de máxima calidad.',
+  },
+  {
+    icon: 'target',
+    title: 'Impacto visual garantizado',
+    text: 'Tu marca visible, reconocible e inolvidable.',
+  },
+] as const;
+
+/* Dos columnas: dentro del panel no caben cuatro sin partir los titulares. */
+const perk = [
+  'grid grid-cols-[auto_1fr] items-start gap-x-3.5 gap-y-1 pr-[18px]',
+  'nth-[2n]:border-l nth-[2n]:border-line nth-[2n]:pr-0 nth-[2n]:pl-[18px]',
+  'max-b480:border-l-0 max-b480:px-0',
+].join(' ');
+---
+
+<section class="section pt-0" aria-labelledby="servicios-branding-title">
+  <div class="container">
+    <div
+      class="grid grid-cols-[1fr_1fr] items-center gap-[34px] rounded-card border border-rust/25 bg-white/70 p-[34px] max-b980:grid-cols-1 max-b560:p-[22px]"
+      data-reveal
+    >
+      <div>
+        <h2
+          id="servicios-branding-title"
+          class="m-0 mb-4 text-[clamp(30px,3.6vw,44px)] leading-[1.02] font-bold text-night"
+        >
+          Tu marca,
+          <em class="block text-rust not-italic">protagonista</em>
+        </h2>
+
+        <p class="m-0 mb-8 max-w-[460px] text-[15.5px] text-muted">
+          Personalizamos el exterior del food truck con tu logo, colores y diseño corporativo para
+          que tu marca destaque y deje huella en cada evento.
+        </p>
+
+        <ul
+          class="m-0 grid list-none grid-cols-2 gap-y-6 p-0 max-b480:grid-cols-1 max-b480:gap-y-5"
+        >
+          {
+            perks.map((item) => (
+              <li class={perk}>
+                <Icon name={item.icon} size={28} class="row-span-2 text-night" />
+                <b class="font-display text-[14.5px] leading-[1.2] font-bold tracking-[0.03em] text-night uppercase">
+                  {item.title}
+                </b>
+                <small class="text-xs leading-[1.45] text-muted">{item.text}</small>
+              </li>
+            ))
+          }
+        </ul>
+      </div>
+
+      <figure class="m-0 max-b980:order-first">
+        <Image
+          src={truckPersonalizado}
+          alt="Food truck NAR rotulado con la marca de un cliente: logo, menú y colores corporativos"
+          widths={[640, 960, 1280]}
+          sizes="(max-width: 980px) 100vw, 46vw"
+          loading="lazy"
+          class="w-full"
+        />
+      </figure>
+    </div>
+  </div>
+</section>

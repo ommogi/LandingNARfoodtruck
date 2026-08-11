@@ -1,0 +1,107 @@
+---
+import { Image } from 'astro:assets';
+import logo from '../assets/logo-nar-horizontal.png';
+import { mainNav, site } from '../config/site';
+import Icon from './Icon.astro';
+
+/**
+ * El item activo depende de la ruta: en la home lo esta "Inicio" y en el resto
+ * de paginas el enlace que coincide con la URL actual.
+ */
+const path = Astro.url.pathname.replace(/\/+$/, '') || '/';
+const isCurrent = (href: string) =>
+  path === '/' ? href === '/#inicio' : href.replace(/\/+$/, '') === path;
+
+/** Enlace de navegacion: la barra inferior marca el estado activo sin depender del color. */
+const navLink = [
+  'relative py-[27px] font-display text-base font-bold tracking-[0.03em] uppercase whitespace-nowrap',
+  "after:absolute after:inset-x-0 after:bottom-[19px] after:h-0.5 after:scale-x-0 after:bg-rust after:transition-transform after:duration-200 after:content-['']",
+  'hover:after:scale-x-100 focus-visible:after:scale-x-100 is-active:after:scale-x-100',
+  'is-active:text-rust',
+  'max-b1180:text-[15px]',
+  'max-b900:py-[13px] max-b900:px-[5px] max-b900:after:right-auto max-b900:after:bottom-[9px] max-b900:after:w-9',
+].join(' ');
+---
+
+<header
+  class="sticky top-0 z-[100] border-b border-black/7 bg-[rgb(252_250_249_/_94%)] backdrop-blur-[14px] transition-shadow duration-[250ms] is-scrolled:shadow-[0_8px_30px_rgb(0_0_0_/_8%)] print:hidden"
+  data-header
+>
+  <div
+    class="container grid min-h-[var(--header-h)] grid-cols-[auto_1fr_auto] items-center gap-6 max-b900:grid-cols-[1fr_auto]"
+  >
+    <a
+      class="flex min-h-11 items-center"
+      href="/"
+      aria-label={`${site.name}, ir al inicio`}
+    >
+      <Image
+        src={logo}
+        alt={site.name}
+        widths={[180, 360]}
+        sizes="180px"
+        loading="eager"
+        class="h-auto w-[180px] max-b900:w-[150px]"
+      />
+    </a>
+
+    <button
+      class="group hidden size-11 cursor-pointer border-0 p-[9px] max-b900:block"
+      type="button"
+      aria-expanded="false"
+      aria-controls="main-nav"
+      data-menu-button
+    >
+      <span class="sr-only">Abrir menú</span>
+      <span
+        class="my-[5px] block h-0.5 bg-ink transition-[transform,opacity] duration-200 ease-out group-aria-expanded:translate-y-[7px] group-aria-expanded:rotate-45"
+        aria-hidden="true"></span>
+      <span
+        class="my-[5px] block h-0.5 bg-ink transition-[transform,opacity] duration-200 ease-out group-aria-expanded:opacity-0"
+        aria-hidden="true"></span>
+      <span
+        class="my-[5px] block h-0.5 bg-ink transition-[transform,opacity] duration-200 ease-out group-aria-expanded:-translate-y-[7px] group-aria-expanded:-rotate-45"
+        aria-hidden="true"></span>
+    </button>
+
+    {/* `nav-panel` (global.css) abre y cierra el desplegable en movil. */}
+    <nav
+      id="main-nav"
+      class="nav-panel flex justify-center gap-[clamp(12px,1.9vw,30px)] max-b900:absolute max-b900:inset-x-0 max-b900:top-full max-b900:flex-col max-b900:gap-0 max-b900:border-b max-b900:border-line max-b900:bg-[#fcfaf9] max-b900:px-5 max-b900:pt-2.5 max-b900:pb-[22px] max-b900:shadow-[0_20px_30px_rgb(0_0_0_/_10%)]"
+      aria-label="Navegación principal"
+      data-nav
+    >
+      {
+        mainNav.map((item) => (
+          <a
+            href={item.href}
+            class={[navLink, isCurrent(item.href) ? 'is-active' : ''].join(' ')}
+            aria-current={isCurrent(item.href) ? 'page' : undefined}
+          >
+            {item.label}
+          </a>
+        ))
+      }
+      {/* En movil el CTA vive dentro del panel desplegable. */}
+      <button
+        class="button button-primary hidden mt-3.5 max-b900:inline-flex"
+        type="button"
+        data-form-open
+        data-track="cta_header_click"
+      >
+        <Icon name="calendar" size={20} />
+        Reservar fecha
+      </button>
+    </nav>
+
+    <button
+      class="button button-primary max-b1180:px-4 max-b1180:text-base max-b1024:hidden"
+      type="button"
+      data-form-open
+      data-track="cta_header_click"
+    >
+      <Icon name="calendar" size={20} />
+      Reservar fecha
+    </button>
+  </div>
+</header>

@@ -1,0 +1,32 @@
+User-agent: *
+Allow: /
+Disallow: /api/
+
+# Crawlers de motores generativos (ChatGPT, Claude, Perplexity, AI Overviews).
+# Ya pasarian por la regla `*`, pero declararlos evita ambiguedades y deja
+# constancia de que se permite el rastreo para respuestas con cita.
+User-agent: GPTBot
+Allow: /
+Disallow: /api/
+
+User-agent: OAI-SearchBot
+Allow: /
+Disallow: /api/
+
+User-agent: ClaudeBot
+Allow: /
+Disallow: /api/
+
+User-agent: PerplexityBot
+Allow: /
+Disallow: /api/
+
+User-agent: Google-Extended
+Allow: /
+Disallow: /api/
+
+User-agent: CCBot
+Allow: /
+Disallow: /api/
+
+Sitemap: https://www.narfoodtruck.com/sitemap-index.xml

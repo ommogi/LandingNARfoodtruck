@@ -1,0 +1,422 @@
+---
+/**
+ * Asistente de reserva en cuatro pasos que abren los CTA de "consultar/comprobar
+ * disponibilidad" (data-booking-open). El modal simple de presupuesto
+ * (QuoteFormModal) sigue existiendo para "Reservar fecha".
+ *
+ * Los nombres de los campos son los mismos que los de QuoteFormModal para que
+ * /api/presupuesto sirva a los dos formularios sin ramificaciones; este anade
+ * ademas `config`, que es lo que acaba en el asunto del correo.
+ *
+ * El backdrop y el panel repiten la estructura de QuoteFormModal para heredar
+ * las transiciones de global.css; la maquinaria (pasos, calendario, envio) esta
+ * en src/scripts/booking.ts.
+ */
+import { Image } from 'astro:assets';
+import logo from '../../assets/logo-nar-horizontal.png';
+import { contact, eventTypes, site, social } from '../../config/site';
+import { configurations, formatPrice } from '../../data/configuraciones';
+import Icon from '../Icon.astro';
+import BookingAside from './BookingAside.astro';
+import BookingCalendar from './BookingCalendar.astro';
+
+const pasos = [
+  { n: 1, label: 'Fecha', next: 'Detalles del evento' },
+  { n: 2, label: 'Detalles', next: 'Datos del evento' },
+  { n: 3, label: 'Evento', next: 'Tus datos de contacto' },
+  { n: 4, label: 'Contacto', next: '' },
+];
+
+const label = 'grid gap-1.5 text-sm font-semibold';
+/* `is-invalid` lo pone src/scripts/lead.ts cuando el campo no valida. */
+const field = [
+  'w-full min-h-[46px] px-3 py-[11px] rounded-lg border border-line bg-white font-normal',
+  'is-invalid:border-[#b42318] is-invalid:shadow-[0_0_0_3px_rgb(180_35_24_/_12%)]',
+].join(' ');
+const required = 'text-rust no-underline';
+
+const accentBg = { blue: 'bg-blue', rust: 'bg-rust', night: 'bg-night' };
+const accentText = { blue: 'text-blue', rust: 'text-rust', night: 'text-night' };
+---
+
+<div
+  class="fixed inset-0 z-[1000] grid place-items-center p-5 max-b560:p-0 print:hidden"
+  hidden
+  data-booking-modal
+  role="dialog"
+  aria-modal="true"
+  aria-labelledby="booking-title"
+>
+  <div
+    class="absolute inset-0 bg-black/76 backdrop-blur-[5px]"
+    data-booking-close
+    data-modal-backdrop
+  >
+  </div>
+
+  <div
+    class="relative z-1 flex max-h-[calc(100dvh-40px)] w-[min(1180px,100%)] flex-col overflow-auto rounded-2xl bg-bg-1 shadow-[0_30px_100px_rgb(0_0_0_/_40%)] max-b560:max-h-dvh max-b560:rounded-none"
+    data-modal-panel
+  >
+    <header
+      class="sticky top-0 z-2 grid grid-cols-[auto_1fr_auto] items-center gap-5 border-b border-line bg-bg-1 px-7 py-4 max-b620:px-4"
+    >
+      <Image
+        src={logo}
+        alt={site.name}
+        widths={[150, 300]}
+        sizes="150px"
+        class="h-auto w-[150px] max-b620:w-[120px]"
+      />
+      <h2
+        id="booking-title"
+        class="m-0 text-center text-[clamp(20px,3vw,30px)] leading-none font-bold text-blue"
+      >
+        Consultar disponibilidad
+      </h2>
+      <button
+        class="grid size-11 cursor-pointer place-items-center rounded-full border-0 bg-bg-2 text-ink hover:bg-line"
+        type="button"
+        data-booking-close
+        aria-label="Cerrar el asistente de reserva"
+      >
+        <Icon name="close" size={22} />
+      </button>
+    </header>
+
+    <div class="grid grid-cols-[340px_1fr] gap-6 p-6 max-b900:grid-cols-1 max-b620:p-4">
+      <BookingAside />
+
+      <div class="min-w-0">
+        {/* -------------------------------------------------- Indicador de pasos */}
+        <ol class="m-0 mb-6 flex list-none items-center gap-2 p-0 max-b620:gap-1">
+          {
+            pasos.map((paso, index) => (
+              <>
+                <li
+                  class="booking-step flex items-center gap-2.5 text-[13px] font-bold tracking-[0.04em] uppercase"
+                  data-step-dot={paso.n}
+                >
+                  <span class="grid size-8 flex-none place-items-center rounded-full text-sm" aria-hidden="true">
+                    {paso.n}
+                  </span>
+                  <span class="max-b1024:sr-only">{paso.label}</span>
+                </li>
+                {index < pasos.length - 1 && (
+                  <li class="h-px flex-1 bg-line" aria-hidden="true" />
+                )}
+              </>
+            ))
+          }
+        </ol>
+
+        {/* Sin data-lead-form: lo inicializa src/scripts/booking.ts, no landing.ts. */}
+        <form data-booking-form novalidate>
+          {/* ------------------------------------------------ Paso 1: fecha */}
+          <section data-step="1" aria-label="Paso 1: fecha">
+            <BookingCalendar />
+
+            {/* Lo rellena el calendario al seleccionar un dia. */}
+            <input type="hidden" name="date" data-booking-date />
+
+            <label
+              class="mt-4 grid grid-cols-[auto_1fr] items-start gap-2.5 text-sm font-normal"
+            >
+              <input class="mt-[3px] size-5 min-h-5" type="checkbox" data-booking-nodate />
+              <span>Aún no tengo la fecha definida. Quiero que me propongáis opciones.</span>
+            </label>
+          </section>
+
+          {/* ------------------------------------------------ Paso 2: configuracion */}
+          <section data-step="2" aria-label="Paso 2: detalles" hidden>
+            <h3 class="m-0 text-[22px] leading-none font-bold text-blue">
+              Elige la configuración del truck
+            </h3>
+            <p class="mt-1.5 mb-4 text-[13px] text-muted">
+              Cada configuración incluye el equipamiento de la anterior. Puedes cambiarla más
+              adelante: el precio final se confirma en el presupuesto.
+            </p>
+
+            <fieldset class="m-0 border-0 p-0">
+              <legend class="sr-only">Configuración del food truck</legend>
+              <ul class="m-0 grid list-none grid-cols-2 gap-3 p-0 max-b620:grid-cols-1">
+                {
+                  configurations.map((config) => (
+                    <li>
+                      <label
+                        class="group grid h-full cursor-pointer grid-cols-[auto_1fr] items-start gap-3 rounded-xl border border-line bg-white p-4 transition-colors hover:border-night has-checked:border-rust has-checked:shadow-[0_0_0_3px_rgb(166_57_33_/_12%)]"
+                      >
+                        <input
+                          class="mt-1 size-5 min-h-5 accent-rust"
+                          type="radio"
+                          name="config"
+                          value={config.id}
+                          data-config-radio={config.id}
+                          required
+                        />
+                        <span class="grid gap-1.5">
+                          <span class="flex flex-wrap items-center gap-2">
+                            <span
+                              class:list={[
+                                'grid size-8 flex-none place-items-center rounded-full text-white',
+                                accentBg[config.accent],
+                              ]}
+                              aria-hidden="true"
+                            >
+                              <Icon name={config.icon} size={18} />
+                            </span>
+                            <b
+                              class:list={[
+                                'text-[19px] font-bold',
+                                accentText[config.accent],
+                              ]}
+                            >
+                              {config.name}
+                            </b>
+                            {config.badge && (
+                              <span
+                                class:list={[
+                                  'rounded-md px-2 py-0.5 text-[10px] font-bold tracking-[0.04em] text-white uppercase',
+                                  accentBg[config.accent],
+                                ]}
+                              >
+                                {config.badge}
+                              </span>
+                            )}
+                          </span>
+                          <span class="text-[13px] text-muted">
+                            Desde <b class="text-[17px] text-night">{formatPrice(config.price)}€</b>{' '}
+                            / día
+                          </span>
+                          <span class="text-[12.5px] leading-[1.5] text-muted">
+                            {config.cardText}
+                          </span>
+                        </span>
+                      </label>
+                    </li>
+                  ))
+                }
+              </ul>
+            </fieldset>
+
+            <label class={`${label} mt-4 max-w-[280px]`}>
+              <span>Número de invitados</span>
+              <input
+                class={field}
+                type="number"
+                name="guests"
+                min="1"
+                max="5000"
+                inputmode="numeric"
+                placeholder="Aproximado"
+              />
+            </label>
+
+            <p class="mt-3 mb-0 text-[12.5px] text-muted">
+              ¿Quieres ver el equipamiento de cada una?{' '}
+              <a class="text-rust underline" href="/configuraciones">Ver configuraciones</a>.
+            </p>
+          </section>
+
+          {/* ------------------------------------------------ Paso 3: evento */}
+          <section data-step="3" aria-label="Paso 3: evento" hidden>
+            <h3 class="m-0 text-[22px] leading-none font-bold text-blue">Cuéntanos del evento</h3>
+            <p class="mt-1.5 mb-4 text-[13px] text-muted">
+              Con esto preparamos una propuesta ajustada a lo que necesitas.
+            </p>
+
+            <div class="grid grid-cols-2 gap-4 max-b620:grid-cols-1">
+              <label class={label}>
+                <span>Tipo de evento <abbr class={required} title="obligatorio">*</abbr></span>
+                <select class={field} name="eventType" required>
+                  <option value="">Selecciona</option>
+                  {eventTypes.map((type) => <option>{type}</option>)}
+                </select>
+              </label>
+
+              <label class={label}>
+                <span>Ubicación</span>
+                <input
+                  class={field}
+                  name="location"
+                  autocomplete="address-level2"
+                  placeholder={`${site.locality} o municipio`}
+                  maxlength="160"
+                />
+              </label>
+            </div>
+
+            <label class={`${label} mt-4`}>
+              <span>Cuéntanos tu idea</span>
+              <textarea
+                class={`${field} min-h-[130px] resize-y`}
+                name="message"
+                maxlength="1500"
+                placeholder="Horario, número de servicios, si ya tienes catering..."></textarea>
+            </label>
+          </section>
+
+          {/* ------------------------------------------------ Paso 4: contacto */}
+          <section data-step="4" aria-label="Paso 4: contacto" hidden>
+            <h3 class="m-0 text-[22px] leading-none font-bold text-blue">¿Cómo te contactamos?</h3>
+            <p class="mt-1.5 mb-4 text-[13px] text-muted">
+              Te respondemos con la disponibilidad real de la fecha en menos de 24 horas.
+            </p>
+
+            <div class="grid grid-cols-2 gap-4 max-b620:grid-cols-1">
+              <label class={label}>
+                <span>Nombre <abbr class={required} title="obligatorio">*</abbr></span>
+                <input
+                  class={field}
+                  name="name"
+                  autocomplete="name"
+                  required
+                  minlength="2"
+                  maxlength="80"
+                />
+              </label>
+
+              <label class={label}>
+                <span>Email <abbr class={required} title="obligatorio">*</abbr></span>
+                <input class={field} type="email" name="email" autocomplete="email" required />
+              </label>
+
+              <label class={label}>
+                <span>Teléfono <abbr class={required} title="obligatorio">*</abbr></span>
+                <input
+                  class={field}
+                  type="tel"
+                  name="phone"
+                  autocomplete="tel"
+                  required
+                  minlength="6"
+                  maxlength="40"
+                />
+              </label>
+            </div>
+
+            {/* Resumen de lo elegido en los pasos anteriores; lo escribe booking.ts. */}
+            <dl
+              class="mt-5 mb-4 grid grid-cols-3 gap-4 rounded-xl border border-line bg-white p-4 text-sm max-b620:grid-cols-1"
+            >
+              <div>
+                <dt class="text-xs font-bold tracking-[0.04em] text-muted uppercase">Fecha</dt>
+                <dd class="m-0 mt-1 font-semibold" data-summary-date>Por definir</dd>
+              </div>
+              <div>
+                <dt class="text-xs font-bold tracking-[0.04em] text-muted uppercase">
+                  Configuración
+                </dt>
+                <dd class="m-0 mt-1 font-semibold" data-summary-config>—</dd>
+              </div>
+              <div>
+                <dt class="text-xs font-bold tracking-[0.04em] text-muted uppercase">Evento</dt>
+                <dd class="m-0 mt-1 font-semibold" data-summary-event>—</dd>
+              </div>
+            </dl>
+
+            <label class="grid grid-cols-[auto_1fr] items-start gap-2.5 text-sm font-normal">
+              <input class="mt-[3px] size-5 min-h-5" type="checkbox" name="consent" required />
+              <span>
+                He leído y acepto la <a
+                  class="text-rust underline"
+                  href="/privacidad"
+                  target="_blank"
+                  rel="noopener">política de privacidad</a
+                >.
+              </span>
+            </label>
+          </section>
+
+          {/* Honeypot anti-spam: oculto visualmente y fuera del orden de tabulacion. */}
+          <label class={`${label} absolute! -left-[9999px]`} aria-hidden="true">
+            Web
+            <input name="website" tabindex="-1" autocomplete="off" />
+          </label>
+
+          {/* ------------------------------------------------ Pie comun */}
+          <div
+            class="mt-6 grid grid-cols-[1fr_1fr_auto] items-center gap-5 rounded-xl border border-line bg-white p-4 max-b1024:grid-cols-1"
+            data-booking-footer
+          >
+            <div>
+              <p class="m-0 text-xs font-bold tracking-[0.04em] text-muted uppercase">
+                Fecha seleccionada
+              </p>
+              <p class="mt-1.5 mb-0 flex items-center gap-2.5 font-semibold">
+                <Icon name="calendar" size={22} class="text-rust" />
+                <span data-booking-recap>Ninguna todavía</span>
+              </p>
+            </div>
+
+            <div>
+              <p class="m-0 text-xs font-bold tracking-[0.04em] text-muted uppercase">
+                ¿Tienes dudas?
+              </p>
+              <p class="mt-1.5 mb-2 text-[12.5px] leading-[1.4] text-muted">
+                Escríbenos por WhatsApp y te ayudamos a encontrar la mejor fecha.
+              </p>
+              <a
+                class="button button-line min-h-11 px-4 text-base"
+                href={social.whatsapp}
+                target="_blank"
+                rel="noopener"
+                data-track="booking_whatsapp"
+              >
+                <Icon name="whatsapp" size={20} />
+                {contact.phone}
+              </a>
+            </div>
+
+            <div class="grid gap-2 justify-self-end max-b1024:w-full max-b1024:justify-self-stretch">
+              <div class="flex gap-2.5 max-b620:flex-col">
+                <button
+                  class="button button-line max-b1024:flex-1"
+                  type="button"
+                  data-booking-back
+                  hidden
+                >
+                  Atrás
+                </button>
+                <button
+                  class="button button-primary px-9 max-b1024:flex-1"
+                  type="button"
+                  data-booking-next
+                  data-form-submit
+                >
+                  Continuar
+                </button>
+              </div>
+              <p class="m-0 text-right text-[12.5px] text-muted max-b1024:text-left">
+                <span data-booking-hint>Siguiente paso: detalles del evento</span>
+              </p>
+            </div>
+          </div>
+
+          <p
+            class="mt-3 mb-0 min-h-6 text-sm font-semibold is-error:text-[#b42318] is-success:text-[#17663a]"
+            data-form-status
+            role="status"
+            aria-live="polite"
+          >
+          </p>
+        </form>
+
+        {/* Sustituye al formulario cuando el envio va bien. */}
+        <div class="hidden text-center" data-booking-success>
+          <Icon name="check-circle" size={54} class="mx-auto text-[#17663a]" />
+          <h3 class="mt-4 mb-2 text-[26px] font-bold">Solicitud enviada</h3>
+          <p class="mx-auto mb-0 max-w-[440px] text-sm text-muted">
+            Gracias. Hemos recibido tu solicitud y te confirmamos la disponibilidad de la fecha en
+            menos de 24 horas.
+          </p>
+        </div>
+
+        <p class="mt-4 mb-0 flex items-center gap-2 text-xs text-muted">
+          <Icon name="lock" size={16} />
+          Tus datos están seguros. No compartimos tu información.
+        </p>
+      </div>
+    </div>
+  </div>
+</div>

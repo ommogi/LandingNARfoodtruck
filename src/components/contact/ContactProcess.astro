@@ -1,0 +1,63 @@
+---
+import Icon from '../Icon.astro';
+import SectionHeading from '../SectionHeading.astro';
+
+/**
+ * Los cuatro pasos que van del formulario al evento. Mismo lenguaje visual que
+ * `home/Process.astro`, resumido a lo que ocurre despues de escribirnos.
+ */
+const steps = [
+  {
+    icon: 'chat',
+    title: 'Cuéntanos tu evento',
+    text: 'Rellena el formulario y cuéntanos tus ideas.',
+  },
+  {
+    icon: 'doc',
+    title: 'Propuesta personalizada',
+    text: 'Te enviamos una propuesta adaptada a tu evento.',
+  },
+  {
+    icon: 'calendar',
+    title: 'Confirmamos la fecha',
+    text: 'Reservamos tu fecha y preparamos el servicio.',
+  },
+  {
+    icon: 'confetti',
+    title: 'Disfruta de tu evento',
+    text: 'Nos encargamos del transporte, montaje y recogida.',
+  },
+] as const;
+
+/** El conector punteado solo tiene sentido cuando los pasos van en una fila. */
+const step = [
+  'relative p-2.5 text-center',
+  "not-last:after:absolute not-last:after:top-[52px] not-last:after:left-[calc(50%+58px)] not-last:after:w-[calc(100%-116px)] not-last:after:border-t-2 not-last:after:border-dashed not-last:after:border-rust/35 not-last:after:content-['']",
+  'max-b1100:after:hidden',
+].join(' ');
+---
+
+<section class="section" aria-labelledby="contact-process-title">
+  <div class="container">
+    <SectionHeading id="contact-process-title" title="¿Cómo funciona?" />
+
+    <ol class="m-0 grid list-none grid-cols-4 gap-[22px] p-0 max-b1100:grid-cols-2 max-b560:grid-cols-1">
+      {
+        steps.map((item, i) => (
+          <li class={step} data-reveal>
+            <div class="relative mx-auto mb-3.5 w-[92px]">
+              <span class="absolute -top-1 -left-0.5 z-2 grid size-8 place-items-center rounded-full bg-rust font-display text-[17px] font-bold text-white">
+                {i + 1}
+              </span>
+              <div class="grid size-[92px] place-items-center rounded-full bg-[#eee7e2] text-night">
+                <Icon name={item.icon} size={34} />
+              </div>
+            </div>
+            <h3 class="m-0 mb-1.5 text-[19px] font-bold text-night">{item.title}</h3>
+            <p class="m-0 text-[13px] leading-[1.5] text-muted">{item.text}</p>
+          </li>
+        ))
+      }
+    </ol>
+  </div>
+</section>

@@ -1,0 +1,46 @@
+---
+import Icon from '../Icon.astro';
+
+const reasons = [
+  { icon: 'euro', title: 'Sin costes ocultos', text: 'Transparencia total desde el principio.' },
+  { icon: 'doc', title: 'Presupuesto sin compromiso', text: 'Te respondemos en menos de 24 horas.' },
+  { icon: 'target', title: 'Flexibilidad total', text: 'Nos adaptamos a tu idea, espacio y necesidades.' },
+  { icon: 'users', title: 'Equipo profesional', text: 'Personal cualificado y con experiencia.' },
+  { icon: 'leaf', title: 'Sostenible', text: 'Opciones responsables con el entorno.' },
+] as const;
+
+const divider = 'border-white/16';
+
+/* 5 columnas en escritorio, 3 desde 1100px, 2 desde 700px y 1 desde 480px. */
+const card = [
+  `grid grid-cols-[32px_1fr] items-start gap-3.5 border-r px-[22px] py-2.5 last:border-r-0 ${divider}`,
+  'max-b1100:nth-[3n]:border-r-0',
+  'max-b1100:[&:nth-child(-n+3)]:border-b max-b1100:[&:nth-child(-n+3)]:pb-5',
+  'max-b700:border-r max-b700:border-b max-b700:px-3.5 max-b700:py-4',
+  'max-b700:even:border-r-0 max-b700:last:border-b-0',
+  'max-b480:border-r-0 max-b480:[&:nth-child(-n+3)]:pb-4',
+].join(' ');
+---
+
+<section class="section" aria-labelledby="reasons-title">
+  <div class="container">
+    <h2 id="reasons-title" class="sr-only">Por qué elegirnos</h2>
+    <div
+      class="grid grid-cols-5 rounded-card bg-[linear-gradient(135deg,#16232b,#0a1c26)] px-[18px] py-[26px] text-white max-b1100:grid-cols-3 max-b1100:gap-y-2 max-b700:grid-cols-2 max-b480:grid-cols-1"
+      data-reveal
+      data-reveal-stagger
+    >
+      {
+        reasons.map((reason) => (
+          <article class={card}>
+            <Icon name={reason.icon} size={32} class="text-rust" />
+            <div>
+              <h3 class="m-0 mb-1 text-base leading-[1.15] font-bold">{reason.title}</h3>
+              <p class="m-0 text-[12.5px] leading-[1.45] text-white/74">{reason.text}</p>
+            </div>
+          </article>
+        ))
+      }
+    </div>
+  </div>
+</section>

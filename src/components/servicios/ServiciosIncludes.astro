@@ -1,0 +1,79 @@
+---
+/**
+ * Que incluye el alquiler. Son siete tarjetas sobre una rejilla de cuatro, asi
+ * que se maquetan con flex + basis en lugar de `grid`: la fila incompleta
+ * queda centrada sola, sin reglas nth-child por breakpoint.
+ */
+import Icon from '../Icon.astro';
+import SectionHeading from '../SectionHeading.astro';
+import { site } from '../../config/site';
+
+const items = [
+  {
+    icon: 'truck',
+    title: 'Alquiler del food truck',
+    text: 'Truck totalmente equipado y listo para usar.',
+  },
+  {
+    icon: 'kitchen',
+    title: 'Equipamiento y utensilios',
+    text: 'Cocina profesional, menaje y utensilios necesarios.',
+  },
+  {
+    icon: 'users',
+    title: 'Personal cualificado',
+    text: 'Equipo profesional de apoyo durante el montaje.',
+  },
+  {
+    icon: 'tools',
+    title: 'Montaje y desmontaje',
+    text: 'Nos encargamos de todo el proceso de montaje y retirada.',
+  },
+  {
+    icon: 'pin',
+    title: 'Logística y transporte',
+    text: `Transporte incluido dentro de ${site.areaServed}.`,
+  },
+  {
+    icon: 'doc',
+    title: 'Permisos y documentación',
+    text: 'Gestionamos los permisos necesarios para el evento.',
+  },
+  {
+    icon: 'headset',
+    title: 'Atención al cliente',
+    text: 'Acompañamiento antes, durante y después del evento.',
+  },
+] as const;
+
+const card = [
+  'basis-[calc(25%-15px)] rounded-card border border-line bg-white/70 px-5 py-[26px] text-center',
+  'max-b900:basis-[calc(50%-10px)]',
+  'max-b560:basis-full',
+].join(' ');
+---
+
+<section class="section pt-0" aria-labelledby="servicios-includes-title">
+  <div class="container">
+    <SectionHeading id="servicios-includes-title" title="Qué incluye nuestro servicio" />
+    <p class="mx-auto -mt-6 mb-[34px] max-w-[620px] text-center text-[15px] text-muted">
+      Todo lo necesario para que tu evento sea un éxito.
+    </p>
+
+    <ul
+      class="m-0 flex list-none flex-wrap justify-center gap-5 p-0"
+      data-reveal
+      data-reveal-stagger
+    >
+      {
+        items.map((item) => (
+          <li class={card}>
+            <Icon name={item.icon} size={38} class="mx-auto text-night" />
+            <h3 class="mt-[15px] mb-2 text-[17px] font-bold tracking-[0.02em]">{item.title}</h3>
+            <p class="m-0 text-[12.5px] leading-[1.5] text-muted">{item.text}</p>
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+</section>

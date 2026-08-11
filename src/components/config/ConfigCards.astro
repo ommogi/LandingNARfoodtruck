@@ -1,0 +1,124 @@
+---
+/**
+ * Comparativa de las cuatro configuraciones. Cada tarjeta abre su modal
+ * (ConfigModal) mediante data-config-open; el equipamiento es acumulativo,
+ * por eso la primera linea de la lista remite a la opcion anterior.
+ */
+import Icon from '../Icon.astro';
+import SectionHeading from '../SectionHeading.astro';
+import ConfigModal from './ConfigModal.astro';
+import { configurations, formatPrice } from '../../data/configuraciones';
+
+const accentBg = { blue: 'bg-blue', rust: 'bg-rust', night: 'bg-night' };
+const accentText = { blue: 'text-blue', rust: 'text-rust', night: 'text-night' };
+const accentButton = {
+  blue: 'text-blue border-blue hover:bg-blue hover:text-white',
+  rust: 'text-rust border-rust hover:bg-rust hover:text-white',
+  night: 'text-night border-night hover:bg-night hover:text-white',
+};
+---
+
+<section class="section" aria-labelledby="configs-title">
+  <div class="container">
+    <div data-reveal>
+      <SectionHeading title="Elige tu configuración" id="configs-title" />
+      <p class="mx-auto mt-[-20px] mb-8 max-w-[680px] text-center text-[13.5px] text-muted">
+        Todas las configuraciones incluyen el equipamiento de la opción anterior.
+      </p>
+
+      <ul
+        class="m-0 grid list-none grid-cols-4 gap-[18px] p-0 max-b1100:grid-cols-2 max-b620:grid-cols-1"
+      >
+        {
+          configurations.map((config) => (
+            <li class="relative flex flex-col rounded-card border border-[rgb(56_40_30_/_8%)] bg-white/96 px-[22px] pt-[26px] pb-[22px] shadow-card">
+              {config.badge && (
+                <span
+                  class:list={[
+                    'absolute -top-3 left-1/2 -translate-x-1/2 rounded-md px-3 py-1 text-[11px] font-bold tracking-[0.04em] whitespace-nowrap text-white uppercase',
+                    accentBg[config.accent],
+                  ]}
+                >
+                  {config.badge}
+                </span>
+              )}
+
+              <div class="flex items-center gap-3.5">
+                <span
+                  class:list={[
+                    'grid size-12 flex-none place-items-center rounded-full text-white',
+                    accentBg[config.accent],
+                  ]}
+                  aria-hidden="true"
+                >
+                  <Icon name={config.icon} size={26} />
+                </span>
+                <div>
+                  <h3
+                    class:list={[
+                      'm-0 text-[26px] leading-none font-bold',
+                      accentText[config.accent],
+                    ]}
+                  >
+                    {config.name}
+                  </h3>
+                  <span
+                    class:list={['mt-1 flex gap-0.5', accentText[config.accent]]}
+                    role="img"
+                    aria-label={`${config.stars} de 5`}
+                  >
+                    {Array.from({ length: 5 }).map((_, index) => (
+                      <Icon
+                        name="star"
+                        size={13}
+                        fill="currentColor"
+                        class={index < config.stars ? undefined : 'opacity-25'}
+                      />
+                    ))}
+                  </span>
+                </div>
+              </div>
+
+              <p class="mt-[18px] mb-0 text-center text-[14px] text-muted">
+                Desde <b class="text-[22px] font-bold text-night">{formatPrice(config.price)}€</b> /
+                día
+              </p>
+
+              <p class="mt-3.5 mb-[18px] text-[12.5px] leading-[1.5] text-muted">
+                {config.cardText}
+              </p>
+
+              <ul class="m-0 grid list-none gap-2.5 p-0">
+                {config.cardFeatures.map((feature) => (
+                  <li class="grid grid-cols-[20px_1fr] items-start gap-2.5 text-[12.5px] leading-[1.4]">
+                    <Icon name="check" size={20} class="mt-px text-[#17663a]" />
+                    {feature}
+                  </li>
+                ))}
+              </ul>
+
+              {/* mt-auto empuja el CTA al pie: las cuatro tarjetas lo alinean. */}
+              <div class="mt-auto pt-[22px]">
+                <button
+                  class:list={[
+                    'button button-block text-base',
+                    config.featured
+                      ? 'button-primary'
+                      : ['border bg-white', accentButton[config.accent]],
+                  ]}
+                  type="button"
+                  data-config-open={config.id}
+                  data-track={`config_open_${config.id}`}
+                >
+                  Ver configuración
+                </button>
+              </div>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </div>
+</section>
+
+{configurations.map((config) => <ConfigModal config={config} />)}

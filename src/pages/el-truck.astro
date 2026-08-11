@@ -1,0 +1,50 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import TruckHero from '../components/truck/TruckHero.astro';
+import TruckSpecs from '../components/truck/TruckSpecs.astro';
+import TruckReady from '../components/truck/TruckReady.astro';
+import TruckWhy from '../components/truck/TruckWhy.astro';
+import TruckProcessFaq from '../components/truck/TruckProcessFaq.astro';
+import TruckDocs from '../components/truck/TruckDocs.astro';
+import TruckFinalCta from '../components/truck/TruckFinalCta.astro';
+import VideoModal from '../components/VideoModal.astro';
+import QuoteFormModal from '../components/QuoteFormModal.astro';
+import BookingModal from '../components/booking/BookingModal.astro';
+import { faqItems } from '../data/faq';
+import { site } from '../config/site';
+import { faqNode } from '../lib/schema';
+
+/* Solo las preguntas `featured`: son exactamente las que pinta
+   TruckProcessFaq.astro en esta pagina. Marcar el resto seria declarar
+   contenido que el usuario no ve. */
+const canonical = new URL('/el-truck', site.url).href;
+const visibleFaqs = faqItems.filter((faq) => faq.featured);
+---
+
+<BaseLayout
+  title="El truck: food truck premium para eventos | NAR"
+  description="Food truck totalmente equipado: 5,40 x 2,40 m, hasta 150 personas/hora, autónomo en agua, luz y gas, y montaje en menos de 60 minutos."
+  path="/el-truck"
+  leadSource="landing-truck"
+  schemas={[faqNode(visibleFaqs, canonical)]}
+  breadcrumbs={[{ name: 'El Truck', path: '/el-truck' }]}
+>
+  <TruckHero />
+  <TruckSpecs />
+  <TruckReady />
+  <TruckWhy />
+  <TruckProcessFaq />
+  <TruckDocs />
+  <TruckFinalCta />
+
+  <Fragment slot="overlays">
+    <VideoModal />
+    <QuoteFormModal />
+    <BookingModal />
+  </Fragment>
+</BaseLayout>
+
+<script>
+  import '../scripts/landing';
+  import '../scripts/booking';
+</script>

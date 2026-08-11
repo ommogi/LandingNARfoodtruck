@@ -1,0 +1,23 @@
+---
+import LegalLayout from '../layouts/LegalLayout.astro';
+import { site, contact } from '../config/site';
+---
+
+<LegalLayout
+  title={`Aviso legal | ${site.name}`}
+  description="Aviso legal de NAR Food Truck Events."
+  path="/aviso-legal"
+  heading="Aviso legal"
+>
+  <h2>Titular</h2>
+  <p>Denominación social, NIF y domicilio pendientes de completar con datos reales.</p>
+
+  <h2>Contacto</h2>
+  <p>{contact.email} · {contact.phone} · {contact.address}</p>
+
+  <h2>Condiciones de uso</h2>
+  <p>Pendiente de redacción.</p>
+
+  <h2>Propiedad intelectual</h2>
+  <p>Pendiente de redacción.</p>
+</LegalLayout>

@@ -1,0 +1,121 @@
+---
+/**
+ * Fila de dos tarjetas: proceso resumido y FAQ.
+ * El acordeon usa <details>/<summary> nativos: accesible sin JS adicional.
+ */
+import Icon from '../Icon.astro';
+import { faqItems } from '../../data/faq';
+
+const steps = [
+  {
+    icon: 'calendar',
+    title: 'Consulta disponibilidad',
+    text: 'Cuéntanos la fecha, lugar y tipo de evento.',
+  },
+  {
+    icon: 'chat',
+    title: 'Te asesoramos',
+    text: 'Te proponemos la mejor opción para tu evento.',
+  },
+  {
+    icon: 'pencil',
+    title: 'Reserva confirmada',
+    text: 'Confirmamos y preparamos todo para tu gran día.',
+  },
+  {
+    icon: 'truck',
+    title: 'Montamos y servimos',
+    text: 'Llegamos, montamos y nos encargamos de todo.',
+  },
+] as const;
+
+/* Las preguntas marcadas como `featured` en src/data/faq.ts: una sola redaccion
+   compartida con /faq, donde estan todas las demas. */
+const faqs = faqItems.filter((faq) => faq.featured);
+
+const card =
+  'flex h-full flex-col rounded-card border border-[rgb(56_40_30_/_8%)] bg-white/96 px-[26px] pt-[30px] pb-7 shadow-card max-b560:px-[18px] max-b560:py-6';
+const cardTitle = 'm-0 text-[clamp(22px,2.2vw,28px)] leading-[1.1] font-bold';
+const ruleBar = 'block h-0.5 w-[42px] bg-current';
+
+/* El ::after es la linea que une los circulos numerados. */
+const step = [
+  'relative text-center',
+  "not-last:after:absolute not-last:after:top-3.5 not-last:after:left-[calc(50%+20px)] not-last:after:w-[calc(100%-40px)] not-last:after:border-t not-last:after:border-line not-last:after:content-['']",
+  'max-b560:after:hidden',
+].join(' ');
+---
+
+<section class="section" aria-labelledby="process-title faq-title">
+  <div class="container grid grid-cols-2 items-start gap-[26px] max-b980:grid-cols-1">
+    <article class={card} data-reveal>
+      <header class="mb-[26px] text-center">
+        <h2 id="process-title" class={cardTitle}>Un proceso simple y rápido</h2>
+        <span class="mt-1.5 flex items-center justify-center gap-2 text-rust" aria-hidden="true">
+          <i class={ruleBar}></i>
+          <Icon name="star" size={14} fill="currentColor" />
+          <i class={ruleBar}></i>
+        </span>
+        <p class="mt-2.5 mb-0 text-[12.5px] text-muted">
+          Así de fácil es llevar nuestro food truck a tu evento.
+        </p>
+      </header>
+
+      <ol
+        class="relative m-0 grid list-none grid-cols-4 gap-3.5 p-0 max-b560:grid-cols-2 max-b560:gap-y-6"
+      >
+        {
+          steps.map((item, i) => (
+            <li class={step}>
+              <span class="relative z-2 mx-auto mb-[22px] grid size-7 place-items-center rounded-full bg-night font-display text-[15px] font-bold text-white">
+                {i + 1}
+              </span>
+              <Icon name={item.icon} size={30} class="mx-auto text-night" />
+              <h3 class="mt-3 mb-1.5 text-[12.5px] leading-[1.25] font-bold">{item.title}</h3>
+              <p class="m-0 text-[11px] leading-[1.45] text-muted">{item.text}</p>
+            </li>
+          ))
+        }
+      </ol>
+    </article>
+
+    <article class={card} data-reveal>
+      <header class="mb-[26px] text-center">
+        <h2 id="faq-title" class={cardTitle}>Preguntas frecuentes</h2>
+        <span class="mt-1.5 flex items-center justify-center gap-2 text-rust" aria-hidden="true">
+          <i class={ruleBar}></i>
+          <Icon name="star" size={14} fill="currentColor" />
+          <i class={ruleBar}></i>
+        </span>
+      </header>
+
+      <div class="grid gap-2.5">
+        {
+          faqs.map((faq) => (
+            <details class="faq-item group rounded-[10px] border border-line bg-white">
+              <summary class="flex cursor-pointer list-none items-center justify-between gap-3.5 px-4 py-[13px] text-[13.5px] font-semibold hover:text-rust [&::-webkit-details-marker]:hidden">
+                {faq.question}
+                <span
+                  class="grid flex-none place-items-center text-muted transition-transform duration-200 ease-out group-open:rotate-180 motion-reduce:transition-none"
+                  aria-hidden="true"
+                >
+                  <Icon name="chevron" size={18} />
+                </span>
+              </summary>
+              <p class="m-0 px-4 pb-[15px] text-[12.5px] leading-[1.6] text-muted">{faq.answer}</p>
+            </details>
+          ))
+        }
+      </div>
+
+      <a
+        class="mt-auto inline-flex items-center justify-center gap-2 pt-[22px] font-display text-base font-bold tracking-[0.02em] text-rust uppercase hover:text-rust-dark"
+        href="/faq"
+        data-track="faq_all_click"
+      >
+        Ver todas las preguntas
+        <Icon name="arrow" size={18} />
+      </a>
+    </article>
+  </div>
+</section>

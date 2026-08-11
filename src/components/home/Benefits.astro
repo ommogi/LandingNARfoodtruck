@@ -1,0 +1,75 @@
+---
+import Icon from '../Icon.astro';
+
+const benefits = [
+  {
+    icon: 'truck',
+    title: 'Food trucks premium',
+    text: 'Equipados con todo lo necesario para ofrecer un servicio impecable.',
+  },
+  {
+    icon: 'leaf',
+    title: 'Personalizables',
+    text: 'Adaptamos el diseño, la carta y la experiencia a tu marca o evento.',
+  },
+  {
+    icon: 'dish',
+    title: 'Experiencia completa',
+    text: 'Nos encargamos del transporte, montaje, operación y retirada.',
+  },
+  {
+    icon: 'clock',
+    title: 'Montaje rápido',
+    text: 'Instalación en menos de 30 minutos.',
+  },
+  {
+    icon: 'shield',
+    title: 'Seguridad y seguro',
+    text: 'Cumplimos con todas las normativas y contamos con seguro incluido.',
+  },
+  {
+    icon: 'headset',
+    title: 'Atención personalizada',
+    text: 'Te acompañamos antes, durante y después de tu evento.',
+  },
+] as const;
+
+/**
+ * Las separaciones entre tarjetas cambian de eje segun el numero de columnas:
+ * 6 columnas en escritorio, 3 a partir de 1100px y 2 a partir de 820px.
+ */
+const card = [
+  'border-r border-line px-5 py-3 text-center last:border-r-0',
+  'max-b1100:nth-[3n]:border-r-0',
+  'max-b1100:[&:nth-child(-n+3)]:border-b max-b1100:[&:nth-child(-n+3)]:pb-[22px]',
+  'max-b1100:[&:nth-last-child(-n+3)]:pt-[22px]',
+  'max-b820:border-r max-b820:border-b max-b820:px-3 max-b820:py-[18px]',
+  'max-b820:even:border-r-0 max-b820:[&:nth-last-child(-n+2)]:border-b-0',
+].join(' ');
+---
+
+{/* La tarjeta se superpone ligeramente al hero. */}
+<section
+  id="servicios"
+  class="relative z-4 -mt-[30px] max-b560:-mt-5"
+  aria-labelledby="benefits-title"
+>
+  <div class="container">
+    <h2 id="benefits-title" class="sr-only">Ventajas del servicio</h2>
+    <div
+      class="grid grid-cols-6 rounded-card border border-[rgb(56_40_30_/_8%)] bg-white/96 px-[18px] py-[30px] shadow-card max-b1100:grid-cols-3 max-b820:grid-cols-2 max-b560:px-2.5 max-b560:py-4"
+      data-reveal
+      data-reveal-stagger
+    >
+      {
+        benefits.map((benefit) => (
+          <article class={card}>
+            <Icon name={benefit.icon} size={38} class="mx-auto text-rust" />
+            <h3 class="mt-[15px] mb-2 text-[17px] font-bold tracking-[0.02em]">{benefit.title}</h3>
+            <p class="m-0 text-[12.5px] leading-[1.5] text-muted">{benefit.text}</p>
+          </article>
+        ))
+      }
+    </div>
+  </div>
+</section>

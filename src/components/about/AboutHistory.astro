@@ -1,0 +1,61 @@
+---
+/**
+ * Linea de tiempo de la empresa. Reutiliza el conector punteado entre pasos
+ * del "Asi trabajamos" de la home (src/components/home/Process.astro), aqui
+ * en horizontal entre los iconos.
+ */
+import Icon from '../Icon.astro';
+import SectionHeading from '../SectionHeading.astro';
+
+const milestones = [
+  {
+    icon: 'dish',
+    title: '1981',
+    text: 'NAR nació como una empresa de fabricación de puntales.',
+  },
+  {
+    icon: 'store',
+    title: 'Evolución',
+    text: 'Con el tiempo, nos adaptamos a los cambios y comenzamos la venta y alquiler de material y equipamiento de construcción.',
+  },
+  {
+    icon: 'users',
+    title: 'Empresa familiar',
+    text: 'El saber hacer y el trabajo duro se transmite de generación en generación para seguir creciendo.',
+  },
+  {
+    icon: 'chart',
+    title: 'Hoy',
+    text: 'Ampliamos nuestros servicios para ofrecer soluciones integrales y una atención única y profesional.',
+  },
+] as const;
+
+/* El ::after es el conector punteado entre hitos, solo en escritorio. */
+const milestone = [
+  'relative grid grid-cols-[auto_1fr] items-start gap-x-[18px] gap-y-2',
+  "not-last:after:absolute not-last:after:top-[22px] not-last:after:left-[calc(100%+9px)] not-last:after:w-4 not-last:after:border-t-2 not-last:after:border-dashed not-last:after:border-rust/35 not-last:after:content-['']",
+  'max-b900:after:hidden',
+].join(' ');
+---
+
+<section class="section" aria-labelledby="history-title">
+  <div class="container">
+    <SectionHeading id="history-title" title="Nuestra historia" />
+
+    <ol
+      class="m-0 grid list-none grid-cols-4 gap-x-[34px] gap-y-[30px] p-0 max-b900:grid-cols-2 max-b560:grid-cols-1"
+    >
+      {
+        milestones.map((item) => (
+          <li class={milestone} data-reveal>
+            <Icon name={item.icon} size={38} class="row-span-2 text-night" />
+            <h3 class="m-0 font-display text-[19px] leading-none font-bold tracking-[0.02em] text-rust">
+              {item.title}
+            </h3>
+            <p class="m-0 text-[13px] leading-[1.55] text-muted">{item.text}</p>
+          </li>
+        ))
+      }
+    </ol>
+  </div>
+</section>

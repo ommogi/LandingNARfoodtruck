@@ -1,0 +1,69 @@
+---
+/**
+ * Banda oscura con las cifras de la empresa. Mismo panel que el bloque
+ * "Por que elegir nuestro food truck" de /el-truck (TruckWhy.astro).
+ */
+import Icon from '../Icon.astro';
+import type { IconName } from '../icons';
+
+interface Stat {
+  icon: IconName;
+  /** Cifra destacada. Sin valor, el bloque muestra solo titulo y texto. */
+  value?: string;
+  title: string;
+  text?: string;
+}
+
+const stats: Stat[] = [
+  { icon: 'calendar', value: '40', title: 'Años de experiencia' },
+  { icon: 'users', value: '25.000+', title: 'Clientes satisfechos' },
+  { icon: 'users', value: '13', title: 'Trabajadores profesionales' },
+  {
+    icon: 'pin',
+    title: 'Varios puntos de atención',
+    text: 'Para estar siempre cerca de ti.',
+  },
+];
+
+const stat = [
+  'grid grid-cols-[auto_1fr] items-center gap-x-[18px] border-r border-white/16 px-6',
+  'first:pl-0 last:border-r-0 last:pr-0',
+  'max-b820:nth-[2n]:border-r-0 max-b820:nth-[2n]:pr-0 max-b820:nth-[2n+1]:pl-0',
+  'max-b560:border-r-0 max-b560:px-0',
+].join(' ');
+---
+
+<section class="section pt-0" aria-labelledby="stats-title">
+  <div class="container">
+    <h2 id="stats-title" class="sr-only">NAR en cifras</h2>
+
+    <ul
+      class="m-0 grid list-none grid-cols-4 gap-y-8 rounded-card bg-[linear-gradient(135deg,#16232b,#0a1c26)] p-[34px] text-white max-b820:grid-cols-2 max-b560:grid-cols-1 max-b560:gap-y-6 max-b560:px-[22px] max-b560:py-6"
+      data-reveal
+    >
+      {
+        stats.map((item) => (
+          <li class={stat}>
+            <Icon name={item.icon} size={44} class="text-white" />
+            <div>
+              {item.value && (
+                <b class="block font-display text-[clamp(32px,3.6vw,44px)] leading-none font-bold text-rust">
+                  {item.value}
+                </b>
+              )}
+              <b
+                class:list={[
+                  'block font-display text-[15px] leading-[1.2] font-bold tracking-[0.03em] uppercase',
+                  item.value && 'mt-1.5',
+                ]}
+              >
+                {item.title}
+              </b>
+              {item.text && <small class="mt-1.5 block text-xs text-white/78">{item.text}</small>}
+            </div>
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+</section>

@@ -1,0 +1,79 @@
+---
+/**
+ * Descarga de documentacion tecnica.
+ *
+ * PENDIENTE: los PDFs todavia no existen. Mientras `ready` sea false el enlace
+ * se renderiza inerte (aria-disabled + tabindex -1) para no dejar 404s
+ * navegables. Al subir el archivo a public/docs/ basta con poner ready: true.
+ */
+import Icon from '../Icon.astro';
+
+const docs = [
+  {
+    title: 'Especificaciones técnicas',
+    file: '/docs/nar-especificaciones-tecnicas.pdf',
+    ready: false,
+  },
+  {
+    title: 'Equipamiento completo',
+    file: '/docs/nar-equipamiento-completo.pdf',
+    ready: false,
+  },
+  {
+    title: 'Ficha de seguridad',
+    file: '/docs/nar-ficha-seguridad.pdf',
+    ready: false,
+  },
+] as const;
+---
+
+<section class="section" aria-labelledby="docs-title">
+  <div class="container">
+    <div
+      class="grid grid-cols-[0.85fr_2.15fr] items-center gap-[34px] rounded-card border border-[rgb(56_40_30_/_8%)] bg-white/96 p-[30px] shadow-card max-b980:grid-cols-1 max-b980:gap-[26px] max-b560:px-[18px] max-b560:py-6"
+      data-reveal
+    >
+      <div>
+        <h2 id="docs-title" class="m-0 mb-2.5 text-[clamp(21px,2.1vw,26px)] leading-[1.1] font-bold">
+          Descarga documentación
+          <span class="ml-[5px] inline-block align-[2px] text-rust" aria-hidden="true">
+            <Icon name="star" size={14} fill="currentColor" />
+          </span>
+        </h2>
+        <p class="m-0 text-[12.5px] leading-[1.6] text-muted">
+          Consulta y descarga toda la información técnica de nuestro food truck. Ideal para
+          organizadores de eventos y profesionales.
+        </p>
+      </div>
+
+      <ul class="m-0 grid list-none grid-cols-3 gap-6 p-0 max-b700:grid-cols-1">
+        {
+          docs.map((doc) => (
+            <li class="grid grid-cols-[34px_1fr] grid-rows-[auto_auto] items-center gap-x-2.5 gap-y-1.5">
+              <span class="text-night" aria-hidden="true">
+                <Icon name="doc" size={26} />
+              </span>
+              <h3 class="m-0 text-[13.5px] leading-[1.25] font-bold">{doc.title}</h3>
+              <a
+                class:list={[
+                  'button button-outline col-span-2 mt-2 min-h-11 text-[15px] print:hidden',
+                  /* Placeholder mientras el PDF no existe: visible pero no activable. */
+                  !doc.ready && 'pointer-events-none opacity-55',
+                ]}
+                href={doc.file}
+                download
+                aria-disabled={doc.ready ? undefined : 'true'}
+                tabindex={doc.ready ? undefined : -1}
+                data-track="doc_download"
+              >
+                <Icon name="download" size={18} />
+                Descargar PDF
+              </a>
+              {!doc.ready && <span class="sr-only">Documento disponible próximamente.</span>}
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </div>
+</section>

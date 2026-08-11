@@ -1,0 +1,76 @@
+---
+import LegalLayout from '../layouts/LegalLayout.astro';
+import { site, contact } from '../config/site';
+---
+
+<LegalLayout
+  title={`Política de privacidad | ${site.name}`}
+  description="Política de privacidad de NAR Food Truck Events."
+  path="/privacidad"
+  heading="Política de privacidad"
+>
+  <h2>Responsable</h2>
+  <p>Pendiente de completar con la identificación real del responsable del tratamiento.</p>
+
+  <h2>Finalidad</h2>
+  <ul>
+    <li>
+      Gestionar las solicitudes de presupuesto enviadas a través del formulario y mantener el
+      contacto comercial derivado de ellas.
+    </li>
+    <li>
+      Medir de forma agregada el uso de la web para mejorarla, solo si aceptas las cookies de
+      analítica.
+    </li>
+  </ul>
+
+  <h2>Base jurídica</h2>
+  <ul>
+    <li>
+      <strong>Formulario:</strong> consentimiento del interesado y aplicación de medidas
+      precontractuales.
+    </li>
+    <li>
+      <strong>Analítica:</strong> consentimiento del interesado, que puedes retirar en cualquier
+      momento desde la <a href="/cookies">política de cookies</a> sin que afecte al resto de la web.
+    </li>
+  </ul>
+
+  <h2>Datos que se recogen</h2>
+  <ul>
+    <li>Nombre, email y teléfono.</li>
+    <li>Tipo de evento, fecha, ubicación y número de invitados.</li>
+    <li>Mensaje escrito por el usuario.</li>
+    <li>
+      Si aceptas la analítica: datos de navegación (páginas vistas, interacciones, tipo de
+      dispositivo, procedencia y dirección IP truncada). No se cruzan con los datos del formulario ni
+      permiten identificarte.
+    </li>
+  </ul>
+
+  <h2>Destinatarios</h2>
+  <ul>
+    <li>
+      Proveedor de correo transaccional utilizado para entregar la solicitud al equipo comercial.
+      Pendiente de detallar contrato de encargo de tratamiento.
+    </li>
+    <li>
+      Google Ireland Limited, como proveedor de Google Analytics y Google Tag Manager, únicamente si
+      aceptas las cookies de analítica. Puede implicar transferencias internacionales de datos
+      amparadas en el Marco de Privacidad de Datos UE-EE. UU. y en las cláusulas contractuales tipo
+      de la Comisión Europea.
+    </li>
+  </ul>
+
+  <h2>Conservación</h2>
+  <p>Pendiente de definir plazo de conservación y política de eliminación.</p>
+
+  <h2>Derechos</h2>
+  <p>
+    Acceso, rectificación, supresión, limitación, oposición y portabilidad escribiendo a
+    <a href={`mailto:${contact.email}`}>{contact.email}</a>, así como reclamación ante la autoridad
+    de control competente.
+  </p>
+
+  <p>Última actualización pendiente de la publicación definitiva de {site.name}.</p>
+</LegalLayout>

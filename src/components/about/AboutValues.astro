@@ -1,0 +1,65 @@
+---
+/**
+ * Valores de la empresa sobre panel claro, con la misma tira separada por
+ * lineas que usan FaqPerks.astro y los heros de /el-truck y /galeria.
+ */
+import Icon from '../Icon.astro';
+import SectionHeading from '../SectionHeading.astro';
+
+const values = [
+  {
+    icon: 'check',
+    title: 'Compromiso',
+    text: 'Nos implicamos al máximo para que tu evento sea un éxito.',
+  },
+  {
+    icon: 'cog',
+    title: 'Calidad',
+    text: 'Ofrecemos equipos revisados y en perfecto estado.',
+  },
+  {
+    icon: 'shield',
+    title: 'Confianza',
+    text: 'Transparencia y trato cercano en cada proyecto.',
+  },
+  {
+    icon: 'gem',
+    title: 'Innovación',
+    text: 'Nos adaptamos a las nuevas necesidades del mercado para seguir mejorando.',
+  },
+] as const;
+
+const value = [
+  'grid grid-cols-[auto_1fr] items-start gap-x-3.5 gap-y-1 border-r border-line px-[22px]',
+  'first:pl-0 last:border-r-0 last:pr-0',
+  'max-b900:nth-[2n]:border-r-0 max-b900:nth-[2n]:pr-0 max-b900:nth-[2n+1]:pl-0',
+  'max-b560:border-r-0 max-b560:px-0',
+].join(' ');
+---
+
+<section class="section pt-0" aria-labelledby="values-title">
+  <div class="container">
+    <div
+      class="rounded-card bg-[#efeae6] px-[34px] py-[38px] max-b560:px-[22px] max-b560:py-7"
+      data-reveal
+    >
+      <SectionHeading id="values-title" title="Nuestros valores" />
+
+      <ul
+        class="m-0 grid list-none grid-cols-4 p-0 max-b900:grid-cols-2 max-b900:gap-y-6 max-b560:grid-cols-1 max-b560:gap-y-5"
+      >
+        {
+          values.map((item) => (
+            <li class={value}>
+              <Icon name={item.icon} size={30} class="row-span-2 text-night" />
+              <b class="font-display text-[15px] font-bold tracking-[0.03em] text-night uppercase">
+                {item.title}
+              </b>
+              <small class="text-xs leading-[1.45] text-muted">{item.text}</small>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </div>
+</section>

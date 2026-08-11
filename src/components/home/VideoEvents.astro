@@ -1,0 +1,78 @@
+---
+import { Image } from 'astro:assets';
+import poster from '../../assets/video-poster.png';
+import Icon from '../Icon.astro';
+
+const categories = [
+  { icon: 'rings', title: 'Bodas', text: 'Un toque único para tu gran día.' },
+  { icon: 'briefcase', title: 'Empresas', text: 'Activaciones y eventos corporativos.' },
+  { icon: 'cake', title: 'Cumpleaños', text: 'Celebraciones privadas.' },
+  { icon: 'music', title: 'Festivales', text: 'Música, cultura y buen rollo.' },
+  { icon: 'tent', title: 'Ferias', text: 'Espacio promocional o comercial.' },
+  { icon: 'gift', title: 'Eventos privados', text: 'A tu manera, en tu estilo.' },
+] as const;
+
+const category = [
+  'border-r border-line p-2.5 text-center last:border-r-0',
+  'max-b1100:nth-[3n]:border-r-0',
+  'max-b560:nth-[3n]:border-r max-b560:even:border-r-0',
+].join(' ');
+---
+
+<section id="eventos" class="section" aria-labelledby="events-title">
+  <div
+    class="container grid grid-cols-[0.9fr_1.1fr] items-center gap-[46px] max-b1100:grid-cols-1 max-b1100:gap-[34px]"
+  >
+    <button
+      class="group relative cursor-pointer overflow-hidden rounded-2xl border-0 bg-black p-0 shadow-card print:hidden"
+      type="button"
+      data-video-open
+      aria-label="Ver vídeo: descubre cómo lo hacemos"
+    >
+      <Image
+        src={poster}
+        alt="Food truck NAR iluminado durante un evento nocturno"
+        widths={[640, 960, 1280]}
+        sizes="(max-width: 1100px) 100vw, 44vw"
+        loading="lazy"
+        class="aspect-16/10 w-full object-cover transition-transform duration-400 ease-out group-hover:scale-[1.025]"
+      />
+      <span
+        class="absolute top-1/2 left-1/2 grid size-[78px] -translate-x-1/2 -translate-y-1/2 place-items-center rounded-full border-4 border-white bg-black/30 text-white"
+        aria-hidden="true"
+      >
+        <Icon name="play" size={30} />
+      </span>
+      <span
+        class="absolute bottom-[18px] left-5 grid text-left text-white [text-shadow:0_2px_12px_rgb(0_0_0_/_60%)]"
+      >
+        <strong class="font-display text-lg uppercase">Ver vídeo</strong>
+        <small class="text-xs">Descubre cómo lo hacemos</small>
+      </span>
+    </button>
+
+    <div>
+      <p class="eyebrow eyebrow-rust">Ideal para cualquier evento</p>
+      <h2
+        id="events-title"
+        class="mt-[3px] mb-6 text-[clamp(30px,3.4vw,42px)] leading-[1.05] font-bold"
+      >
+        Hacemos especial cualquier ocasión
+      </h2>
+
+      <div
+        class="grid grid-cols-6 max-b1100:grid-cols-3 max-b1100:gap-y-[18px] max-b560:grid-cols-2"
+      >
+        {
+          categories.map((item) => (
+            <article class={category}>
+              <Icon name={item.icon} size={30} class="mx-auto text-night" />
+              <h3 class="mt-2.5 mb-1 text-base font-bold">{item.title}</h3>
+              <p class="m-0 text-[11.5px] leading-[1.45] text-muted">{item.text}</p>
+            </article>
+          ))
+        }
+      </div>
+    </div>
+  </div>
+</section>

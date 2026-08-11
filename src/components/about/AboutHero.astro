@@ -1,0 +1,57 @@
+---
+/**
+ * Hero de /nosotros. Mismo esquema que el de /el-truck: texto a la izquierda
+ * sobre el degradado crema del body y foto a la derecha.
+ */
+import { Image } from 'astro:assets';
+import heroImage from '../../assets/gallery-01.png';
+import Icon from '../Icon.astro';
+---
+
+<section id="nosotros" class="section pt-[34px]" aria-labelledby="about-title">
+  <div
+    class="container grid grid-cols-[0.86fr_1.14fr] items-start gap-x-[46px] gap-y-[30px] max-b980:grid-cols-1"
+  >
+    <div class="self-center" data-reveal>
+      <p class="eyebrow eyebrow-rust flex items-center gap-2">
+        <span class="inline-block" aria-hidden="true">
+          <Icon name="star" size={14} fill="currentColor" />
+        </span>
+        Nosotros
+      </p>
+
+      <h1
+        id="about-title"
+        class="m-0 text-[clamp(36px,4.4vw,58px)] leading-[0.95] font-bold text-night"
+      >
+        Pasión por los <em class="block text-rust not-italic">grandes eventos</em>
+      </h1>
+
+      <i class="mt-6 mb-[26px] block h-0.5 w-[54px] bg-rust" aria-hidden="true"></i>
+
+      <p class="m-0 mb-4 max-w-[440px] text-[14.5px] leading-[1.7] text-muted">
+        NAR nació en 1981 como una empresa de fabricación de puntales. Con el tiempo y las diversas
+        adaptaciones a los cambios, evolucionamos hasta convertirnos en una empresa especializada en
+        el alquiler de food trucks para eventos.
+      </p>
+
+      <p class="m-0 max-w-[440px] text-[14.5px] leading-[1.7] text-muted">
+        Somos una empresa familiar donde el saber hacer y el trabajo duro se ha ido instaurando en
+        las nuevas generaciones, ampliando los puntos de atención para satisfacer al cliente.
+      </p>
+    </div>
+
+    {/* En movil manda la foto: se coloca sobre el texto. */}
+    <div class="max-b980:order-first" data-reveal>
+      <Image
+        src={heroImage}
+        alt="Food truck NAR iluminado y abierto durante un evento nocturno"
+        widths={[640, 960, 1280]}
+        sizes="(max-width: 980px) 100vw, 58vw"
+        loading="eager"
+        fetchpriority="high"
+        class="aspect-4/3 w-full rounded-card object-cover shadow-card"
+      />
+    </div>
+  </div>
+</section>

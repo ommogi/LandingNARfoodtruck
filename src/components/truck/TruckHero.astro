@@ -1,0 +1,108 @@
+---
+/**
+ * Hero de /el-truck. A diferencia del hero de la home (full-bleed oscuro), este
+ * vive sobre el degradado crema del body: la pagina es una ficha de producto.
+ */
+import { Image } from 'astro:assets';
+import heroImage from '../../assets/gallery-01.png';
+import Icon from '../Icon.astro';
+
+const stats = [
+  {
+    icon: 'users',
+    title: 'Hasta 150 personas/hora',
+    text: 'Alto rendimiento para tus eventos.',
+  },
+  {
+    icon: 'drop',
+    title: 'Totalmente autónomo',
+    text: 'Agua, electricidad y gas integrados.',
+  },
+  {
+    icon: 'shield',
+    title: 'Cumple normativa sanitaria',
+    text: 'Seguridad e higiene certificadas.',
+  },
+  {
+    icon: 'clock',
+    title: 'Montaje en menos de 60 minutos',
+    text: 'Listo para servir en cualquier lugar.',
+  },
+] as const;
+
+const stat = [
+  'border-r border-line px-3.5 text-center',
+  'first:pl-0 last:border-r-0 last:pr-0',
+  'max-b620:even:border-r-0 max-b620:even:pr-0 max-b620:odd:pl-0',
+].join(' ');
+---
+
+<section id="el-truck" class="section pt-[34px]">
+  <div
+    class="container grid grid-cols-[0.92fr_1.08fr] items-start gap-x-[46px] gap-y-[34px] max-b980:grid-cols-1"
+  >
+    <div class="self-center" data-reveal>
+      <p class="eyebrow eyebrow-rust">
+        El truck
+        <span class="ml-1 inline-block align-[1px]" aria-hidden="true">
+          <Icon name="star" size={13} fill="currentColor" />
+        </span>
+      </p>
+
+      <h1 class="m-0 text-[clamp(38px,4.6vw,62px)] leading-[0.95] font-bold text-night">
+        Food truck premium <em class="block text-rust not-italic">para eventos únicos</em>
+      </h1>
+
+      <p class="mt-5 mb-[26px] max-w-[460px] text-[15.5px] text-muted">
+        Food truck totalmente equipado para bodas, eventos corporativos, ferias y celebraciones
+        privadas. Cocina profesional, autonomía completa y servicio adaptable a cualquier ubicación.
+      </p>
+
+      <div class="flex flex-wrap gap-3.5 print:hidden">
+        <button
+          class="button button-primary max-b620:w-full"
+          type="button"
+          data-booking-open
+          data-track="cta_truck_hero"
+        >
+          <Icon name="calendar" size={20} />
+          Comprobar disponibilidad
+        </button>
+        <a class="button button-line max-b620:w-full" href="/#galeria" data-track="truck_gallery_hero">
+          <Icon name="search" size={20} />
+          Ver galería
+        </a>
+      </div>
+
+      {/* La fila de datos cuelga bajo el texto, nunca bajo la imagen. */}
+      <ul
+        class="mx-0 mt-10 mb-0 grid list-none grid-cols-4 p-0 max-b620:grid-cols-2 max-b620:gap-y-[22px]"
+      >
+        {
+          stats.map((item) => (
+            <li class={stat}>
+              <Icon name={item.icon} size={30} class="mx-auto text-night" />
+              <h2 class="mt-2.5 mb-1.5 text-[13px] leading-[1.2] font-bold tracking-[0.01em]">
+                {item.title}
+              </h2>
+              <p class="m-0 text-[11px] leading-[1.45] text-muted">{item.text}</p>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+
+    {/* En movil manda la foto: se coloca sobre el texto. */}
+    <div class="max-b980:order-first" data-reveal>
+      <Image
+        src={heroImage}
+        alt="Food truck NAR iluminado y abierto durante un evento nocturno"
+        widths={[640, 960, 1280]}
+        sizes="(max-width: 980px) 100vw, 54vw"
+        loading="eager"
+        fetchpriority="high"
+        class="aspect-4/3 w-full rounded-card object-cover shadow-card"
+      />
+    </div>
+  </div>
+</section>

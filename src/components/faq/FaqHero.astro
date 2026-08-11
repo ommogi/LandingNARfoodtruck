@@ -1,0 +1,92 @@
+---
+import { Image } from 'astro:assets';
+import Icon from '../Icon.astro';
+import heroImage from '../../assets/gallery/truck-exterior-01.jpg';
+import { faqItems } from '../../data/faq';
+
+/**
+ * Hero de /faq: promesa a la izquierda con el buscador, foto del truck a la
+ * derecha. El buscador lo gobierna src/scripts/faq.ts; sin JS sigue viendose
+ * la lista completa, por eso el campo no vive dentro de un <form>.
+ */
+const highlights = [
+  { icon: 'clock', text: 'Respuesta en<br />menos de 24 h' },
+  { icon: 'shield', text: 'Sin compromiso' },
+  { icon: 'headset', text: 'Atención<br />personalizada' },
+] as const;
+---
+
+<section class="pt-[26px] pb-2.5" aria-labelledby="faq-hero-title">
+  <div
+    class="container grid grid-cols-[0.95fr_1.05fr] items-center gap-[clamp(28px,4.5vw,58px)] max-b900:grid-cols-1"
+  >
+    <div>
+      <p class="eyebrow flex items-center gap-2 text-night">
+        <span class="text-rust" aria-hidden="true">★</span>
+        Preguntas frecuentes
+      </p>
+
+      <h1
+        id="faq-hero-title"
+        class="m-0 mb-[18px] text-[clamp(40px,4.6vw,62px)] leading-[0.92] font-bold text-night"
+      >
+        Todo lo que
+        <em class="block text-rust not-italic">quieres saber.</em>
+      </h1>
+
+      <p class="m-0 max-w-[460px] text-[17px] text-muted max-b560:text-base">
+        Resolvemos aquí las {faqItems.length} dudas que más nos llegan sobre el alquiler del food truck.
+        Si la tuya no está, escríbenos y te contestamos.
+      </p>
+
+      <div class="mt-7 max-w-[440px] print:hidden">
+        <label class="sr-only" for="faq-search">Buscar en las preguntas frecuentes</label>
+        <div
+          class="flex items-center gap-2.5 rounded-[10px] border border-line bg-white px-4 py-1 focus-within:border-rust"
+        >
+          <Icon name="search" size={20} class="flex-none text-muted" />
+          <input
+            class="min-h-[46px] w-full border-0 bg-transparent text-[15px] outline-none placeholder:text-muted"
+            id="faq-search"
+            type="search"
+            autocomplete="off"
+            placeholder="Busca por palabra: montaje, precio, permisos..."
+            data-faq-search
+          />
+          <button
+            class="hidden flex-none cursor-pointer rounded-full border-0 bg-transparent p-1 text-muted hover:text-rust"
+            type="button"
+            data-faq-clear
+            aria-label="Borrar la búsqueda"
+          >
+            <Icon name="close" size={18} />
+          </button>
+        </div>
+      </div>
+
+      <ul class="mt-8 mb-0 flex list-none flex-wrap gap-x-7 gap-y-4 p-0">
+        {
+          highlights.map((item) => (
+            <li class="flex items-center gap-2.5 text-xs leading-[1.35] text-muted">
+              <Icon name={item.icon} size={26} class="text-night" />
+              <span set:html={item.text} />
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+
+    {/* En movil la fotografia va primero, como en el resto de heros. */}
+    <figure class="m-0 max-b900:order-first">
+      <Image
+        class="aspect-video w-full rounded-card object-cover shadow-card"
+        src={heroImage}
+        alt="Food truck azul NAR iluminado de noche con la ventana de servicio abierta"
+        widths={[640, 960, 1280]}
+        sizes="(max-width: 900px) 100vw, 50vw"
+        loading="eager"
+        fetchpriority="high"
+      />
+    </figure>
+  </div>
+</section>

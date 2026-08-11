@@ -1,0 +1,44 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import FaqHero from '../components/faq/FaqHero.astro';
+import FaqAccordion from '../components/faq/FaqAccordion.astro';
+import FaqSupport from '../components/faq/FaqSupport.astro';
+import FaqPerks from '../components/faq/FaqPerks.astro';
+import TruckFinalCta from '../components/truck/TruckFinalCta.astro';
+import QuoteFormModal from '../components/QuoteFormModal.astro';
+import { faqItems } from '../data/faq';
+import { site } from '../config/site';
+import { faqNode } from '../lib/schema';
+
+/* FAQPage con las 26 preguntas: el acordeon las pinta todas en esta pagina. */
+const canonical = new URL('/faq', site.url).href;
+---
+
+<BaseLayout
+  title="Preguntas frecuentes sobre el alquiler | NAR Food Truck"
+  description="Resolvemos las dudas más comunes sobre el alquiler del food truck: qué incluye, medidas, montaje, zonas de desplazamiento, permisos y reservas."
+  path="/faq"
+  leadSource="landing-faq"
+  schemas={[faqNode(faqItems, canonical)]}
+  breadcrumbs={[{ name: 'Preguntas frecuentes', path: '/faq' }]}
+>
+  <FaqHero />
+  <FaqAccordion />
+  <FaqSupport />
+  <TruckFinalCta
+    title="¿Listo para vivir una experiencia inolvidable?"
+    cta="Reservar fecha"
+    track="cta_faq_final"
+    modo="presupuesto"
+  />
+  <FaqPerks />
+
+  <Fragment slot="overlays">
+    <QuoteFormModal />
+  </Fragment>
+</BaseLayout>
+
+<script>
+  import '../scripts/landing';
+  import '../scripts/faq';
+</script>
