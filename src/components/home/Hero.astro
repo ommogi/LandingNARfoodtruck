@@ -6,8 +6,7 @@ import { site } from '../../config/site';
 
 const points = [
   { icon: 'pin', text: site.areaServed },
-  { icon: 'bolt', text: 'Montaje rápido en menos de 30 minutos' },
-  { icon: 'truck', text: 'Transporte, instalación y retirada incluidos' },
+  { icon: 'bolt', text: 'Montaje rápido en menos de 60 minutos' },
 ] as const;
 ---
 
@@ -48,7 +47,7 @@ const points = [
       </h1>
       <p class="my-[22px] max-w-[600px] text-lg text-white/90 max-b560:text-base">
         Food trucks premium totalmente equipados para bodas, empresas, ferias y eventos privados en
-        {' '}{site.locality}. Nosotros nos encargamos de todo para que tú solo disfrutes.
+        {' '}{site.areaServedLong}. Nosotros nos encargamos de todo para que tú solo disfrutes.
       </p>
 
       <ul

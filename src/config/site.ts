@@ -6,9 +6,8 @@
  * PENDIENTE ANTES DE PUBLICAR: telefono, email, redes y dominio son
  * los valores de ejemplo de la guia. Sustituir por datos verificados.
  *
- * PENDIENTE DE CONFIRMAR CON NAR: `areaServed` asume Valencia y alrededores.
- * Si tambien cubren Castellon y Alicante hay que ampliarlo aqui: afecta al
- * SEO local y a los textos de cobertura de toda la web.
+ * Zona de servicio: toda Espana (confirmado por NAR). La sede sigue en
+ * Valencia (`locality`), que es lo que usa la direccion del schema.
  */
 
 export const site = {
@@ -17,13 +16,13 @@ export const site = {
   url: 'https://www.narfoodtruck.com',
   claim: 'Experiencias sobre ruedas desde 1981',
   description:
-    'Alquiler de food trucks premium para bodas, empresas, ferias y eventos privados en Valencia. Transporte, montaje y retirada incluidos.',
+    'Alquiler de food trucks premium para bodas, empresas, ferias y eventos privados. Nos desplazamos por toda España.',
   locality: 'Valencia',
   region: 'Comunitat Valenciana',
   country: 'ES',
-  areaServed: 'Valencia y alrededores',
+  areaServed: 'Toda España',
   /** Zona ampliada tal y como se nombra en textos de cobertura. */
-  areaServedLong: 'toda la Comunitat Valenciana',
+  areaServedLong: 'toda España',
   foundingYear: 1981,
 } as const;
 
