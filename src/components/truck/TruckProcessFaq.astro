@@ -44,6 +44,7 @@ const step = [
   "not-last:after:absolute not-last:after:top-3.5 not-last:after:left-[calc(50%+20px)] not-last:after:w-[calc(100%-40px)] not-last:after:border-t not-last:after:border-line not-last:after:content-['']",
   'max-b560:after:hidden',
 ].join(' ');
+import FaqRespuesta from '../faq/FaqRespuesta.astro';
 ---
 
 <section class="section" aria-labelledby="process-title faq-title">
@@ -102,7 +103,7 @@ const step = [
                   <Icon name="chevron" size={18} />
                 </span>
               </summary>
-              <p class="m-0 px-4 pb-[15px] text-[12.5px] leading-[1.6] text-muted">{faq.answer}</p>
+              <FaqRespuesta texto={faq.answer} class="px-4 pb-[15px] text-[12.5px] leading-[1.6] text-muted" />
             </details>
           ))
         }

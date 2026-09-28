@@ -9,9 +9,9 @@ import Icon from '../Icon.astro';
 
 const reasons = [
   {
-    icon: 'gem',
-    title: 'Diseño exclusivo',
-    text: 'Imagen moderna que aporta valor a tu evento.',
+    icon: 'shield',
+    title: 'Interior en acero inoxidable',
+    text: 'Diseñado para un uso profesional, funcional y fácil de mantener.',
   },
   {
     icon: 'chef',
@@ -19,21 +19,26 @@ const reasons = [
     text: 'Equipamiento de alta gama para resultados excelentes.',
   },
   {
-    icon: 'bolt',
-    title: 'Autonomía total',
-    text: 'No requiere conexiones externas ni instalaciones.',
+    icon: 'tools',
+    title: 'Equipamiento intercambiable',
+    text: 'Elige la maquinaria que necesita cada evento.',
   },
   {
     icon: 'users',
     title: 'Alta capacidad',
     text: 'Hasta 150 personas/hora sin comprometer la calidad.',
   },
+  {
+    icon: 'paintbrush',
+    title: 'Listo para personalizar',
+    text: 'Adapta su imagen a tu marca, evento o campaña.',
+  },
 ] as const;
 
 const reason = [
   'border-r border-white/16 px-4 text-center',
   'first:pl-0 last:border-r-0 last:pr-0',
-  'max-b980:even:border-r-0 max-b980:even:pr-0 max-b980:odd:pl-0',
+  'max-b1180:even:border-r-0 max-b1180:even:pr-0 max-b1180:odd:pl-0',
   'max-b560:border-r-0 max-b560:px-0',
 ].join(' ');
 ---
@@ -56,7 +61,7 @@ const reason = [
         </h2>
 
         <ul
-          class="m-0 grid list-none grid-cols-4 p-0 max-b980:grid-cols-2 max-b980:gap-y-6 max-b560:grid-cols-1"
+          class="m-0 grid list-none grid-cols-5 p-0 max-b1180:grid-cols-2 max-b1180:gap-y-6 max-b560:grid-cols-1"
         >
           {
             reasons.map((item) => (

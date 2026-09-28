@@ -84,7 +84,7 @@
 @custom-variant is-success (&.is-success);
 
 :root {
-  --container: 1280px;
+  --container: 1440px;
   --header-h: 78px;
 
   /* Permite transicionar `height: auto` en el acordeon del FAQ. */

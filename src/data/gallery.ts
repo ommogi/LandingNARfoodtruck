@@ -126,5 +126,5 @@ export const galleryFilters: GalleryFilter[] = [
   { value: 'interior', label: 'Interior', icon: 'window' },
   { value: 'detail', label: 'Detalles', icon: 'tag' },
   { value: 'event', label: 'Eventos', icon: 'users' },
-  { value: 'equipment', label: 'Equipo', icon: 'wrench' },
+  /* Sin pestana «Equipo»: sus fotos siguen saliendo en «Todas». */
 ];

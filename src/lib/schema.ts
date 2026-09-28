@@ -14,7 +14,7 @@
 
 import { site, contact, social } from '../config/site';
 import { AJUSTES_RESPALDO } from '../data/configurador';
-import type { FaqItem } from '../data/faq';
+import { textoPlanoFaq, type FaqItem } from '../data/faq';
 import type { ProcessStep } from '../data/proceso';
 import logo from '../assets/logo-nar-horizontal.webp';
 
@@ -177,7 +177,7 @@ export function faqNode(items: FaqItem[], canonical: string) {
     mainEntity: items.map((faq) => ({
       '@type': 'Question',
       name: faq.question,
-      acceptedAnswer: { '@type': 'Answer', text: faq.answer },
+      acceptedAnswer: { '@type': 'Answer', text: textoPlanoFaq(faq.answer) },
     })),
   };
 }

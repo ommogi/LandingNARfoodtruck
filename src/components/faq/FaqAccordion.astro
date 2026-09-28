@@ -34,6 +34,7 @@ const slug = (value: string) =>
     .replace(/[^a-z0-9]+/g, '-')
     .replace(/^-+|-+$/g, '')
     .slice(0, 60);
+import FaqRespuesta from './FaqRespuesta.astro';
 ---
 
 <section id="preguntas" class="section pt-[34px]" aria-labelledby="faq-list-title">
@@ -83,9 +84,10 @@ const slug = (value: string) =>
                 <Icon name="chevron" size={18} />
               </span>
             </summary>
-            <p class="faq-answer m-0 px-[18px] pb-4 pl-[58px] text-[13.5px] leading-[1.65] text-muted max-b560:pl-[18px]">
-              {faq.answer}
-            </p>
+            <FaqRespuesta
+              texto={faq.answer}
+              class="faq-answer px-[18px] pb-4 pl-[58px] text-[13.5px] leading-[1.65] text-muted max-b560:pl-[18px]"
+            />
           </details>
         ))
       }

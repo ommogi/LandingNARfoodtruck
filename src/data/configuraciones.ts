@@ -294,8 +294,8 @@ export const interiorFeatures: { icon: IconName; title: string }[] = [
   { icon: 'shield', title: '100% Profesional' },
   { icon: 'check', title: 'Homologado y seguro' },
   { icon: 'cog', title: 'Listo para trabajar' },
-  { icon: 'truck', title: 'Transporte incluido' },
-  { icon: 'wrench', title: 'Instalación incluida' },
+  { icon: 'truck', title: 'Compacto por fuera. Profesional por dentro.' },
+  { icon: 'pin', title: 'Llega donde está tu evento' },
 ];
 
 /** Franja de garantias del final de la pagina. */

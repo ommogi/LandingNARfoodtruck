@@ -1,48 +1,52 @@
 ---
 /**
- * Que incluye el alquiler. Son siete tarjetas sobre una rejilla de cuatro, asi
- * que se maquetan con flex + basis en lugar de `grid`: la fila incompleta
- * queda centrada sola, sin reglas nth-child por breakpoint.
+ * Nuestros servicios. Ocho tarjetas sobre una rejilla de cuatro, maquetadas
+ * con flex + basis en lugar de `grid`: si algun dia la ultima fila queda
+ * incompleta, se centra sola sin reglas nth-child por breakpoint.
  */
 import Icon from '../Icon.astro';
 import SectionHeading from '../SectionHeading.astro';
-import { site } from '../../config/site';
 
 const items = [
   {
     icon: 'truck',
     title: 'Alquiler del food truck',
-    text: 'Truck totalmente equipado y listo para usar.',
+    text: 'Food truck equipado y preparado para tu evento.',
   },
   {
-    icon: 'kitchen',
-    title: 'Equipamiento y utensilios',
-    text: 'Cocina profesional, menaje y utensilios necesarios.',
-  },
-  {
-    icon: 'users',
-    title: 'Personal cualificado',
-    text: 'Equipo profesional de apoyo durante el montaje.',
-  },
-  {
-    icon: 'tools',
-    title: 'Montaje y desmontaje',
-    text: 'Nos encargamos de todo el proceso de montaje y retirada.',
+    icon: 'sliders',
+    title: 'Configuración a medida',
+    text: 'Seleccionamos el equipamiento adecuado para cada tipo de servicio.',
   },
   {
     icon: 'pin',
     title: 'Logística y transporte',
-    text: `Transporte incluido dentro de ${site.areaServed}.`,
+    text: 'Coordinamos la entrega y recogida en la ubicación del evento.',
   },
   {
-    icon: 'doc',
-    title: 'Permisos y documentación',
-    text: 'Gestionamos los permisos necesarios para el evento.',
+    icon: 'tools',
+    title: 'Montaje y desmontaje',
+    text: 'Nos encargamos de la instalación y posterior retirada.',
+  },
+  {
+    icon: 'paintbrush',
+    title: 'Personalización de marca',
+    text: 'Vinilado y elementos gráficos adaptados a tu evento o identidad.',
+  },
+  {
+    icon: 'sofa',
+    title: 'Ambientación',
+    text: 'Mobiliario, iluminación y decoración para completar el espacio.',
+  },
+  {
+    icon: 'chef',
+    title: 'Personal profesional',
+    text: 'Cocinero disponible según las necesidades y disponibilidad del evento.',
   },
   {
     icon: 'headset',
-    title: 'Atención al cliente',
-    text: 'Acompañamiento antes, durante y después del evento.',
+    title: 'Asesoramiento y soporte',
+    text: 'Te acompañamos desde la planificación hasta la celebración del evento.',
   },
 ] as const;
 
@@ -55,7 +59,7 @@ const card = [
 
 <section class="section pt-0" aria-labelledby="servicios-includes-title">
   <div class="container">
-    <SectionHeading id="servicios-includes-title" title="Qué incluye nuestro servicio" />
+    <SectionHeading id="servicios-includes-title" title="Nuestros servicios" />
     <p class="mx-auto -mt-6 mb-[34px] max-w-[620px] text-center text-[15px] text-muted">
       Todo lo necesario para que tu evento sea un éxito.
     </p>

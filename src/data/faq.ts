@@ -11,7 +11,6 @@
  */
 
 import type { IconName } from '../components/icons';
-import { site } from '../config/site';
 
 export type FaqCategory = 'alquiler' | 'truck' | 'logistica' | 'evento' | 'legal';
 
@@ -49,8 +48,11 @@ export const faqItems: FaqItem[] = [
   /* ------------------------------------------------------------ Alquiler */
   {
     question: '¿Qué incluye exactamente el alquiler?',
-    answer:
-      'Alquilas el food truck equipado: transporte hasta la ubicación, montaje, nivelación, puesta en marcha, recogida al terminar y soporte durante todo el alquiler. No incluye elaboración de alimentos, personal de cocina ni catering.',
+    answer: [
+      'El alquiler incluye el **food truck FOODD completamente equipado en su configuración base**, con zona de trabajo y encimeras de acero inoxidable, campana extractora, nevera, congelador, botellero refrigerado, iluminación interior e instalaciones propias del vehículo.',
+      'Lo entregamos **limpio, revisado y preparado para su uso**, y nos encargamos de la gestión de entrega y devolución de la unidad.',
+      'El **transporte, el equipamiento de cocina adicional, la ambientación, el branding y el personal profesional** se configuran por separado según las necesidades de cada evento.',
+    ].join('\n\n'),
     category: 'alquiler',
     featured: true,
   },
@@ -121,8 +123,11 @@ export const faqItems: FaqItem[] = [
   /* ---------------------------------------------------------- Logistica */
   {
     question: '¿Necesito conexión eléctrica o de agua?',
-    answer:
-      'No. El truck es autónomo en agua, electricidad y gas. Si la ubicación dispone de toma eléctrica podemos usarla para reducir el ruido del generador.',
+    answer: [
+      '**El food truck dispone de toma de corriente para su conexión eléctrica.** El punto de suministro eléctrico deberá estar disponible en el lugar del evento.',
+      'Para el agua, **no es necesaria una toma directa**: el truck incorpora un bidón bajo el fregadero con bomba de agua para su funcionamiento.',
+      'Antes de la entrega te indicaremos los requisitos de conexión necesarios según la configuración elegida.',
+    ].join('\n\n'),
     category: 'logistica',
     featured: true,
   },
@@ -136,7 +141,7 @@ export const faqItems: FaqItem[] = [
   {
     question: '¿En qué zonas os desplazáis?',
     answer:
-      `Trabajamos en ${site.areaServed}. Para eventos fuera de la provincia escríbenos y valoramos el desplazamiento sin compromiso.`,
+      '**Nos desplazamos por toda España.** Llevamos el food truck hasta el lugar de tu evento y nos encargamos de la entrega y recogida.',
     category: 'logistica',
     featured: true,
   },
@@ -211,3 +216,6 @@ export const faqItems: FaqItem[] = [
     category: 'legal',
   },
 ];
+
+/** Respuesta sin marcas de formato (**negrita**, parrafos): para JSON-LD y buscador. */
+export const textoPlanoFaq = (answer: string) => answer.replace(/\*\*(.+?)\*\*/g, '$1').replace(/\n\s*\n/g, ' ');

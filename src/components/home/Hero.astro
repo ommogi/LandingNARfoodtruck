@@ -1,6 +1,6 @@
 ---
 import { Image } from 'astro:assets';
-import hero from '../../assets/hero-foodtruck.webp';
+import hero from '../../assets/hero-home-atardecer.webp';
 import Icon from '../Icon.astro';
 import { site } from '../../config/site';
 
@@ -29,11 +29,11 @@ const points = [
     />
   </div>
   {/*
-    La foto es solo ambiente: un velo negro en todo el ancho (mas denso donde
-    esta el texto) la apaga para que el titular mande.
+    Velo negro solo donde hace falta: denso bajo el texto y casi transparente
+    a la derecha, para que la foto del atardecer luzca y el titular se lea.
   */}
   <div
-    class="absolute inset-0 bg-[linear-gradient(90deg,rgb(0_0_0_/_88%)_0%,rgb(0_0_0_/_75%)_45%,rgb(0_0_0_/_60%)_100%)] max-b820:bg-[rgb(0_0_0_/_80%)]"
+    class="absolute inset-0 bg-[linear-gradient(90deg,rgb(0_0_0_/_88%)_0%,rgb(0_0_0_/_70%)_45%,rgb(0_0_0_/_40%)_100%)] max-b820:bg-[rgb(0_0_0_/_72%)]"
     aria-hidden="true"
   >
   </div>
@@ -42,7 +42,7 @@ const points = [
     <div class="max-w-[630px]">
       <p class="eyebrow">Alquiler de food trucks para eventos</p>
       <h1
-        class="m-0 text-[clamp(52px,6.2vw,92px)] leading-[0.91] font-bold tracking-[-0.02em] max-b820:text-[clamp(46px,11vw,72px)]"
+        class="m-0 text-[clamp(44px,5.2vw,76px)] leading-[0.91] font-bold tracking-[-0.02em] max-b820:text-[clamp(40px,10vw,64px)]"
       >
         Haz que tu evento sea imposible <em class="block text-rust not-italic">de olvidar.</em>
       </h1>

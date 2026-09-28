@@ -16,9 +16,9 @@ export interface ProcessStep {
 
 export const processSteps: ProcessStep[] = [
   {
-    icon: 'chat',
-    title: 'Nos escribes',
-    text: 'Cuéntanos tu idea, fecha, lugar y número de invitados.',
+    icon: 'cog',
+    title: 'Configura el food truck',
+    text: 'Configura el food truck según tus necesidades.',
   },
   {
     icon: 'pencil',

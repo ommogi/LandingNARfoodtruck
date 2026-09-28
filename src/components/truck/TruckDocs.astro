@@ -1,28 +1,26 @@
 ---
 /**
- * Descarga de documentacion tecnica.
- *
- * PENDIENTE: los PDFs todavia no existen. Mientras `ready` sea false el enlace
- * se renderiza inerte (aria-disabled + tabindex -1) para no dejar 404s
- * navegables. Al subir el archivo a public/docs/ basta con poner ready: true.
+ * Descarga de documentacion tecnica. Los PDF viven en public/docs/ (la
+ * configuracion base se comprimio de 11,6 MB a ~450 KB optimizando sus imagenes
+ * para pantalla). `ready: false` deja el enlace inerte para no ofrecer un 404.
  */
 import Icon from '../Icon.astro';
 
 const docs = [
   {
-    title: 'Especificaciones técnicas',
-    file: '/docs/nar-especificaciones-tecnicas.pdf',
-    ready: false,
+    title: 'Ficha técnica del vehículo',
+    file: '/docs/nar-ficha-tecnica-vehiculo.pdf',
+    ready: true,
   },
   {
-    title: 'Equipamiento completo',
-    file: '/docs/nar-equipamiento-completo.pdf',
-    ready: false,
+    title: 'Ficha técnica del equipamiento',
+    file: '/docs/nar-ficha-tecnica-equipamiento.pdf',
+    ready: true,
   },
   {
-    title: 'Ficha de seguridad',
-    file: '/docs/nar-ficha-seguridad.pdf',
-    ready: false,
+    title: 'Configuración base',
+    file: '/docs/nar-configuracion-base.pdf',
+    ready: true,
   },
 ] as const;
 ---

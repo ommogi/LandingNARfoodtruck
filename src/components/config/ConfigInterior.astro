@@ -1,8 +1,8 @@
 ---
 /**
- * Banda partida a todo el ancho: foto real del interior a la izquierda y panel
- * oscuro a la derecha con las cinco garantias. Es la unica seccion de la pagina
- * que se sale del contenedor, igual que el hero de la home.
+ * Banda partida dentro del contenedor: foto real del interior a la izquierda y
+ * panel oscuro a la derecha con las cinco garantias. Compacta a proposito: la
+ * foto acompana, no domina la pagina.
  */
 import { Image } from 'astro:assets';
 import interiorPhoto from '../../assets/gallery/hero-interior.webp';
@@ -11,7 +11,7 @@ import { interiorFeatures } from '../../data/configuraciones';
 ---
 
 <section
-  class="my-[clamp(32px,4.5vw,56px)] grid min-h-[clamp(360px,30vw,460px)] grid-cols-[1.1fr_0.9fr] max-b900:min-h-0 max-b900:grid-cols-1"
+  class="container my-[clamp(28px,4vw,48px)] grid min-h-[clamp(260px,22vw,340px)] grid-cols-[0.8fr_1.2fr] overflow-hidden rounded-card shadow-card max-b900:min-h-0 max-b900:grid-cols-1"
   aria-labelledby="interior-title"
   data-reveal
 >
@@ -20,38 +20,38 @@ import { interiorFeatures } from '../../data/configuraciones';
       src={interiorPhoto}
       alt="Interior de acero inoxidable del food truck con planchas, campana extractora y lámparas de calor"
       widths={[640, 960, 1280]}
-      sizes="(max-width: 900px) 100vw, 55vw"
+      sizes="(max-width: 900px) 100vw, 40vw"
       loading="lazy"
       class="size-full min-h-full object-cover max-b900:aspect-video max-b900:min-h-0"
     />
   </figure>
 
   <div
-    class="flex flex-col justify-center bg-[linear-gradient(135deg,#16232b,#0a1c26)] px-[clamp(24px,4vw,64px)] py-11 text-white max-b560:px-[18px] max-b560:py-[30px]"
+    class="flex flex-col justify-center bg-[linear-gradient(135deg,#16232b,#0a1c26)] px-[clamp(22px,3vw,48px)] py-8 text-white max-b560:px-[18px] max-b560:py-[26px]"
   >
     {/* El rust de .eyebrow-rust no contrasta sobre el degradado oscuro: blanco al 70%. */}
     <p class="eyebrow text-white/70">El interior</p>
 
-    <h2 id="interior-title" class="m-0 text-[clamp(28px,3vw,40px)] leading-[1.05] font-bold">
+    <h2 id="interior-title" class="m-0 text-[clamp(24px,2.4vw,34px)] leading-[1.05] font-bold">
       Interior profesional
       <em class="block text-rust not-italic">diseñado para rendir</em>
     </h2>
 
-    <p class="mt-4 mb-[30px] max-w-[480px] text-[14.5px] leading-[1.6] text-white/80">
+    <p class="mt-3 mb-6 max-w-[520px] text-[14px] leading-[1.6] text-white/80">
       Acabados premium, distribución inteligente y equipamiento profesional para que solo te
       preocupes de cocinar.
     </p>
 
     <ul
-      class="m-0 grid list-none grid-cols-5 gap-3.5 border-t border-white/12 p-0 pt-[26px] max-b560:grid-cols-3 max-b560:gap-x-3.5 max-b560:gap-y-5"
+      class="m-0 grid list-none grid-cols-5 gap-3.5 border-t border-white/12 p-0 pt-5 max-b560:grid-cols-3 max-b560:gap-x-3.5 max-b560:gap-y-5"
       data-reveal
       data-reveal-stagger
     >
       {
         interiorFeatures.map((feature) => (
           <li class="grid justify-items-center gap-2.5 text-center">
-            <span class="grid size-[68px] place-items-center rounded-full bg-white/8 max-b560:size-[60px]">
-              <Icon name={feature.icon} size={34} class="text-white" />
+            <span class="grid size-[54px] place-items-center rounded-full bg-white/8 max-b560:size-[50px]">
+              <Icon name={feature.icon} size={26} class="text-white" />
             </span>
             <span class="text-[12px] leading-[1.25] font-semibold text-white/85">
               {feature.title}

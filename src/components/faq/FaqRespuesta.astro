@@ -1,0 +1,26 @@
+---
+/**
+ * Respuesta de una pregunta frecuente con un formato minimo: una linea en
+ * blanco separa parrafos y **texto** pasa a negrita. Se escapa todo antes de
+ * aplicar ese formato, asi que en los datos no puede colarse HTML.
+ * El JSON-LD usa la version en texto plano (textoPlanoFaq en src/data/faq.ts).
+ */
+interface Props {
+  texto: string;
+  class?: string;
+}
+
+const { texto, class: clase } = Astro.props;
+
+const escapar = (s: string) =>
+  s.replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c] as string);
+
+const parrafos = texto
+  .split(/\n\s*\n/)
+  .map((p) => escapar(p.trim()).replace(/\*\*(.+?)\*\*/g, '<strong class="font-semibold text-ink">$1</strong>'))
+  .filter(Boolean);
+---
+
+<div class:list={['grid gap-2', clase]}>
+  {parrafos.map((p) => <p class="m-0" set:html={p} />)}
+</div>
