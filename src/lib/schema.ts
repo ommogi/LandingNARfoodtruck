@@ -68,8 +68,8 @@ export function organizationNode() {
       addressCountry: site.country,
     },
     areaServed: {
-      '@type': 'Country',
-      name: 'España',
+      '@type': 'AdministrativeArea',
+      name: site.areaServed,
     },
     // Precio de partida del FOODD Rental Base (+ IVA / dia); el resto va a presupuesto.
     priceRange: `Desde ${AJUSTES_RESPALDO.precioDesde}€`,
@@ -136,8 +136,8 @@ export function serviceOffersNode() {
     description: site.description,
     provider: ref(ORGANIZATION_ID),
     areaServed: {
-      '@type': 'Country',
-      name: 'España',
+      '@type': 'AdministrativeArea',
+      name: site.areaServed,
     },
     offers: {
       '@type': 'Offer',
