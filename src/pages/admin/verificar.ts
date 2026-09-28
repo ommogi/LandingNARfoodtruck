@@ -62,6 +62,13 @@ export const POST: APIRoute = async ({ request, locals, cookies }) => {
     return json({ ok: false, motivo: 'codigo' }, 401);
   }
 
+  // Cuenta valida pero fuera de `admins`: se cierra la sesion recien abierta.
+  const { data: esAdmin } = await supabase.rpc('es_admin');
+  if (esAdmin !== true) {
+    await supabase.auth.signOut();
+    return json({ ok: false, motivo: 'no-autorizado' }, 403);
+  }
+
   cookies.set(COOKIE_CLAVE_PENDIENTE, '1', {
     path: '/',
     httpOnly: true,

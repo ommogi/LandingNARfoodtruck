@@ -42,6 +42,9 @@ export const crearResumen = (raiz: HTMLElement, catalogo: Catalogo) => {
       const ps = f.paradas.filter((p) => p.ciudad);
       return ps.length ? tx('r.paradas', { n: ps.length, ciudades: ps.map((p) => p.ciudad).join(' → ') }) : tx('r.paradasPorDefinir');
     }
+    if (f.situacion === 'known' && f.modo === 'dias' && f.dias.length) {
+      return [...f.dias].sort().map(fechaCorta).join(', ');
+    }
     if (f.situacion === 'known' && f.inicio) {
       return f.modo === 'range' && f.fin ? textoRango(f.inicio, f.fin) : fechaCorta(f.inicio);
     }

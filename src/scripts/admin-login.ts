@@ -34,6 +34,8 @@ const ERRORES: Record<string, string> = {
   email: 'Ese correo no tiene un formato válido.',
   codigo: 'Código incorrecto o caducado. Pide uno nuevo.',
   credenciales: 'Correo o contraseña incorrectos.',
+  'no-autorizado':
+    'Este correo no está autorizado para acceder al panel. Si crees que es un error, pide a un administrador que te dé acceso.',
   'sin-configurar': 'El acceso no está configurado todavía.',
 };
 

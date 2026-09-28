@@ -494,8 +494,11 @@ export interface EstadoConfigurador {
   proyecto: { tipo: string | null; subtipo: string | null; descripcion: string };
   fecha: {
     situacion: 'known' | 'multiple' | 'unknown' | null;
-    modo: 'single' | 'range';
+    /** single: un dia · range: periodo continuo · dias: dias sueltos (3, 5, 7…). */
+    modo: 'single' | 'range' | 'dias';
     inicio: string | null;
+    /** Solo en modo 'dias': los dias sueltos elegidos, en ISO y ordenados. */
+    dias: string[];
     fin: string | null;
     alternativas: string[];
     elegida: string | null;
@@ -551,6 +554,7 @@ export const estadoInicial = (): EstadoConfigurador => ({
     situacion: null,
     modo: 'single',
     inicio: null,
+    dias: [],
     fin: null,
     alternativas: [],
     elegida: null,
@@ -629,6 +633,7 @@ export const fechasServicio = (estado: EstadoConfigurador): string[] => {
     return [...new Set(f.paradas.map((p) => p.fecha).filter((x): x is string => Boolean(x)))].sort();
   }
   if (f.situacion === 'known') {
+    if (f.modo === 'dias') return [...new Set(f.dias)].sort();
     if (!f.inicio) return [];
     if (f.modo === 'range' && f.fin) return expandirRango(f.inicio, f.fin, 60);
     return [f.inicio];
@@ -656,6 +661,13 @@ export const textoFecha = (estado: EstadoConfigurador): string => {
     return f.elegida
       ? `${formatearFecha(f.elegida)} (de ${f.alternativas.length} opciones)`
       : `${f.alternativas.length} fechas posibles`;
+  }
+  if (f.situacion === 'known' && f.modo === 'dias') {
+    const dias = [...f.dias].sort();
+    if (!dias.length) return '';
+    return dias.length === 1
+      ? formatearFecha(dias[0] as string)
+      : `${dias.length} días: ${dias.map((d) => formatearFecha(d).slice(0, 5)).join(', ')}`;
   }
   if (f.situacion === 'known' && f.inicio) {
     if (f.modo === 'range' && f.fin && f.fin !== f.inicio) {
@@ -696,7 +708,9 @@ export const faltaEnPaso = (paso: PasoId, estado: EstadoConfigurador, catalogo: 
         return '';
       }
       if (!f.situacion) return 'Selecciona tu situación';
-      if (f.situacion === 'known') {
+      if (f.situacion === 'known' && f.modo === 'dias') {
+        if (!f.dias.length) return 'Marca en el calendario los días de tu proyecto';
+      } else if (f.situacion === 'known') {
         if (!f.inicio) return 'Selecciona la fecha en el calendario';
         if (f.modo === 'range' && !f.fin) return 'Selecciona el último día del periodo';
       }

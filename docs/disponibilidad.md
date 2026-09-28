@@ -266,6 +266,7 @@ logs del servidor (`npm run dev` en local, *Logs* de la función en Vercel), don
 | El correo llega con enlace pero sin código | Falta `{{ .Token }}` en la plantilla *Magic Link* (paso 2b). |
 | No llega nada y en los logs no hay error | No existe la cuenta en `auth.users`. Crearla (paso 2). |
 | «Código incorrecto o caducado» con el código recién llegado | Se pidió más de un código: solo vale el último. |
+| «Este correo no está autorizado para acceder al panel» | El correo no está en `public.admins`. Se muestra a propósito (migración 0006, `admin_autorizado()`), y no se envía ningún código. Si sale el mensaje neutro en su lugar, falta `CONFIGURADOR_PRICING_SECRET` en el servidor. |
 | Todo da 404, también la URL del panel | Falta `ADMIN_PATH`, no es válida o el servidor no se reinició tras añadirla. |
 | «Correo o contraseña incorrectos» con la contraseña buena | La cuenta existe pero el email no está en `public.admins`, o aún no se ha creado contraseña (usar el código). |
 | «Demasiados intentos» | 5 fallos en 15 min desde esa IP o para ese correo. Esperar. |

@@ -12,6 +12,7 @@
  */
 
 import type { APIRoute } from 'astro';
+import { esCorreoAutorizado } from '../../lib/admin';
 
 export const prerender = false;
 
@@ -44,6 +45,16 @@ export const POST: APIRoute = async ({ request, locals }) => {
   const email = typeof body.email === 'string' ? body.email.trim().toLowerCase() : '';
   if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
     return json({ ok: false, motivo: 'email' }, 422);
+  }
+
+  /*
+   * Un correo que no esta en `admins` recibe un «no autorizado» claro y no se
+   * le envia nada. Se decidio asi a proposito (antes el mensaje era neutro): la
+   * URL del panel es secreta y el acceso sigue protegido por contrasena, limite
+   * de intentos y RLS.
+   */
+  if ((await esCorreoAutorizado(email)) === false) {
+    return json({ ok: false, motivo: 'no-autorizado' }, 403);
   }
 
   const { error } = await supabase.auth.signInWithOtp({

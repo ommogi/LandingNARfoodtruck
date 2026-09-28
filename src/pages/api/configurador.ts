@@ -97,7 +97,11 @@ const sanear = (raw: unknown, catalogo: Catalogo): EstadoConfigurador => {
 
   const f = obj(r.fecha);
   e.fecha.situacion = deLista(f.situacion, ids('situaciones') as ('known' | 'multiple' | 'unknown')[]);
-  e.fecha.modo = deLista(f.modo, ['single', 'range'] as const) ?? 'single';
+  e.fecha.modo = deLista(f.modo, ['single', 'range', 'dias'] as const) ?? 'single';
+  e.fecha.dias =
+    e.fecha.modo === 'dias'
+      ? [...new Set((Array.isArray(f.dias) ? f.dias : []).slice(0, 60).map(iso).filter((x): x is string => Boolean(x)))].sort()
+      : [];
   e.fecha.inicio = iso(f.inicio);
   e.fecha.fin = e.fecha.modo === 'range' ? iso(f.fin) : null;
   if (e.fecha.inicio && e.fecha.fin && e.fecha.fin < e.fecha.inicio) e.fecha.fin = null;

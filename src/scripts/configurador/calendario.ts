@@ -41,6 +41,8 @@ export const cargarDisponibilidad = async () => {
 };
 
 const MAX_ALTERNATIVAS = 5;
+/** Tope de dias sueltos: el mismo que un periodo (60 dias). */
+const MAX_DIAS_SUELTOS = 60;
 
 /** "12 oct 2026" */
 export const fechaCorta = (iso: string) => {
@@ -84,7 +86,7 @@ export const iniciarCalendario = (raiz: HTMLElement, catalogo: Catalogo) => {
   const hoy = new Date();
   const primerMes = new Date(hoy.getFullYear(), hoy.getMonth(), 1);
   const f = () => store.estado.fecha;
-  const inicioVista = f().inicio ?? f().alternativas[0] ?? null;
+  const inicioVista = f().inicio ?? f().dias[0] ?? f().alternativas[0] ?? null;
   const vista = inicioVista ? new Date(fromIso(inicioVista).getFullYear(), fromIso(inicioVista).getMonth(), 1) : new Date(primerMes);
 
   /** Aviso local del panel (periodo con dias no disponibles). */
@@ -96,6 +98,7 @@ export const iniciarCalendario = (raiz: HTMLElement, catalogo: Catalogo) => {
   const seleccionadas = (): Set<string> => {
     const e = f();
     if (e.situacion === 'multiple') return new Set(e.alternativas);
+    if (e.situacion === 'known' && e.modo === 'dias') return new Set(e.dias);
     if (e.situacion === 'known' && e.inicio) {
       if (e.modo === 'range' && e.fin) return new Set(expandirRango(e.inicio, e.fin, 60));
       return new Set([e.inicio]);
@@ -213,6 +216,22 @@ export const iniciarCalendario = (raiz: HTMLElement, catalogo: Catalogo) => {
       return;
     }
 
+    if (e.modo === 'dias') {
+      const dias = [...e.dias].sort();
+      if (!dias.length) {
+        poner('is-neutro', t(catalogo, 'fecha.msgDiasTitulo'), t(catalogo, 'fecha.msgDiasTexto'));
+        return;
+      }
+      const texto = `${dias.length} ${dias.length === 1 ? 'día' : 'días'}: ${dias.map(fechaCorta).join(', ')}`;
+      const revisar = dias.some((iso) => estadoFecha(iso, dispo) === 'poca');
+      if (revisar) {
+        poner('is-revisar', t(catalogo, 'fecha.msgRevisar', { fechas: texto }), t(catalogo, 'fecha.msgRevisarTexto'));
+      } else {
+        poner('is-ok', t(catalogo, 'fecha.msgDisponible', { fechas: texto }), t(catalogo, 'fecha.msgDisponibleTexto'));
+      }
+      return;
+    }
+
     if (!e.inicio) {
       poner('is-neutro', t(catalogo, 'fecha.msgElige'), t(catalogo, 'fecha.msgEligeTexto'));
       return;
@@ -281,6 +300,16 @@ export const iniciarCalendario = (raiz: HTMLElement, catalogo: Catalogo) => {
         if (e.elegida === iso) escribir('fecha.elegida', null, catalogo);
       } else if (e.alternativas.length < MAX_ALTERNATIVAS) {
         escribir('fecha.alternativas', [...e.alternativas, iso].sort(), catalogo);
+      }
+      return;
+    }
+
+    // Dias sueltos: cada clic anade o quita ese dia, sin rango.
+    if (e.modo === 'dias') {
+      if (e.dias.includes(iso)) {
+        escribir('fecha.dias', e.dias.filter((x) => x !== iso), catalogo);
+      } else if (e.dias.length < MAX_DIAS_SUELTOS) {
+        escribir('fecha.dias', [...e.dias, iso].sort(), catalogo);
       }
       return;
     }

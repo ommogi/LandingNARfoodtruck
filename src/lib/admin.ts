@@ -7,6 +7,8 @@
  * data-admin-base para que los scripts construyan sus rutas.
  */
 
+import { createAnonClient } from './supabase';
+
 const ADMIN_PATH_RE = /^[a-z0-9-]{12,64}$/;
 
 let avisado = false;
@@ -45,3 +47,24 @@ export const jsonPanel = (data: unknown, status = 200) =>
 
 /** Espera fija: la respuesta tarda lo mismo acierte o falle la contrasena. */
 export const esperar = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+
+/**
+ * ¿Este correo esta en `admins`? Lo pregunta admin_autorizado() (migracion
+ * 0006) con la clave de servidor, asi que la anon key sola no sirve para ir
+ * probando correos desde fuera.
+ *
+ * null = no se ha podido saber (sin clave o Supabase caido). Quien llame debe
+ * seguir como antes en ese caso: mejor un mensaje neutro que dejar fuera al
+ * admin de verdad por un fallo nuestro.
+ */
+export const esCorreoAutorizado = async (email: string): Promise<boolean | null> => {
+  const clave = import.meta.env.CONFIGURADOR_PRICING_SECRET;
+  const supabase = createAnonClient();
+  if (!clave || !supabase) return null;
+  const { data, error } = await supabase.rpc('admin_autorizado', { correo: email, clave });
+  if (error) {
+    console.warn('[admin] No se pudo comprobar si el correo esta autorizado:', error.message);
+    return null;
+  }
+  return data === true;
+};

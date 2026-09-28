@@ -58,11 +58,11 @@ export const POST: APIRoute = async ({ request, locals, clientAddress }) => {
     return responder({ ok: false, motivo: 'credenciales' }, 401);
   }
 
-  // Credenciales buenas pero sin permiso: se cierra y se responde lo mismo.
+  // Contrasena buena pero sin permiso: se cierra y se dice que no esta autorizado.
   const { data: esAdmin } = await supabase.rpc('es_admin');
   if (esAdmin !== true) {
     await supabase.auth.signOut();
-    return responder({ ok: false, motivo: 'credenciales' }, 401);
+    return responder({ ok: false, motivo: 'no-autorizado' }, 403);
   }
 
   return responder({ ok: true }, 200);
