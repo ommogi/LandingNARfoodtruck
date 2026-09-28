@@ -14,14 +14,14 @@ import type { ImageMetadata } from 'astro';
 import type { IconName } from '../components/icons';
 import { configNames, type ConfigId } from './config-ids';
 
-import heroInterior from '../assets/gallery/hero-interior.jpg';
-import interior01 from '../assets/gallery/interior-01.jpg';
-import interior02 from '../assets/gallery/interior-02.jpg';
-import interior03 from '../assets/gallery/interior-03.jpg';
-import detalleLamparas from '../assets/gallery/detalle-lamparas.jpg';
-import detalleEquipamiento from '../assets/gallery/detalle-equipamiento.jpg';
-import truckExterior from '../assets/gallery/truck-exterior-01.jpg';
-import truckDimensions from '../assets/truck-dimensions.png';
+import heroInterior from '../assets/gallery/hero-interior.webp';
+import interior01 from '../assets/gallery/interior-01.webp';
+import interior02 from '../assets/gallery/interior-02.webp';
+import interior03 from '../assets/gallery/interior-03.webp';
+import detalleLamparas from '../assets/gallery/detalle-lamparas.webp';
+import detalleEquipamiento from '../assets/gallery/detalle-equipamiento.webp';
+import truckExterior from '../assets/gallery/truck-exterior-01.webp';
+import truckDimensions from '../assets/truck-dimensions.webp';
 
 /* Los ids y sus nombres viven en ./config-ids, que tambien usan el asistente de
  * reserva y la API sin arrastrar las imagenes de este archivo. */

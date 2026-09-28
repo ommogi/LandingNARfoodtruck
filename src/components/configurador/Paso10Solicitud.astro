@@ -1,0 +1,113 @@
+---
+/**
+ * Paso 10 · Recibe tu propuesta. Datos de contacto y envio. No es un checkout:
+ * ni DNI, ni pago, ni cuenta. El envio lo hace
+ * src/scripts/configurador/envio.ts contra /api/configurador.
+ */
+import Icon from '../Icon.astro';
+import PasoCabecera from './PasoCabecera.astro';
+import T from './T.astro';
+import CampoTelefono from '../forms/CampoTelefono.astro';
+import type { Catalogo } from '../../data/configurador';
+import { t } from '../../data/configurador-textos';
+
+interface Props {
+  c: Catalogo;
+}
+
+const { c } = Astro.props;
+---
+
+<section class="cf-paso" data-paso="solicitud" hidden>
+  <PasoCabecera c={c} paso="solicitud" />
+
+  <article class="cf-hero is-mini">
+    <img class="cf-hero-img" src={t(c, 'img.resumenPorDefecto')} alt="" data-cf-r-img="proyecto" />
+    <div class="cf-hero-body">
+      <p class="cf-over"><T c={c} k="resumen.tuProyecto" /></p>
+      <p class="cf-hero-title" data-cf-r="proyecto"></p>
+      <p class="cf-linea"><Icon name="calendar" size={18} /> <span data-cf-r="fechaCorta"></span></p>
+      <p class="cf-linea"><Icon name="pin" size={18} /> <span data-cf-r="lugar"></span></p>
+      <p class="cf-linea"><Icon name="utensils" size={18} /> <span data-cf-r="configuracionTitulo"></span></p>
+      <div class="cf-fila is-entre">
+        <span class="cf-estado-badge" data-cf-r-dispo></span>
+        <button type="button" class="cf-btn cf-btn-outline cf-btn-sm" data-ir="resumen">
+          <Icon name="arrow-left" size={16} /> <T c={c} k="solicitud.volverResumen" />
+        </button>
+      </div>
+    </div>
+  </article>
+
+  <form class="cf-stack" id="cf-form" data-cf-form novalidate>
+    <div class="cf-caja cf-seccion-num">
+      <span class="cf-num is-rust">1</span>
+      <div class="cf-stack is-gap-pequeno">
+        <div>
+          <h2 class="cf-h3 is-serif"><T c={c} k="solicitud.s1" /></h2>
+          <p class="cf-h2-sub"><T c={c} k="solicitud.s1Sub" /></p>
+        </div>
+        <div class="cf-form-grid is-2">
+          <label class="cf-campo">
+            <span class="cf-label"><T c={c} k="solicitud.nombre" /> <span class="cf-req">*</span></span>
+            <input class="field" name="name" autocomplete="name" required minlength="2" maxlength="80" placeholder={t(c, 'solicitud.nombre')} />
+          </label>
+          <label class="cf-campo">
+            <span class="cf-label"><T c={c} k="solicitud.empresa" /> <span class="cf-opc"><T c={c} k="solicitud.opcional" /></span></span>
+            <input class="field" name="company" autocomplete="organization" maxlength="100" />
+          </label>
+          <label class="cf-campo">
+            <span class="cf-label"><T c={c} k="solicitud.email" /> <span class="cf-req">*</span></span>
+            <input class="field" type="email" name="email" autocomplete="email" required maxlength="160" placeholder="nombre@empresa.com" />
+          </label>
+          <div class="cf-campo">
+            <span class="cf-label"><T c={c} k="solicitud.telefono" /> <span class="cf-req">*</span></span>
+            <CampoTelefono placeholder="600 000 000" />
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="cf-caja cf-seccion-num">
+      <span class="cf-num is-rust">2</span>
+      <label class="cf-campo">
+        <span class="cf-h3 is-serif"><T c={c} k="solicitud.s2" /></span>
+        <span class="cf-h2-sub"><T c={c} k="solicitud.s2Sub" /></span>
+        <textarea class="field cf-textarea" name="message" maxlength="750" rows="3" placeholder={t(c, 'solicitud.s2Placeholder')} data-cf-mensaje></textarea>
+        <span class="cf-contador" data-cf-contador-mensaje>0 / 750</span>
+      </label>
+    </div>
+
+    <div class="cf-caja cf-seccion-num">
+      <span class="cf-num is-rust">3</span>
+      <div class="cf-stack is-gap-pequeno">
+        <h2 class="cf-h3 is-serif"><T c={c} k="solicitud.s3" /></h2>
+        <div class="cf-form-grid is-2">
+          <label class="cf-check is-top">
+            <input type="checkbox" name="consent" required />
+            <span><T c={c} k="solicitud.privacidad" /> <a href="/privacidad" target="_blank" class="cf-link"><T c={c} k="solicitud.privacidadEnlace" /></a>. <span class="cf-req">*</span></span>
+          </label>
+          <label class="cf-check is-top">
+            <input type="checkbox" name="marketing" />
+            <span><T c={c} k="solicitud.comerciales" /> <span class="cf-opc"><T c={c} k="solicitud.comercialesNota" /></span></span>
+          </label>
+        </div>
+      </div>
+    </div>
+
+    <div class="cf-caja cf-seccion-num">
+      <span class="cf-num is-rust">4</span>
+      <div class="cf-stack is-gap-pequeno">
+        <h2 class="cf-h3 is-serif"><T c={c} k="solicitud.s4" /></h2>
+        <p class="cf-nota is-info cf-nota-texto"><T c={c} k="solicitud.importante" /></p>
+      </div>
+    </div>
+
+    {/* Honeypot: invisible para personas; si llega relleno, la API descarta el envio. */}
+    <label class="cf-honeypot" aria-hidden="true">
+      Web
+      <input type="text" name="website" tabindex="-1" autocomplete="off" />
+    </label>
+
+    <p class="cf-status" data-cf-status role="status" aria-live="polite"></p>
+  </form>
+</section>

@@ -6,8 +6,6 @@ import AboutStats from '../components/about/AboutStats.astro';
 import AboutServices from '../components/about/AboutServices.astro';
 import AboutValues from '../components/about/AboutValues.astro';
 import TruckFinalCta from '../components/truck/TruckFinalCta.astro';
-import QuoteFormModal from '../components/QuoteFormModal.astro';
-import BookingModal from '../components/booking/BookingModal.astro';
 ---
 
 <BaseLayout
@@ -24,17 +22,11 @@ import BookingModal from '../components/booking/BookingModal.astro';
   <TruckFinalCta
     title="¿Tienes un evento en mente?"
     claim="Cuéntanos tu idea y te ayudaremos a hacerlo realidad."
-    cta="Consultar disponibilidad"
     track="cta_about_final"
   />
 
-  <Fragment slot="overlays">
-    <QuoteFormModal />
-    <BookingModal />
-  </Fragment>
 </BaseLayout>
 
 <script>
   import '../scripts/landing';
-  import '../scripts/booking';
 </script>

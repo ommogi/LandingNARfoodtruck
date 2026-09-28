@@ -5,8 +5,6 @@ import ServiciosProcess from '../components/servicios/ServiciosProcess.astro';
 import ServiciosIncludes from '../components/servicios/ServiciosIncludes.astro';
 import ServiciosBranding from '../components/servicios/ServiciosBranding.astro';
 import TruckFinalCta from '../components/truck/TruckFinalCta.astro';
-import QuoteFormModal from '../components/QuoteFormModal.astro';
-import BookingModal from '../components/booking/BookingModal.astro';
 import { site } from '../config/site';
 ---
 
@@ -23,17 +21,11 @@ import { site } from '../config/site';
   <TruckFinalCta
     title="¿Tienes un evento en mente?"
     claim="Cuéntanos tu idea y te enviamos una propuesta sin compromiso."
-    cta="Consultar disponibilidad"
     track="cta_servicios_final"
   />
 
-  <Fragment slot="overlays">
-    <QuoteFormModal />
-    <BookingModal />
-  </Fragment>
 </BaseLayout>
 
 <script>
   import '../scripts/landing';
-  import '../scripts/booking';
 </script>

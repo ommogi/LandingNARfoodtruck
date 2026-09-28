@@ -1,0 +1,98 @@
+---
+/**
+ * El configurador completo: cabecera de pasos, los 10 pasos, navegacion y
+ * barra lateral. Lo usan tal cual la pagina publica (/configurador) y la
+ * vista previa del editor del panel (src/pages/admin/vista.astro), asi que lo
+ * que ve el admin mientras edita es exactamente lo que vera el cliente.
+ *
+ * El catalogo viaja tambien como JSON para la logica del navegador, SIN
+ * precios: esos solo los lee /api/configurador al enviar.
+ */
+import '@fontsource/dm-serif-display/400.css';
+import '../../styles/configurador.css';
+import Icon from '../Icon.astro';
+import T from './T.astro';
+import Stepper from './Stepper.astro';
+import Sidebar from './Sidebar.astro';
+import Paso01Proyecto from './Paso01Proyecto.astro';
+import Paso02Fecha from './Paso02Fecha.astro';
+import Paso03Configuracion from './Paso03Configuracion.astro';
+import Paso04Equipamiento from './Paso04Equipamiento.astro';
+import Paso05Cocina from './Paso05Cocina.astro';
+import Paso06Ambientacion from './Paso06Ambientacion.astro';
+import Paso07Branding from './Paso07Branding.astro';
+import Paso08Logistica from './Paso08Logistica.astro';
+import Paso09Resumen from './Paso09Resumen.astro';
+import Paso10Solicitud from './Paso10Solicitud.astro';
+import Exito from './Exito.astro';
+import type { Catalogo } from '../../data/configurador';
+
+interface Props {
+  catalogo: Catalogo;
+}
+
+const { catalogo: c } = Astro.props;
+
+/* Solo lo que la logica del navegador necesita. Fuera del editor, solo lo activo. */
+const catalogoNavegador = {
+  opciones: c.editor ? c.opciones : c.opciones.filter((o) => o.activo),
+  ajustes: c.ajustes,
+  editor: c.editor ? true : undefined,
+};
+/* `<` escapado: un texto del admin con "</script>" no puede cerrar la etiqueta. */
+const catalogoJson = JSON.stringify(catalogoNavegador).replace(/</g, '\\u003c');
+---
+
+<div class:list={['cf', c.editor && 'is-editor']} data-configurador data-cf-editor={c.editor ? '' : undefined}>
+  <Stepper c={c} />
+
+  <div class="cf-cuerpo">
+    <div class="cf-main">
+      <Paso01Proyecto c={c} />
+      <Paso02Fecha c={c} />
+      <Paso03Configuracion c={c} />
+      <Paso04Equipamiento c={c} />
+      <Paso05Cocina c={c} />
+      <Paso06Ambientacion c={c} />
+      <Paso07Branding c={c} />
+      <Paso08Logistica c={c} />
+      <Paso09Resumen c={c} />
+      <Paso10Solicitud c={c} />
+      <Exito c={c} />
+
+      <div class="cf-nav" data-cf-nav>
+        <button type="button" class="cf-btn cf-btn-outline" data-cf-volver>
+          <Icon name="arrow-left" size={18} /> <T c={c} k="nav.volver" />
+        </button>
+        <div class="cf-nav-derecha">
+          <button type="button" class="cf-btn cf-btn-outline" data-cf-al-resumen hidden>
+            <T c={c} k="nav.alResumen" />
+          </button>
+          <button type="button" class="cf-btn cf-btn-primary" data-cf-continuar>
+            <span data-cf-continuar-texto>Continuar</span> <Icon name="arrow" size={18} />
+          </button>
+          <button type="submit" form="cf-form" class="cf-btn cf-btn-primary" data-cf-enviar hidden>
+            <span data-cf-enviar-texto><T c={c} k="nav.enviar" /></span> <Icon name="arrow" size={18} />
+          </button>
+          <p class="cf-nav-pista" data-cf-pista aria-live="polite"></p>
+        </div>
+      </div>
+    </div>
+
+    <Sidebar c={c} />
+  </div>
+
+  <button type="button" class="cf-side-abrir" data-cf-side-abrir aria-controls="cf-side" aria-expanded="false">
+    <span>
+      <span class="cf-over"><T c={c} k="side.titulo" /></span>
+      <span data-cf-side-progreso></span>
+    </span>
+    <Icon name="chevron" size={20} />
+  </button>
+</div>
+
+<script type="application/json" data-cf-catalogo-json is:inline set:html={catalogoJson} />
+
+<script>
+  import '../../scripts/configurador/index';
+</script>

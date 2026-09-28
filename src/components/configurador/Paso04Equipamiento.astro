@@ -1,0 +1,88 @@
+---
+/**
+ * Paso 4 · Equipa tu FOODD. Tres bloques: incluido (fijo), recomendado para la
+ * subconfiguracion elegida (nunca preseleccionado) y todo el catalogo con
+ * buscador y pestanas. La visibilidad de "recomendado" y el filtro los aplica
+ * src/scripts/configurador/equipamiento.ts.
+ */
+import Icon from '../Icon.astro';
+import Equipo from './Equipo.astro';
+import PasoCabecera from './PasoCabecera.astro';
+import AnadirOpcion from './AnadirOpcion.astro';
+import T from './T.astro';
+import { opcionesDe, type Catalogo } from '../../data/configurador';
+import { lista, refEdicion, t } from '../../data/configurador-textos';
+
+interface Props {
+  c: Catalogo;
+}
+
+const { c } = Astro.props;
+const equipos = opcionesDe(c, 'equipo');
+const incluidos = equipos.filter((e) => e.incluido);
+const extras = equipos.filter((e) => !e.incluido);
+const recomendables = extras.filter((e) => e.recomendado_para.length);
+const categorias = lista(c, 'categoriasEquipo').filter((cat) => extras.some((e) => e.categoria === cat.id));
+---
+
+<section class="cf-paso" data-paso="equipamiento" hidden>
+  <PasoCabecera c={c} paso="equipamiento" compacta />
+
+  <div class="cf-tira">
+    <Icon name="calendar" size={22} />
+    <div>
+      <p class="cf-tira-label"><T c={c} k="equipamiento.tiraLabel" /></p>
+      <p class="cf-tira-valor" data-cf-texto="proyecto"></p>
+    </div>
+    <p class="cf-tira-nota"><T c={c} k="equipamiento.tiraNota" /></p>
+    <button type="button" class="cf-link" data-ir="configuracion"><T c={c} k="equipamiento.cambiar" /> <Icon name="pencil" size={14} /></button>
+  </div>
+
+  <div class="cf-bloque cf-bloque-caja">
+    <h2 class="cf-h2 is-serif"><Icon name="doc" size={24} /> <T c={c} k="equipamiento.incluidoTitulo" /></h2>
+    <p class="cf-h2-sub"><T c={c} k="equipamiento.incluidoSub" /></p>
+    <div class="cf-grid cf-grid-4">
+      {incluidos.map((e) => <Equipo c={c} e={e} incluido />)}
+    </div>
+  </div>
+
+  <div class="cf-bloque cf-bloque-caja is-calida" data-cf-recomendados>
+    <h2 class="cf-h2 is-serif"><Icon name="star" size={24} fill="currentColor" class="text-rust" /> <T c={c} k="equipamiento.recomendadoTitulo" /></h2>
+    <p class="cf-h2-sub"><T c={c} k="equipamiento.recomendadoSub" /></p>
+    <div class="cf-grid cf-grid-4">
+      {recomendables.map((e) => <Equipo c={c} e={e} recomendado />)}
+    </div>
+    <p class="cf-vacio" data-cf-sin-recomendados hidden><T c={c} k="equipamiento.sinRecomendados" /></p>
+  </div>
+
+  <div class="cf-bloque cf-bloque-caja">
+    <div class="cf-h2-fila">
+      <div>
+        <h2 class="cf-h2 is-serif"><Icon name="grid" size={24} /> <T c={c} k="equipamiento.catalogoTitulo" /></h2>
+        <p class="cf-h2-sub"><T c={c} k="equipamiento.catalogoSub" /></p>
+      </div>
+      <label class="cf-buscar">
+        <Icon name="search" size={16} />
+        <input type="search" placeholder={t(c, 'equipamiento.buscar')} data-cf-buscar aria-label={t(c, 'equipamiento.buscar')} />
+      </label>
+    </div>
+    <div class="cf-tabs" role="group" aria-label="Categorías" data-cf-edit={refEdicion(c, 'l:categoriasEquipo')}>
+      <button type="button" class="cf-tab" data-cf-cat="" aria-pressed="true"><T c={c} k="equipamiento.todos" /></button>
+      {categorias.map((cat) => <button type="button" class="cf-tab" data-cf-cat={cat.id} aria-pressed="false">{cat.nombre}</button>)}
+    </div>
+    <div class="cf-grid cf-grid-5" data-cf-catalogo>
+      {extras.map((e) => <Equipo c={c} e={e} />)}
+      <AnadirOpcion c={c} tipo="equipo" texto="Añadir equipamiento" />
+    </div>
+    <p class="cf-vacio" data-cf-sin-resultados hidden><T c={c} k="equipamiento.sinResultados" /></p>
+
+    <div class="cf-otro">
+      <Icon name="cog" size={28} class="text-rust" />
+      <label class="cf-campo">
+        <span class="cf-label"><T c={c} k="equipamiento.otroTitulo" /></span>
+        <span class="cf-card-text"><T c={c} k="equipamiento.otroTexto" /></span>
+        <textarea class="field cf-textarea" data-bind="equipamiento.otros" maxlength="500" rows="2" placeholder={t(c, 'equipamiento.otroPlaceholder')} />
+      </label>
+    </div>
+  </div>
+</section>

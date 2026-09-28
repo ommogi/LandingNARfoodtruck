@@ -1,0 +1,135 @@
+---
+/**
+ * Paso 2 · Fecha y disponibilidad. El calendario lo pinta
+ * src/scripts/configurador/calendario.ts con la disponibilidad real de
+ * /api/disponibilidad. Si el proyecto es un Roadshow, el paso pide paradas
+ * (ciudad + fecha) en lugar de calendario.
+ */
+import Icon from '../Icon.astro';
+import { esIcono } from '../icons';
+import PasoCabecera from './PasoCabecera.astro';
+import Aviso from './Aviso.astro';
+import T from './T.astro';
+import type { Catalogo } from '../../data/configurador';
+import { lista, refEdicion, type ClaveTexto } from '../../data/configurador-textos';
+import { DIAS } from '../../data/disponibilidad';
+
+interface Props {
+  c: Catalogo;
+}
+
+const { c } = Astro.props;
+const situaciones = lista(c, 'situaciones', { conOcultos: Boolean(c.editor) });
+const leyenda: { clase: string; k: ClaveTexto }[] = [
+  { clase: 'is-disponible', k: 'fecha.leyendaDisponible' },
+  { clase: 'is-poca', k: 'fecha.leyendaRevisar' },
+  { clase: 'is-ocupado', k: 'fecha.leyendaNo' },
+  { clase: 'is-sel', k: 'fecha.leyendaSel' },
+];
+---
+
+<section class="cf-paso" data-paso="fecha" hidden>
+  <PasoCabecera c={c} paso="fecha" kRoadshow="fecha.tituloRoadshow" />
+
+  <!-- Flujo normal -->
+  <div class="cf-stack" data-cuando="!roadshow">
+    <div class="cf-bloque">
+      <h2 class="cf-h2"><span class="cf-num">1</span> <T c={c} k="fecha.situacion" /></h2>
+      <div class="cf-grid cf-grid-3" role="group" aria-label="Situación de la fecha" data-cf-edit={refEdicion(c, 'l:situaciones')}>
+        {
+          situaciones.map((s) => (
+            <button
+              type="button"
+              class:list={['cf-card cf-card-linea', s.oculto && 'is-oculta']}
+              data-elegir="fecha.situacion"
+              data-valor={s.id}
+              aria-pressed="false"
+            >
+              <span class="cf-radio" aria-hidden="true"><Icon name="tick" size={14} /></span>
+              {esIcono(s.icono) && <Icon name={s.icono} size={40} class="cf-card-icon" />}
+              <span>
+                <span class="cf-card-title is-serif">{s.nombre}</span>
+                <span class="cf-card-text">{s.descripcion}</span>
+              </span>
+            </button>
+          ))
+        }
+      </div>
+    </div>
+
+    <div class="cf-bloque" data-cuando="fecha.situacion=known|multiple" hidden>
+      <div class="cf-h2-fila">
+        <div>
+          <h2 class="cf-h2"><span class="cf-num">2</span> <T c={c} k="fecha.fechas" /></h2>
+          <p class="cf-h2-sub" data-cuando="fecha.situacion=known"><T c={c} k="fecha.fechasSubConocida" /></p>
+          <p class="cf-h2-sub" data-cuando="fecha.situacion=multiple"><T c={c} k="fecha.fechasSubVarias" /></p>
+        </div>
+        <div class="cf-segmento" role="group" aria-label="Duración" data-cuando="fecha.situacion=known">
+          <button type="button" data-elegir="fecha.modo" data-valor="single" aria-pressed="false"><T c={c} k="fecha.unDia" /></button>
+          <button type="button" data-elegir="fecha.modo" data-valor="range" aria-pressed="false"><T c={c} k="fecha.variosDias" /></button>
+        </div>
+      </div>
+
+      <div class="cf-cal-wrap">
+        <div class="cf-cal-caja">
+          <div class="cf-cals" data-cf-cal>
+            {
+              [0, 1].map((i) => (
+                <div class="cf-cal" data-cf-mes={i}>
+                  <div class="cf-cal-head">
+                    {i === 0 && (
+                      <button type="button" class="cf-cal-nav" data-cf-cal-prev aria-label="Mes anterior">
+                        <Icon name="chevron-left" size={18} />
+                      </button>
+                    )}
+                    <p class="cf-cal-mes" data-cf-cal-titulo aria-live="polite"></p>
+                    {i === 1 && (
+                      <button type="button" class="cf-cal-nav" data-cf-cal-next aria-label="Mes siguiente">
+                        <Icon name="chevron-right" size={18} />
+                      </button>
+                    )}
+                  </div>
+                  <div class="cf-cal-dias" aria-hidden="true">
+                    {DIAS.map((d) => <span>{d.charAt(0)}</span>)}
+                  </div>
+                  <div class="cf-cal-grid" data-cf-cal-grid role="group"></div>
+                </div>
+              ))
+            }
+          </div>
+          <ul class="cf-leyenda">
+            {leyenda.map((l) => (
+              <li><span class:list={['cf-leyenda-punto', l.clase]} aria-hidden="true" /><T c={c} k={l.k} /></li>
+            ))}
+          </ul>
+        </div>
+
+        <div class="cf-dispo-col">
+          <div class="cf-dispo" data-cf-dispo role="status" aria-live="polite"></div>
+          <div class="cf-alternativas" data-cuando="fecha.situacion=multiple" hidden>
+            <p class="cf-label"><T c={c} k="fecha.elegirAlternativa" /></p>
+            <div class="cf-alternativas-lista" data-cf-alternativas></div>
+          </div>
+          <Aviso c={c} kTitulo="fecha.avisoComprobacionTitulo" k="fecha.avisoComprobacion" />
+        </div>
+      </div>
+    </div>
+
+    <Aviso c={c} tono="ok" cuando="fecha.situacion=unknown" k="fecha.sinFecha" />
+  </div>
+
+  <!-- Roadshow -->
+  <div class="cf-stack" data-cuando="roadshow" hidden>
+    <div class="cf-bloque">
+      <h2 class="cf-h2"><span class="cf-num"><Icon name="route" size={16} /></span> <T c={c} k="fecha.roadshowTitulo" /></h2>
+      <p class="cf-h2-sub"><T c={c} k="fecha.roadshowSub" /></p>
+      <ol class="cf-paradas" data-cf-paradas></ol>
+      <button type="button" class="cf-btn cf-btn-outline cf-btn-sm" data-cf-parada-anadir>
+        <Icon name="plus" size={16} /> <T c={c} k="fecha.anadirParada" />
+      </button>
+    </div>
+    <Aviso c={c} kTitulo="fecha.roadshowAvisoTitulo" k="fecha.roadshowAviso" />
+  </div>
+
+  <Aviso c={c} tono="aviso" kTitulo="fecha.noReservaTitulo" k="fecha.noReserva" />
+</section>

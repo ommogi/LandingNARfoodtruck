@@ -5,7 +5,6 @@ import FaqAccordion from '../components/faq/FaqAccordion.astro';
 import FaqSupport from '../components/faq/FaqSupport.astro';
 import FaqPerks from '../components/faq/FaqPerks.astro';
 import TruckFinalCta from '../components/truck/TruckFinalCta.astro';
-import QuoteFormModal from '../components/QuoteFormModal.astro';
 import { faqItems } from '../data/faq';
 import { site } from '../config/site';
 import { faqNode } from '../lib/schema';
@@ -26,15 +25,10 @@ const canonical = new URL('/faq', site.url).href;
   <FaqSupport />
   <TruckFinalCta
     title="¿Listo para vivir una experiencia inolvidable?"
-    cta="Reservar fecha"
     track="cta_faq_final"
-    modo="presupuesto"
   />
   <FaqPerks />
 
-  <Fragment slot="overlays">
-    <QuoteFormModal />
-  </Fragment>
 </BaseLayout>
 
 <script>

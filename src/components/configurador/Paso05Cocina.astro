@@ -1,0 +1,126 @@
+---
+/**
+ * Paso 5 · Servicio de cocina. Primero la decision (propio personal o
+ * cocinero); solo si pide cocinero se despliegan las preguntas del servicio.
+ * El paso entero se salta si la familia de uso no tiene `mostrar_cocina`.
+ */
+import Icon from '../Icon.astro';
+import OpcionFoto from './OpcionFoto.astro';
+import OpcionIcono from './OpcionIcono.astro';
+import PasoCabecera from './PasoCabecera.astro';
+import Aviso from './Aviso.astro';
+import AnadirOpcion from './AnadirOpcion.astro';
+import T from './T.astro';
+import { opcionesDe, type Catalogo } from '../../data/configurador';
+import { lista, refEdicion, t } from '../../data/configurador-textos';
+
+interface Props {
+  c: Catalogo;
+}
+
+const { c } = Astro.props;
+const modos = opcionesDe(c, 'cocina');
+const servicios = opcionesDe(c, 'cocina_servicio');
+const alimentos = lista(c, 'alimentos', { conOcultos: Boolean(c.editor) });
+const necesidades = lista(c, 'necesidades');
+const cuandoServicio = (visible: string[]) => (visible.length && !c.editor ? `configuracion.uso=${visible.join('|')}` : undefined);
+---
+
+<section class="cf-paso" data-paso="cocina" hidden>
+  <PasoCabecera c={c} paso="cocina" />
+
+  <div class="cf-grid cf-grid-2" role="group" aria-label="Personal del servicio">
+    {modos.map((o) => <OpcionFoto c={c} opcion={o} campo="cocina.opcion" lista />)}
+  </div>
+
+  <div class="cf-stack" data-cuando="cocina.opcion=cocina.cocinero" hidden>
+    <div class="cf-caja cf-grid cf-grid-2 is-gap-grande">
+      <div class="cf-bloque">
+        <h3 class="cf-h3"><Icon name="chef" size={22} /> <T c={c} k="cocina.b1" /></h3>
+        <p class="cf-card-title"><T c={c} k="cocina.b1Nombre" /></p>
+        <p class="cf-card-text"><T c={c} k="cocina.b1Texto" /></p>
+        <p class="cf-cantidad"><Icon name="chef" size={28} /> <T c={c} k="cocina.b1Cantidad" /></p>
+      </div>
+
+      <div class="cf-bloque">
+        <h3 class="cf-h3"><Icon name="utensils" size={22} /> <T c={c} k="cocina.b2" /></h3>
+        <p class="cf-h2-sub"><T c={c} k="cocina.b2Sub" /></p>
+        <div class="cf-grid cf-grid-chips" role="group" aria-label="Tipo de servicio">
+          {servicios.map((s) => (
+            <OpcionIcono c={c} opcion={s} campo="cocina.servicios" multiple compacta sinTexto cuando={cuandoServicio(s.visible_para)} />
+          ))}
+          <AnadirOpcion c={c} tipo="cocina_servicio" texto="Añadir" />
+        </div>
+      </div>
+
+      <label class="cf-campo">
+        <span class="cf-h3"><Icon name="doc" size={22} /> <T c={c} k="cocina.b3" /></span>
+        <textarea
+          class="field cf-textarea"
+          data-bind="cocina.descripcion"
+          maxlength="500"
+          rows="3"
+          placeholder={t(c, 'cocina.b3Placeholder')}
+        />
+        <span class="cf-contador" data-contador="cocina.descripcion" data-max="500"></span>
+      </label>
+
+      <div class="cf-campo">
+        <span class="cf-h3"><Icon name="users" size={22} /> <T c={c} k="cocina.b4" /></span>
+        <div class="cf-fila">
+          <label class="cf-numero">
+            <input class="field" type="number" min="1" max="10000" inputmode="numeric" data-bind="cocina.personas" aria-label="Personas del servicio" />
+            <T c={c} k="cocina.personas" />
+          </label>
+          <label class="cf-check"><input type="checkbox" data-bind="cocina.personasNoSe" /> <T c={c} k="cocina.noSe" /></label>
+        </div>
+        <span class="cf-card-text"><T c={c} k="cocina.b4Nota" /></span>
+      </div>
+    </div>
+
+    <div class="cf-caja">
+      <h3 class="cf-h3"><Icon name="gift" size={22} /> <T c={c} k="cocina.b5" /></h3>
+      <div class="cf-grid cf-grid-2" data-cf-edit={refEdicion(c, 'l:alimentos')}>
+        {
+          alimentos.map((a) => (
+            <button type="button" class:list={['cf-card cf-card-radio', a.oculto && 'is-oculta']} data-elegir="cocina.alimentos" data-valor={a.id} aria-pressed="false">
+              <span class="cf-radio" aria-hidden="true"><Icon name="tick" size={14} /></span>
+              <span>
+                <span class="cf-card-title">{a.nombre}</span>
+                <span class="cf-card-text">{a.descripcion}</span>
+              </span>
+            </button>
+          ))
+        }
+      </div>
+    </div>
+
+    <div class="cf-caja cf-grid cf-grid-2 is-gap-grande">
+      <div class="cf-campo">
+        <span class="cf-h3"><Icon name="clipboard" size={22} /> <T c={c} k="cocina.b6" /></span>
+        <div class="cf-checks" data-cf-edit={refEdicion(c, 'l:necesidades')}>
+          {
+            necesidades.map((n) => (
+              <button type="button" class="cf-check-btn" data-alternar="cocina.necesidades" data-valor={n.id} aria-pressed="false">
+                <span class="cf-check-caja" aria-hidden="true"><Icon name="tick" size={12} /></span>
+                {n.nombre}
+              </button>
+            ))
+          }
+        </div>
+      </div>
+      <label class="cf-campo">
+        <span class="cf-label"><T c={c} k="cocina.notasLabel" /></span>
+        <textarea
+          class="field cf-textarea"
+          data-bind="cocina.notas"
+          maxlength="500"
+          rows="3"
+          placeholder={t(c, 'cocina.notasPlaceholder')}
+        />
+      </label>
+    </div>
+
+    <Aviso c={c} tono="aviso" kTitulo="cocina.avisoTitulo" k="cocina.aviso" />
+  </div>
+</section>

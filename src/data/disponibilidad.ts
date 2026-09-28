@@ -1,10 +1,18 @@
 /**
- * Disponibilidad del food truck para el asistente de reserva.
+ * Logica de disponibilidad del food truck para el asistente de reserva.
  *
- * PARA EDITAR: anadir o quitar fechas en `fechasOcupadas` y
- * `fechasPocaDisponibilidad`, siempre en formato ISO local `AAAA-MM-DD`. Todo
- * lo que no este en esas listas se considera disponible. Los cambios requieren
- * volver a desplegar la web (el sitio es estatico, no hay base de datos).
+ * Este modulo es PURO y se empaqueta en el bundle del navegador (lo importa
+ * src/scripts/booking.ts). No puede tocar la base de datos ni leer secretos: las
+ * funciones reciben los datos ya cargados en un objeto `Disponibilidad`.
+ *
+ * Quien los carga:
+ *   - navegador -> GET /api/disponibilidad (src/pages/api/disponibilidad.ts)
+ *   - servidor   -> getDisponibilidad() de src/lib/disponibilidad-server.ts
+ *
+ * El cliente gestiona las fechas desde /admin y los cambios se ven sin volver a
+ * desplegar. Si Supabase no responde se usa DISPONIBILIDAD_VACIA y el calendario
+ * se comporta como antes de existir la base de datos: nada bloqueado salvo la
+ * antelacion minima.
  *
  * Los nombres de mes y dia estan escritos a mano y no con Intl: el mismo modulo
  * lo usan el navegador y la ruta /api/presupuesto, y el Node del build no
@@ -12,17 +20,34 @@
  * usa toLocaleString).
  */
 
-/** Fechas ya reservadas: no se pueden seleccionar. */
-export const fechasOcupadas: string[] = [];
+/** Estado de las fechas que el cliente marca a mano en /admin. */
+export type EstadoEditable = 'ocupado' | 'poca';
 
-/** Fechas casi cerradas: se pueden seleccionar, pero avisan al usuario. */
-export const fechasPocaDisponibilidad: string[] = [];
+/** Instantanea de la disponibilidad. Serializable a JSON tal cual. */
+export type Disponibilidad = {
+  /** Fechas ya reservadas: no se pueden seleccionar. */
+  ocupadas: string[];
+  /** Fechas casi cerradas: se pueden seleccionar, pero avisan al usuario. */
+  poca: string[];
+  /** Dias minimos entre hoy y la fecha del evento. */
+  minDiasAntelacion: number;
+  /** Meses que se pueden navegar hacia delante desde el mes actual. */
+  mesesVisibles: number;
+};
 
-/** Dias minimos entre hoy y la fecha del evento. */
-export const MIN_DIAS_ANTELACION = 7;
+/** Valores por defecto y red de seguridad si la base de datos no responde. */
+export const DISPONIBILIDAD_VACIA: Disponibilidad = {
+  ocupadas: [],
+  poca: [],
+  minDiasAntelacion: 7,
+  mesesVisibles: 12,
+};
 
-/** Meses que se pueden navegar hacia delante desde el mes actual. */
-export const MESES_VISIBLES = 12;
+/** Limites de los ajustes. Replican los CHECK de la tabla `ajustes`. */
+export const LIMITES = {
+  minDiasAntelacion: { min: 0, max: 90 },
+  mesesVisibles: { min: 1, max: 24 },
+} as const;
 
 export const MESES = [
   'Enero',
@@ -57,9 +82,10 @@ export const ESTADO_TEXTO: Record<EstadoFecha, string> = {
 
 /**
  * Rotulo visible bajo el numero del dia. `disponible` va vacio a proposito:
- * mientras `fechasOcupadas` no se mantenga al dia, el calendario no puede
- * afirmar que una fecha esta libre. La confirmacion real llega por correo en
- * menos de 24 horas, y eso es lo que dicen el paso 1 y el acuse del asistente.
+ * aunque el cliente ya puede mantener las fechas desde /admin, el calendario no
+ * afirma que una fecha este libre hasta que ese habito este asentado. La
+ * confirmacion real llega por correo en menos de 24 horas, y eso es lo que dicen
+ * el paso 1 y el acuse del asistente.
  */
 export const ESTADO_ETIQUETA: Record<EstadoFecha, string> = {
   disponible: '',
@@ -82,33 +108,95 @@ export const fromIso = (iso: string) => {
 
 const ISO_RE = /^\d{4}-\d{2}-\d{2}$/;
 
+/**
+ * Comprueba formato y que la fecha exista de verdad: '2026-02-31' pasa el regex
+ * pero fromIso lo desplaza al 3 de marzo. Lo usan el panel y la API de escritura.
+ */
+export const esIsoValido = (iso: string) => ISO_RE.test(iso) && toIso(fromIso(iso)) === iso;
+
 /** Primer dia que se puede reservar: hoy mas los dias de antelacion minima. */
-export const primeraFechaReservable = () => {
+export const primeraFechaReservable = (minDiasAntelacion: number) => {
   const date = new Date();
   date.setHours(0, 0, 0, 0);
-  date.setDate(date.getDate() + MIN_DIAS_ANTELACION);
+  date.setDate(date.getDate() + minDiasAntelacion);
   return date;
 };
 
-export const estadoFecha = (iso: string): EstadoFecha => {
+export const estadoFecha = (iso: string, dispo: Disponibilidad): EstadoFecha => {
   if (!ISO_RE.test(iso)) return 'bloqueado';
-  if (fromIso(iso) < primeraFechaReservable()) return 'bloqueado';
-  if (fechasOcupadas.includes(iso)) return 'ocupado';
-  if (fechasPocaDisponibilidad.includes(iso)) return 'poca';
+  if (fromIso(iso) < primeraFechaReservable(dispo.minDiasAntelacion)) return 'bloqueado';
+  if (dispo.ocupadas.includes(iso)) return 'ocupado';
+  if (dispo.poca.includes(iso)) return 'poca';
   return 'disponible';
 };
 
 /** Se puede elegir en el calendario y aceptar en el servidor. */
-export const esFechaReservable = (iso: string) => {
-  const estado = estadoFecha(iso);
+export const esFechaReservable = (iso: string, dispo: Disponibilidad) => {
+  const estado = estadoFecha(iso, dispo);
   return estado === 'disponible' || estado === 'poca';
 };
+
+/**
+ * Expande un rango inclusivo a fechas sueltas. El panel guarda los rangos como
+ * dias individuales: con 12 meses visibles son 365 filas como mucho, y asi la
+ * lectura sigue siendo una simple busqueda en una lista.
+ *
+ * Devuelve [] si el rango esta invertido o alguna fecha no es valida.
+ */
+export const expandirRango = (desde: string, hasta: string, maxDias = 400) => {
+  if (!esIsoValido(desde) || !esIsoValido(hasta)) return [];
+
+  const fin = fromIso(hasta);
+  const cursor = fromIso(desde);
+  if (cursor > fin) return [];
+
+  const fechas: string[] = [];
+  while (cursor <= fin && fechas.length < maxDias) {
+    fechas.push(toIso(cursor));
+    cursor.setDate(cursor.getDate() + 1);
+  }
+  return fechas;
+};
+
+/**
+ * Lista de fechas del formulario. El asistente permite elegir varios dias y los
+ * manda en un unico campo `date` separados por comas, porque lead.ts arma el
+ * cuerpo con Object.fromEntries(new FormData(...)) y eso colapsa los nombres
+ * repetidos: varios <input name="date"> perderian todos menos el ultimo.
+ *
+ * Una fecha suelta (el <input type="date"> de ContactForm) es simplemente una
+ * lista de un elemento, asi que ese formulario sigue funcionando sin cambios.
+ *
+ * Valida, deduplica y ordena; el orden ISO es alfabetico, asi que sort() basta.
+ * El techo real de cuantas caben lo pone MAX_BODY_BYTES en /api/presupuesto.
+ */
+export const parsearFechas = (valor: string, max = 1000) => [
+  ...new Set(
+    valor
+      .split(',')
+      .map((parte) => parte.trim())
+      .filter(esIsoValido),
+  ),
+]
+  .sort()
+  .slice(0, max);
+
+/** Rotulo del recuento, con el singular resuelto. */
+export const contarFechas = (total: number) => (total === 1 ? '1 fecha' : `${total} fechas`);
 
 /** 2026-06-28 -> 28/06/2026 */
 export const formatearFecha = (iso: string) => {
   if (!ISO_RE.test(iso)) return iso;
   const [year, month, day] = iso.split('-');
   return `${day}/${month}/${year}`;
+};
+
+/** 2026-06-28 -> 28 de junio. Para el resumen de varias fechas, donde el dia de
+ * la semana y el ano repetidos no caben en una linea. */
+export const formatearDiaMes = (iso: string) => {
+  if (!ISO_RE.test(iso)) return iso;
+  const date = fromIso(iso);
+  return `${date.getDate()} de ${(MESES[date.getMonth()] as string).toLowerCase()}`;
 };
 
 /** 2026-06-28 -> Viernes, 28 de junio de 2026 */

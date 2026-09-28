@@ -1,0 +1,87 @@
+---
+/** Paso 1 · ¿Para que necesitas FOODD? Tipo de proyecto y subtipo. */
+import Icon from '../Icon.astro';
+import { esIcono } from '../icons';
+import OpcionFoto from './OpcionFoto.astro';
+import OpcionIcono from './OpcionIcono.astro';
+import PasoCabecera from './PasoCabecera.astro';
+import Aviso from './Aviso.astro';
+import AnadirOpcion from './AnadirOpcion.astro';
+import T from './T.astro';
+import { opcionesDe, type Catalogo } from '../../data/configurador';
+import { refEdicion, t } from '../../data/configurador-textos';
+
+interface Props {
+  c: Catalogo;
+}
+
+const { c } = Astro.props;
+const proyectos = opcionesDe(c, 'proyecto');
+---
+
+<section class="cf-paso" data-paso="proyecto" hidden>
+  <PasoCabecera c={c} paso="proyecto">
+    <p class="cf-head-lema">
+      <Icon name="sparkles" size={28} />
+      <T c={c} k="general.lema" />
+    </p>
+  </PasoCabecera>
+
+  <div class="cf-grid cf-grid-4" role="group" aria-label="Tipo de proyecto">
+    {proyectos.map((o) => <OpcionFoto c={c} opcion={o} campo="proyecto.tipo" />)}
+    <AnadirOpcion c={c} tipo="proyecto" />
+  </div>
+
+  {
+    proyectos.map((p) => {
+      const subtipos = opcionesDe(c, 'subtipo', p.id);
+      return (
+        <div class="cf-reveal-row" data-cuando={`proyecto.tipo=${p.id}`} hidden>
+          <div class="cf-panel">
+            <div class="cf-panel-head">
+              {esIcono(p.icono) && <Icon name={p.icono} size={40} class="cf-panel-icon" />}
+              <div>
+                <p class="cf-panel-title">
+                  <T c={c} k="proyecto.seleccionado" vars={{ nombre: p.nombre.toUpperCase() }} />
+                </p>
+                <p class="cf-panel-text">
+                  {subtipos.length || c.editor ? (
+                    <T c={c} k="proyecto.preguntaSubtipo" vars={{ nombre: p.nombre.toLowerCase() }} />
+                  ) : (
+                    p.descripcion
+                  )}
+                </p>
+              </div>
+            </div>
+
+            {(subtipos.length > 0 || c.editor) && (
+              <div class="cf-grid cf-grid-auto" role="group" aria-label={`Tipo de ${p.nombre}`}>
+                {subtipos.map((s) => (
+                  <OpcionIcono c={c} opcion={s} campo="proyecto.subtipo" />
+                ))}
+                <AnadirOpcion c={c} tipo="subtipo" padre={p.id} />
+              </div>
+            )}
+
+            <label class="cf-campo" data-cuando="proyectoConTexto" hidden>
+              <span class="cf-label"><T c={c} k="proyecto.textoLabel" /></span>
+              <textarea
+                class="field cf-textarea"
+                data-bind="proyecto.descripcion"
+                maxlength="500"
+                rows="3"
+                placeholder={t(c, 'proyecto.textoPlaceholder')}
+              />
+              <span class="cf-contador" data-contador="proyecto.descripcion" data-max="500"></span>
+            </label>
+
+            <Aviso c={c} k="proyecto.aviso" />
+          </div>
+          <figure class="cf-panel-foto" data-cf-edit={refEdicion(c, 'i:img.lateralProyecto')}>
+            <img src={t(c, 'img.lateralProyecto')} alt="" loading="lazy" decoding="async" data-cf-img="img.lateralProyecto" />
+          </figure>
+        </div>
+      );
+    })
+  }
+</section>

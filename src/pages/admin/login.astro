@@ -1,0 +1,159 @@
+---
+/**
+ * Entrada al panel con correo y contrasena.
+ *
+ * El codigo de un solo uso por correo sigue existiendo, pero solo para dos
+ * casos: el primer acceso (la cuenta invitada aun no tiene contrasena) y
+ * recuperarla si se olvida. Tras canjearlo, el middleware obliga a fijar una
+ * contrasena nueva antes de dejar pasar al panel.
+ *
+ * Todas las respuestas de error son genericas: la pagina no confirma a un
+ * curioso que correo tiene acceso.
+ */
+import AdminLayout from '../../layouts/AdminLayout.astro';
+import { LARGO_CODIGO } from '../../data/acceso';
+import { haySupabase } from '../../lib/supabase';
+
+export const prerender = false;
+
+// Con sesion abierta no tiene sentido volver a entrar.
+if (Astro.locals.userEmail) return Astro.redirect(Astro.locals.adminBase, 302);
+
+const configurado = haySupabase();
+
+const input =
+  'min-h-11 w-full rounded-lg border border-line bg-white px-3 text-ink placeholder:text-muted focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue';
+const boton =
+  'min-h-11 cursor-pointer rounded-lg bg-rust px-4 font-semibold text-white hover:bg-rust-dark disabled:cursor-not-allowed disabled:opacity-60';
+---
+
+<AdminLayout title="Acceso">
+  <div class="grid max-w-[420px] gap-4">
+    <div class="rounded-card border border-line bg-white p-6 shadow-card">
+      {
+        configurado ? (
+          <form class="grid gap-4" data-login-form>
+            <div class="grid gap-1.5">
+              <label class="text-[13px] font-semibold text-ink" for="email">
+                Tu correo electrónico
+              </label>
+              <input
+                class={`${input} read-only:bg-bg-2 read-only:text-muted`}
+                id="email"
+                name="email"
+                type="email"
+                autocomplete="email"
+                required
+                placeholder="nombre@narfoodtruck.com"
+              />
+            </div>
+
+            <div class="grid gap-1.5" data-login-paso-clave>
+              <label class="text-[13px] font-semibold text-ink" for="password">
+                Contraseña
+              </label>
+              <div class="relative">
+                <input
+                  class={`${input} pr-24`}
+                  id="password"
+                  name="password"
+                  type="password"
+                  autocomplete="current-password"
+                  maxlength="128"
+                />
+                <button
+                  class="absolute top-1/2 right-2 -translate-y-1/2 cursor-pointer rounded-md border-0 bg-transparent px-2 py-1 text-[12.5px] font-semibold text-muted hover:text-ink"
+                  type="button"
+                  data-login-ver
+                  aria-pressed="false"
+                >
+                  Mostrar
+                </button>
+              </div>
+            </div>
+            <div class="grid gap-1.5" data-login-paso-codigo hidden>
+              <label class="text-[13px] font-semibold text-ink" for="codigo">
+                Código de {LARGO_CODIGO} dígitos
+              </label>
+
+              {/*
+                Un solo input real, invisible y estirado sobre las casillas. Seis
+                inputs de verdad obligarian a repartir el foco a mano y romperian
+                el pegado y el autorrelleno del codigo del correo; asi el
+                navegador sigue viendo un campo normal y las casillas son solo
+                el reflejo de su valor.
+              */}
+              <div class="relative">
+                <input
+                  class="absolute inset-0 z-10 h-full w-full cursor-pointer opacity-0"
+                  id="codigo"
+                  name="codigo"
+                  type="text"
+                  inputmode="numeric"
+                  autocomplete="one-time-code"
+                  maxlength={LARGO_CODIGO}
+                  pattern={`[0-9]{${LARGO_CODIGO}}`}
+                />
+                {/* Las columnas van en `style` y no en una clase: Tailwind no
+                    puede generar `grid-cols-N` si la N sale de una variable. */}
+                <div
+                  class="grid gap-2"
+                  style={`grid-template-columns: repeat(${LARGO_CODIGO}, minmax(0, 1fr))`}
+                  aria-hidden="true"
+                >
+                  {
+                    Array.from({ length: LARGO_CODIGO }).map(() => (
+                      <div
+                        class="grid min-h-12 place-items-center rounded-lg border border-line bg-bg-2 font-mono text-[18px] text-ink transition-colors is-active:border-blue is-active:bg-white is-active:ring-2 is-active:ring-blue/20"
+                        data-codigo-caja
+                      />
+                    ))
+                  }
+                </div>
+              </div>
+            </div>
+
+            <button class={boton} type="submit" data-login-enviar>
+              Entrar
+            </button>
+            <button
+              class="m-0 cursor-pointer border-0 bg-transparent p-0 text-left text-[12.5px] text-muted underline hover:text-ink"
+              type="button"
+              data-login-recuperar
+            >
+              ¿Olvidaste la contraseña o es tu primer acceso?
+            </button>
+
+            <button
+              class="m-0 cursor-pointer border-0 bg-transparent p-0 text-left text-[12.5px] text-muted underline hover:text-ink"
+              type="button"
+              data-login-volver
+              hidden
+            >
+              Volver a entrar con contraseña
+            </button>
+
+            <p class="m-0 min-h-5 text-[13px] is-error:text-rust" data-login-status role="status" />
+
+            <p class="m-0 text-[12.5px] text-muted" data-login-ayuda hidden>
+              Te enviaremos un código por correo. Al introducirlo podrás crear una contraseña nueva.
+            </p>
+          </form>
+        ) : (
+          <p class="m-0 text-[14px] text-rust">
+            El acceso no está configurado todavía: faltan las variables
+            <code>PUBLIC_SUPABASE_URL</code> y <code>PUBLIC_SUPABASE_ANON_KEY</code>.
+          </p>
+        )
+      }
+    </div>
+  </div>
+
+  {
+    configurado && (
+      <script>
+        import '../../scripts/admin-login';
+      </script>
+    )
+  }
+</AdminLayout>

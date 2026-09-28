@@ -1,0 +1,101 @@
+---
+/** Paso 7 · Branding: personalizacion visual del propio remolque. */
+import Icon from '../Icon.astro';
+import { esIcono } from '../icons';
+import OpcionFoto from './OpcionFoto.astro';
+import PasoCabecera from './PasoCabecera.astro';
+import Aviso from './Aviso.astro';
+import AnadirOpcion from './AnadirOpcion.astro';
+import T from './T.astro';
+import { opcionesDe, type Catalogo } from '../../data/configurador';
+import { lista, refEdicion, t } from '../../data/configurador-textos';
+
+interface Props {
+  c: Catalogo;
+}
+
+const { c } = Astro.props;
+const tipos = opcionesDe(c, 'branding');
+const archivos = lista(c, 'archivosBranding', { conOcultos: Boolean(c.editor) });
+---
+
+<section class="cf-paso" data-paso="branding" hidden>
+  <PasoCabecera c={c} paso="branding" />
+
+  <div class="cf-grid cf-grid-2" role="group" aria-label="Personalización">
+    <button type="button" class="cf-card cf-card-linea is-grande" data-elegir="branding.quiere" data-valor="false" aria-pressed="false">
+      <span class="cf-radio" aria-hidden="true"><Icon name="tick" size={14} /></span>
+      <Icon name="truck" size={56} class="cf-card-icon" />
+      <span>
+        <span class="cf-card-title"><T c={c} k="branding.noTitulo" /></span>
+        <span class="cf-card-text"><T c={c} k="branding.noTexto" /></span>
+      </span>
+    </button>
+    <button type="button" class="cf-card cf-card-linea is-grande" data-elegir="branding.quiere" data-valor="true" aria-pressed="false">
+      <span class="cf-radio" aria-hidden="true"><Icon name="tick" size={14} /></span>
+      <Icon name="paintbrush" size={56} class="cf-card-icon" />
+      <span>
+        <span class="cf-card-title"><T c={c} k="branding.siTitulo" /></span>
+        <span class="cf-card-text"><T c={c} k="branding.siTexto" /></span>
+      </span>
+    </button>
+  </div>
+
+  <div class="cf-stack" data-cuando="branding.quiere=true" hidden>
+    <div class="cf-bloque">
+      <h2 class="cf-h2 is-serif"><span class="cf-num">2</span> <T c={c} k="branding.tipoTitulo" /></h2>
+      <div class="cf-grid cf-grid-4" role="group" aria-label="Tipo de personalización">
+        {tipos.map((ti) => <OpcionFoto c={c} opcion={ti} campo="branding.tipo" chips />)}
+        <AnadirOpcion c={c} tipo="branding" />
+      </div>
+    </div>
+
+    <div class="cf-bloque">
+      <h2 class="cf-h2 is-serif"><span class="cf-num">3</span> <T c={c} k="branding.archivosTitulo" /></h2>
+      <p class="cf-h2-sub"><T c={c} k="branding.archivosSub" /></p>
+      <div class="cf-grid cf-grid-4" role="group" aria-label="Estado de los archivos" data-cf-edit={refEdicion(c, 'l:archivosBranding')}>
+        {
+          archivos.map((a) => (
+            <button type="button" class:list={['cf-card cf-card-linea is-compacta', a.oculto && 'is-oculta']} data-elegir="branding.archivos" data-valor={a.id} aria-pressed="false">
+              <span class="cf-radio" aria-hidden="true"><Icon name="tick" size={14} /></span>
+              {esIcono(a.icono) && <Icon name={a.icono} size={26} class="cf-card-icon" />}
+              <span>
+                <span class="cf-card-title is-normal">{a.nombre}</span>
+                {a.descripcion && <span class="cf-card-text">{a.descripcion}</span>}
+              </span>
+            </button>
+          ))
+        }
+      </div>
+    </div>
+
+    <div class="cf-grid cf-grid-2">
+      <div class="cf-caja cf-subida">
+        <Icon name="upload" size={28} />
+        <div>
+          <p class="cf-card-title is-normal"><T c={c} k="branding.subidaTitulo" /></p>
+          <p class="cf-card-text"><T c={c} k="branding.subidaTexto" /></p>
+        </div>
+      </div>
+      <div class="cf-caja cf-stack is-gap-pequeno">
+        <label class="cf-campo">
+          <span class="cf-label"><T c={c} k="branding.marcaLabel" /></span>
+          <input class="field" data-bind="branding.marca" maxlength="80" />
+        </label>
+        <label class="cf-campo">
+          <span class="cf-label" data-cuando="!brandAMedida"><T c={c} k="branding.infoLabel" /></span>
+          <span class="cf-label" data-cuando="brandAMedida" hidden><T c={c} k="branding.medidaLabel" /></span>
+          <textarea
+            class="field cf-textarea"
+            data-bind="branding.descripcion"
+            maxlength="500"
+            rows="2"
+            placeholder={t(c, 'branding.infoPlaceholder')}
+          />
+        </label>
+      </div>
+    </div>
+
+    <Aviso c={c} kTitulo="branding.avisoTitulo" k="branding.aviso" />
+  </div>
+</section>

@@ -8,7 +8,6 @@ import Gallery from '../components/home/Gallery.astro';
 import Reasons from '../components/home/Reasons.astro';
 import FinalCta from '../components/home/FinalCta.astro';
 import VideoModal from '../components/VideoModal.astro';
-import QuoteFormModal from '../components/QuoteFormModal.astro';
 import Lightbox from '../components/gallery/Lightbox.astro';
 import { site } from '../config/site';
 import { processSteps } from '../data/proceso';
@@ -22,7 +21,7 @@ const schemas = [howToNode(processSteps, canonical)];
 
 <BaseLayout
   title={`Alquiler de food trucks para eventos en ${site.locality} | NAR`}
-  description={`Food trucks premium para bodas, empresas, ferias y eventos privados en ${site.locality}. Transporte, montaje y retirada incluidos. Presupuesto en menos de 24 horas.`}
+  description={`Food trucks premium para bodas, empresas, ferias y eventos privados en ${site.locality}. Transporte, montaje y retirada incluidos. Configúralo online y recibe tu propuesta en menos de 24 horas.`}
   path="/"
   schemas={schemas}
 >
@@ -36,7 +35,6 @@ const schemas = [howToNode(processSteps, canonical)];
 
   <Fragment slot="overlays">
     <VideoModal />
-    <QuoteFormModal />
     <Lightbox />
   </Fragment>
 </BaseLayout>

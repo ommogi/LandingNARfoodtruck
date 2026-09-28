@@ -9,21 +9,21 @@ import type { ImageMetadata } from 'astro';
 
 import type { IconName } from '../components/icons';
 
-import truckExterior01 from '../assets/gallery/truck-exterior-01.jpg';
-import truckTrasera from '../assets/gallery/truck-trasera.jpg';
-import interior01 from '../assets/gallery/interior-01.jpg';
-import interior02 from '../assets/gallery/interior-02.jpg';
-import interior03 from '../assets/gallery/interior-03.jpg';
-import heroInterior from '../assets/gallery/hero-interior.jpg';
-import detalleLamparas from '../assets/gallery/detalle-lamparas.jpg';
-import detalleEquipamiento from '../assets/gallery/detalle-equipamiento.jpg';
+import truckExterior01 from '../assets/gallery/truck-exterior-01.webp';
+import truckTrasera from '../assets/gallery/truck-trasera.webp';
+import interior01 from '../assets/gallery/interior-01.webp';
+import interior02 from '../assets/gallery/interior-02.webp';
+import interior03 from '../assets/gallery/interior-03.webp';
+import heroInterior from '../assets/gallery/hero-interior.webp';
+import detalleLamparas from '../assets/gallery/detalle-lamparas.webp';
+import detalleEquipamiento from '../assets/gallery/detalle-equipamiento.webp';
 
-import gallery01 from '../assets/gallery-01.png';
-import gallery02 from '../assets/gallery-02.png';
-import gallery03 from '../assets/gallery-03.png';
-import gallery04 from '../assets/gallery-04.jpg';
-import gallery05 from '../assets/gallery-05.jpg';
-import gallery06 from '../assets/gallery-06.jpg';
+import gallery01 from '../assets/gallery-01.webp';
+import gallery02 from '../assets/gallery-02.webp';
+import gallery03 from '../assets/gallery-03.webp';
+import gallery04 from '../assets/gallery-04.webp';
+import gallery05 from '../assets/gallery-05.webp';
+import gallery06 from '../assets/gallery-06.webp';
 
 export type GalleryCategory = 'truck' | 'interior' | 'detail' | 'event' | 'equipment';
 

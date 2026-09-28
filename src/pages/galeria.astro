@@ -4,8 +4,6 @@ import GalleryHero from '../components/gallery/GalleryHero.astro';
 import GalleryGrid from '../components/gallery/GalleryGrid.astro';
 import BookingCta from '../components/gallery/BookingCta.astro';
 import Lightbox from '../components/gallery/Lightbox.astro';
-import QuoteFormModal from '../components/QuoteFormModal.astro';
-import BookingModal from '../components/booking/BookingModal.astro';
 ---
 
 <BaseLayout
@@ -19,14 +17,11 @@ import BookingModal from '../components/booking/BookingModal.astro';
   <BookingCta />
 
   <Fragment slot="overlays">
-    <QuoteFormModal />
-    <BookingModal />
     <Lightbox />
   </Fragment>
 </BaseLayout>
 
 <script>
   import '../scripts/landing';
-  import '../scripts/booking';
   import '../scripts/gallery';
 </script>

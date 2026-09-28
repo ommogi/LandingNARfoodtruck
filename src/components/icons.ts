@@ -67,6 +67,44 @@ import Wrench from '@lucide/astro/icons/wrench';
 import X from '@lucide/astro/icons/x';
 import Zap from '@lucide/astro/icons/zap';
 
+/* Configurador (/configurador) y su panel. */
+import ArrowLeft from '@lucide/astro/icons/arrow-left';
+import Beer from '@lucide/astro/icons/beer';
+import CalendarRange from '@lucide/astro/icons/calendar-range';
+import CircleAlert from '@lucide/astro/icons/circle-alert';
+import CircleQuestionMark from '@lucide/astro/icons/circle-question-mark';
+import Croissant from '@lucide/astro/icons/croissant';
+import Ellipsis from '@lucide/astro/icons/ellipsis';
+import Flame from '@lucide/astro/icons/flame';
+import Hamburger from '@lucide/astro/icons/hamburger';
+import House from '@lucide/astro/icons/house';
+import ImagePlus from '@lucide/astro/icons/image-plus';
+import Info from '@lucide/astro/icons/info';
+import LampCeiling from '@lucide/astro/icons/lamp-ceiling';
+import Lightbulb from '@lucide/astro/icons/lightbulb';
+import Martini from '@lucide/astro/icons/martini';
+import Megaphone from '@lucide/astro/icons/megaphone';
+import Microwave from '@lucide/astro/icons/microwave';
+import Minus from '@lucide/astro/icons/minus';
+import Paintbrush from '@lucide/astro/icons/paintbrush';
+import Plus from '@lucide/astro/icons/plus';
+import Refrigerator from '@lucide/astro/icons/refrigerator';
+import Route from '@lucide/astro/icons/route';
+import Sandwich from '@lucide/astro/icons/sandwich';
+import Save from '@lucide/astro/icons/save';
+import SlidersHorizontal from '@lucide/astro/icons/sliders-horizontal';
+import Snowflake from '@lucide/astro/icons/snowflake';
+import Sofa from '@lucide/astro/icons/sofa';
+import Soup from '@lucide/astro/icons/soup';
+import Sparkles from '@lucide/astro/icons/sparkles';
+import Sun from '@lucide/astro/icons/sun';
+import Trash2 from '@lucide/astro/icons/trash-2';
+import Umbrella from '@lucide/astro/icons/umbrella';
+import Upload from '@lucide/astro/icons/upload';
+import Utensils from '@lucide/astro/icons/utensils';
+import Wine from '@lucide/astro/icons/wine';
+import Check from '@lucide/astro/icons/check';
+
 export const icons = {
   calendar: Calendar,
   truck: Truck,
@@ -133,6 +171,47 @@ export const icons = {
      que acompana a texto (boton del modal de reserva, campo de telefono); la
      version a color de marca vive en ./icons/WhatsappIcon.astro. */
   whatsapp: MessageCircleMore,
+  /* Configurador: opciones del catalogo y controles. */
+  'arrow-left': ArrowLeft,
+  beer: Beer,
+  'calendar-range': CalendarRange,
+  alert: CircleAlert,
+  help: CircleQuestionMark,
+  croissant: Croissant,
+  ellipsis: Ellipsis,
+  flame: Flame,
+  hamburger: Hamburger,
+  house: House,
+  'image-plus': ImagePlus,
+  info: Info,
+  'lamp-ceiling': LampCeiling,
+  lightbulb: Lightbulb,
+  martini: Martini,
+  megaphone: Megaphone,
+  microwave: Microwave,
+  minus: Minus,
+  paintbrush: Paintbrush,
+  plus: Plus,
+  refrigerator: Refrigerator,
+  route: Route,
+  sandwich: Sandwich,
+  save: Save,
+  sliders: SlidersHorizontal,
+  snowflake: Snowflake,
+  sofa: Sofa,
+  soup: Soup,
+  sparkles: Sparkles,
+  sun: Sun,
+  trash: Trash2,
+  umbrella: Umbrella,
+  upload: Upload,
+  utensils: Utensils,
+  wine: Wine,
+  tick: Check,
 } as const;
 
 export type IconName = keyof typeof icons;
+
+/** true si el nombre existe en el registro: los iconos del catalogo vienen de la base de datos. */
+export const esIcono = (name: string | null | undefined): name is IconName =>
+  Boolean(name && name in icons);

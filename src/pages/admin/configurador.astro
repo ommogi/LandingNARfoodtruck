@@ -1,0 +1,447 @@
+---
+/**
+ * Editor visual del configurador.
+ *
+ * A la izquierda, el stepper real (iframe de /{ADMIN_PATH}/vista) en modo
+ * editor. A la derecha, el formulario de lo que se pulsa en el: una opcion, un
+ * texto, una imagen, el titulo de un paso, una lista o los ajustes generales.
+ * Cada cambio se ve al momento en la vista previa; nada se publica hasta
+ * «Guardar y publicar».
+ *
+ * La logica de filas, lectura y guardado es la de src/scripts/admin-configurador.ts
+ * (compartida con la lista completa); src/scripts/admin-editor.ts anade la
+ * vista previa, la seleccion y las listas.
+ */
+import AdminLayout from '../../layouts/AdminLayout.astro';
+import OpcionAdmin from '../../components/admin/OpcionAdmin.astro';
+import { PASOS, RENTAL_BASE_ID, TIPOS_OPCION, TIPO_ETIQUETA, type TipoOpcion } from '../../data/configurador';
+import { LISTAS, TEXTOS, lista, type ClaveTexto, type NombreLista } from '../../data/configurador-textos';
+import { getCatalogo, getPreciosAdmin } from '../../lib/configurador-server';
+import { icons } from '../../components/icons';
+import { IMAGEN_AYUDA } from '../../data/imagenes';
+
+export const prerender = false;
+
+const base = Astro.locals.adminBase;
+const catalogo = await getCatalogo(Astro.locals.supabase);
+const precios = await getPreciosAdmin(Astro.locals.supabase);
+const rental = precios.get(RENTAL_BASE_ID) ?? { precio: 450, unidad: 'dia' as const };
+
+const porTipo = (tipo: TipoOpcion) =>
+  catalogo.opciones.filter((o) => o.tipo === tipo).sort((a, b) => a.orden - b.orden);
+const proyectos = porTipo('proyecto');
+const usos = porTipo('uso');
+const subconfigs = porTipo('subconfig');
+const padresDe = (tipo: TipoOpcion) => (tipo === 'subtipo' ? proyectos : tipo === 'subconfig' ? usos : []);
+const contextosDe = (tipo: TipoOpcion) => (tipo === 'uso' ? proyectos : tipo === 'cocina_servicio' ? usos : []);
+
+const claves = Object.keys(TEXTOS) as ClaveTexto[];
+const nombresListas = Object.keys(LISTAS) as NombreLista[];
+const nombresIconos = Object.keys(icons).sort();
+
+const input =
+  'min-h-10 w-full rounded-lg border border-line bg-white px-3 text-[14px] text-ink focus-visible:outline-2 focus-visible:outline-blue';
+const label = 'grid gap-1 text-[12.5px] font-semibold text-ink';
+const boton =
+  'inline-flex min-h-9 cursor-pointer items-center gap-1.5 rounded-lg border border-line bg-white px-3 text-[13px] font-semibold text-ink hover:border-night';
+---
+
+<AdminLayout title="Configurador" email={Astro.locals.userEmail} completo>
+  <div class="ed" data-editor>
+    <!-- Barra superior -->
+    <div class="ed-barra">
+      <label class="flex items-center gap-2 text-[13px] font-semibold">
+        Paso
+        <select class={`${input} w-auto`} data-ed-paso>
+          {PASOS.map((p, i) => <option value={p.id}>{i + 1}. {p.etiqueta}</option>)}
+        </select>
+      </label>
+      <div class="ed-segmento" role="group" aria-label="Tamaño de la vista previa">
+        <button type="button" data-ed-disp="escritorio" aria-pressed="true">Escritorio</button>
+        <button type="button" data-ed-disp="movil" aria-pressed="false">Móvil</button>
+      </div>
+      <label class="flex items-center gap-2 text-[13px]">
+        <input type="checkbox" data-ed-zonas checked data-ed-local /> Marcar zonas editables
+      </label>
+      <button type="button" class={boton} data-ed-general>Ajustes y textos generales</button>
+      <a class="text-[13px] text-blue underline" href={`${base}/configurador-lista`}>Lista completa</a>
+
+      <div class="ml-auto flex items-center gap-3">
+        <p class="m-0 max-w-[340px] text-[13px] text-muted is-error:text-rust is-success:text-blue" data-save-status role="status">
+          Sin cambios pendientes.
+        </p>
+        <button
+          class="min-h-10 rounded-lg border border-line bg-white px-4 font-semibold text-ink disabled:cursor-not-allowed disabled:opacity-40 not-disabled:cursor-pointer"
+          type="button"
+          data-descartar
+          disabled>Descartar</button
+        >
+        <button
+          class="min-h-10 rounded-lg bg-rust px-5 font-semibold text-white disabled:cursor-not-allowed disabled:opacity-40 not-disabled:cursor-pointer not-disabled:hover:bg-rust-dark"
+          type="button"
+          data-guardar
+          disabled>Guardar y publicar</button
+        >
+      </div>
+    </div>
+
+    <div class="ed-cuerpo">
+      <!-- Vista previa -->
+      <div class="ed-lienzo" data-ed-lienzo>
+        <iframe name="cf-vista" title="Vista previa del configurador" src={`${base}/vista?paso=proyecto`} data-ed-iframe></iframe>
+      </div>
+
+      <!-- Panel -->
+      <aside class="ed-panel" data-ajustes data-ed-panel>
+        <div class="ed-panel-head">
+          <p class="m-0 text-[11px] font-bold tracking-[0.08em] text-muted uppercase" data-ed-titulo-tipo>Editando</p>
+          <p class="m-0 font-display text-[22px] leading-tight text-night" data-ed-titulo>Paso 1</p>
+          <p class="m-0 text-[12.5px] text-muted" data-ed-ayuda>
+            Pulsa cualquier tarjeta, texto o imagen de la vista previa para editarlo aquí.
+          </p>
+          <button type="button" class="mt-1 cursor-pointer text-left text-[12.5px] text-blue underline" data-ed-volver hidden>
+            ← Ver todos los textos de este paso
+          </button>
+        </div>
+
+        <div class="ed-panel-scroll">
+          <!-- Ajustes generales -->
+          <div class="ed-bloque" data-ed-bloque="a:general" hidden>
+            <p class="ed-sub">Precio y barra lateral</p>
+            <label class={label}>
+              Precio público «Desde» (€/día)
+              <input class={input} type="number" min="0" step="1" data-ajuste="precioDesde" value={catalogo.ajustes.precioDesde} />
+            </label>
+            <label class={label}>
+              Precio interno Rental Base (€/día, el cliente no lo ve)
+              <input class={input} type="number" min="0" step="0.01" data-ajuste="rentalPrecio" value={rental.precio} />
+            </label>
+            <label class={label}>
+              WhatsApp del asesor (solo números, con prefijo)
+              <input class={input} inputmode="numeric" placeholder="34600000000" data-ajuste="whatsapp" value={catalogo.ajustes.whatsapp} />
+            </label>
+            <label class={label}>
+              Texto «Incluye»
+              <textarea class={`${input} py-2`} rows="3" maxlength="400" data-ajuste="textoIncluye">{catalogo.ajustes.textoIncluye}</textarea>
+            </label>
+          </div>
+
+          <!-- Titulo y subtitulo de cada paso -->
+          {
+            PASOS.map((p) => (
+              <div class="ed-bloque" data-ed-bloque={`p:${p.id}`} hidden>
+                <p class="ed-sub">Título del paso</p>
+                <label class={label}>
+                  Título
+                  <input class={input} maxlength="120" data-paso={p.id} data-paso-campo="titulo" value={catalogo.ajustes.pasos[p.id].titulo} />
+                </label>
+                <label class={label}>
+                  Subtítulo
+                  <textarea class={`${input} py-2`} rows="2" maxlength="300" data-paso={p.id} data-paso-campo="subtitulo">{catalogo.ajustes.pasos[p.id].subtitulo}</textarea>
+                </label>
+              </div>
+            ))
+          }
+
+          <!-- Textos e imagenes fijas -->
+          {
+            claves.map((k) => {
+              const def = TEXTOS[k];
+              const valor = catalogo.ajustes.textos[k] ?? def.v;
+              return (
+                <div class="ed-bloque is-texto" data-ed-bloque={`t:${k}`} data-ed-grupo={def.g} hidden>
+                  <label class={label}>
+                    {def.e}
+                    {def.tipo === 'largo' ? (
+                      <textarea class={`${input} py-2`} rows="3" maxlength="500" data-texto={k} data-defecto={def.v}>{valor}</textarea>
+                    ) : (
+                      <input class={input} maxlength="500" data-texto={k} data-defecto={def.v} value={valor} />
+                    )}
+                  </label>
+                  {def.tipo === 'imagen' && (
+                    <div class="flex items-center gap-2">
+                      <img src={valor} alt="" class="h-14 w-20 rounded-md border border-line object-cover" data-ed-vista-texto={k} />
+                      <label class={boton}>
+                        Subir imagen
+                        <input type="file" accept="image/webp,.webp" class="sr-only" data-subir-texto={k} data-ed-local />
+                      </label>
+                      <span class="text-[11.5px] text-muted">{IMAGEN_AYUDA}</span>
+                    </div>
+                  )}
+                  {def.v.includes('{') && (
+                    <p class="m-0 text-[11.5px] text-muted">Las palabras entre llaves, como {'{nombre}'}, se sustituyen solas: no las borres.</p>
+                  )}
+                  <button type="button" class="w-fit cursor-pointer text-[12px] text-muted underline hover:text-ink" data-restaurar={k}>
+                    Volver al texto original
+                  </button>
+                </div>
+              );
+            })
+          }
+
+          <!-- Listas pequenas -->
+          {
+            nombresListas.map((n) => {
+              const def = LISTAS[n];
+              const items = lista(catalogo, n, { conOcultos: true });
+              const conDescripcion = def.items.some((x) => 'descripcion' in x);
+              const conIcono = def.items.some((x) => 'icono' in x);
+              const fila = (it: (typeof items)[number] | null) => (
+                <div class="ed-item" data-ed-item>
+                  <input type="hidden" data-item-campo="id" value={it?.id ?? ''} />
+                  <input class={input} placeholder="Nombre" data-item-campo="nombre" value={it?.nombre ?? ''} maxlength="80" />
+                  {conDescripcion && (
+                    <textarea class={`${input} py-2`} rows="2" placeholder="Descripción" data-item-campo="descripcion" maxlength="300">{it?.descripcion ?? ''}</textarea>
+                  )}
+                  {conIcono && (
+                    <select class={input} data-item-campo="icono">
+                      <option value="">— Sin icono —</option>
+                      {nombresIconos.map((ic) => <option value={ic} selected={it?.icono === ic}>{ic}</option>)}
+                    </select>
+                  )}
+                  <div class="flex items-center justify-between gap-2">
+                    {def.fija ? (
+                      <label class="flex items-center gap-2 text-[12.5px]">
+                        <input type="checkbox" data-item-campo="oculto" checked={it?.oculto} /> Ocultar
+                      </label>
+                    ) : (
+                      <span />
+                    )}
+                    {!def.fija && (
+                      <button type="button" class="cursor-pointer text-[12.5px] font-semibold text-rust" data-ed-quitar-item>Quitar</button>
+                    )}
+                  </div>
+                </div>
+              );
+              return (
+                <div class="ed-bloque" data-ed-bloque={`l:${n}`} hidden>
+                  <p class="ed-sub">{def.e}</p>
+                  {def.fija && <p class="m-0 text-[12px] text-muted">Puedes cambiar los textos u ocultar elementos; no añadir ni quitar.</p>}
+                  <div class="grid gap-3" data-ed-lista={n}>
+                    {items.map((it) => fila(it))}
+                  </div>
+                  {!def.fija && (
+                    <>
+                      <button type="button" class={boton} data-ed-anadir-item={n}>+ Añadir</button>
+                      <template data-ed-plantilla-item={n}>{fila(null)}</template>
+                    </>
+                  )}
+                </div>
+              );
+            })
+          }
+
+          <!-- Opciones del catalogo (se muestra solo la pulsada) -->
+          {
+            TIPOS_OPCION.map((tipo) => (
+              <div data-ed-tipo={tipo}>
+                <div class="grid gap-2" data-lista={tipo}>
+                  {porTipo(tipo).map((o) => (
+                    <OpcionAdmin
+                      opcion={o}
+                      tipo={tipo}
+                      precio={precios.get(o.id) ?? null}
+                      padres={padresDe(tipo)}
+                      subconfigs={subconfigs}
+                      contextos={contextosDe(tipo)}
+                    />
+                  ))}
+                </div>
+                <template data-plantilla={tipo}>
+                  <OpcionAdmin
+                    opcion={null}
+                    tipo={tipo}
+                    precio={null}
+                    padres={padresDe(tipo)}
+                    subconfigs={subconfigs}
+                    contextos={contextosDe(tipo)}
+                  />
+                </template>
+              </div>
+            ))
+          }
+
+          <div class="ed-bloque" data-ed-bloque="orden" hidden>
+            <div class="flex gap-2">
+              <button type="button" class={boton} data-ed-mover="-1">↑ Subir</button>
+              <button type="button" class={boton} data-ed-mover="1">↓ Bajar</button>
+            </div>
+          </div>
+        </div>
+      </aside>
+    </div>
+
+    {/* El borrador viaja a la vista previa con un POST a su iframe. */}
+    <form method="post" target="cf-vista" data-ed-form hidden>
+      <input type="hidden" name="borrador" data-ed-borrador />
+    </form>
+
+    <script type="application/json" data-ed-tipos is:inline set:html={JSON.stringify(TIPO_ETIQUETA)} />
+  </div>
+
+  <script>
+    import '../../scripts/admin-configurador';
+    import '../../scripts/admin-editor';
+  </script>
+</AdminLayout>
+
+<style>
+  .ed {
+    display: grid;
+    gap: 12px;
+  }
+
+  .ed-barra {
+    position: sticky;
+    top: 0;
+    z-index: 5;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px 16px;
+    padding: 10px 14px;
+    border: 1px solid var(--color-line);
+    border-radius: 12px;
+    background: #fff;
+  }
+
+  .ed-segmento {
+    display: inline-flex;
+    overflow: hidden;
+    border: 1px solid var(--color-line);
+    border-radius: 8px;
+
+    & button {
+      padding: 7px 12px;
+      border: 0;
+      background: #fff;
+      font: inherit;
+      font-size: 13px;
+      cursor: pointer;
+    }
+
+    & [aria-pressed='true'] {
+      color: #fff;
+      background: var(--color-night);
+    }
+  }
+
+  .ed-cuerpo {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 440px;
+    gap: 14px;
+    align-items: start;
+  }
+
+  .ed-lienzo {
+    display: grid;
+    justify-items: center;
+    overflow: hidden;
+    border: 1px solid var(--color-line);
+    border-radius: 12px;
+    background: #e9e5e0;
+
+    & iframe {
+      width: 100%;
+      height: calc(100dvh - 210px);
+      min-height: 560px;
+      border: 0;
+      background: #fff;
+      transition: width 250ms ease;
+    }
+
+    &.is-movil iframe {
+      width: 390px;
+      border-inline: 1px solid var(--color-line);
+    }
+  }
+
+  .ed-panel {
+    position: sticky;
+    top: 70px;
+    display: grid;
+    grid-template-rows: auto minmax(0, 1fr);
+    max-height: calc(100dvh - 190px);
+    overflow: hidden;
+    border: 1px solid var(--color-line);
+    border-radius: 12px;
+    background: #fff;
+  }
+
+  .ed-panel-head {
+    display: grid;
+    gap: 4px;
+    padding: 14px 16px;
+    border-bottom: 1px solid var(--color-line);
+    background: var(--color-bg-1);
+  }
+
+  .ed-panel-scroll {
+    display: grid;
+    align-content: start;
+    gap: 12px;
+    overflow-y: auto;
+    padding: 14px 16px 24px;
+  }
+
+  .ed-bloque {
+    display: grid;
+    gap: 10px;
+  }
+
+  .ed-bloque.is-texto {
+    padding-bottom: 12px;
+    border-bottom: 1px dashed var(--color-line);
+  }
+
+  .ed-sub {
+    margin: 0;
+    color: var(--color-night);
+    font-size: 13px;
+    font-weight: 700;
+  }
+
+  .ed-item {
+    display: grid;
+    gap: 6px;
+    padding: 10px;
+    border: 1px solid var(--color-line);
+    border-radius: 10px;
+    background: var(--color-bg-1);
+  }
+
+  /* Las opciones se ensenan de una en una: el resto, fuera. */
+  .ed-panel :global([data-opcion]:not(.is-visible)) {
+    display: none;
+  }
+
+  /*
+   * En el panel la cabecera plegable sobra: arriba ya pone tipo y nombre. El
+   * formulario queda abierto y sin marco propio, alineado con el resto de
+   * bloques del panel.
+   */
+  .ed-panel :global([data-opcion] > summary) {
+    display: none;
+  }
+
+  .ed-panel :global([data-opcion]) {
+    border: 0;
+    box-shadow: none;
+  }
+
+  .ed-panel :global([data-opcion] > div) {
+    padding: 0;
+    border-top: 0;
+  }
+
+  @media (max-width: 1100px) {
+    .ed-cuerpo {
+      grid-template-columns: minmax(0, 1fr);
+    }
+
+    .ed-panel {
+      position: static;
+      max-height: none;
+    }
+  }
+</style>

@@ -96,7 +96,7 @@ igual, pero no puedes segmentar por ellos.
 | `form_error` | `type` (`client` \| `server`) | Falla la validación o el envío | |
 | `booking_open` | — | Se abre el asistente de reserva | |
 | `booking_step` | `step` | Avanza de paso en el asistente | |
-| `booking_date` | `estado` | Elige una fecha en el calendario | |
+| `booking_date` | `estado`, `total` | Marca o desmarca una fecha en el calendario. `total` son las que quedan elegidas | |
 | `booking_config` | `config` | Elige configuración en el asistente | |
 | `booking_whatsapp` | — | Termina la reserva por WhatsApp | **Sí** |
 

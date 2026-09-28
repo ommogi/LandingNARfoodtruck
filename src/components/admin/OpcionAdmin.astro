@@ -1,0 +1,305 @@
+---
+/**
+ * Una opcion del catalogo del configurador, editable en el sitio.
+ *
+ * Se pinta en el servidor para cada opcion existente y una vez mas, vacia,
+ * dentro de un <template> por tipo: src/scripts/admin-configurador.ts la clona
+ * al pulsar "Añadir". El script no conoce el marcado; solo lee y escribe los
+ * campos por su atributo data-campo.
+ */
+import {
+  CATEGORIAS_EQUIPO,
+  IDS_PROTEGIDOS,
+  TIPO_PADRE,
+  UNIDADES,
+  type Opcion,
+  type TipoOpcion,
+  type Unidad,
+} from '../../data/configurador';
+import { icons } from '../icons';
+import { IMAGEN_AYUDA } from '../../data/imagenes';
+
+interface Props {
+  opcion: Opcion | null;
+  tipo: TipoOpcion;
+  precio: { precio: number; unidad: Unidad } | null;
+  /** Posibles padres (proyectos o usos). */
+  padres: Opcion[];
+  /** Subconfigs, para "recomendado para" del equipamiento. */
+  subconfigs: Opcion[];
+  /** Opciones de contexto para "visible para" (proyectos o usos). */
+  contextos: Opcion[];
+}
+
+const { opcion, tipo, precio, padres, subconfigs, contextos } = Astro.props;
+
+const nueva = opcion === null;
+const o = opcion;
+const protegida = o ? (IDS_PROTEGIDOS as readonly string[]).includes(o.id) : false;
+const tienePadre = Boolean(TIPO_PADRE[tipo]);
+const nombresIconos = Object.keys(icons).sort();
+
+const input =
+  'min-h-10 w-full rounded-lg border border-line bg-white px-3 text-[14px] text-ink focus-visible:outline-2 focus-visible:outline-blue';
+/* content-start: cada campo con su alto natural aunque el vecino de fila sea mas alto. */
+const label = 'grid content-start gap-1 text-[12.5px] font-semibold text-ink';
+const check = 'flex items-center gap-2 text-[13px] text-ink';
+const unidadPorDefecto: Unidad = tipo === 'equipo' || tipo === 'cocina' ? 'dia' : 'proyecto';
+---
+
+<details
+  class="group @container rounded-xl border border-line bg-white open:shadow-card"
+  data-opcion
+  data-tipo={tipo}
+  data-id={o?.id ?? ''}
+  data-nueva={nueva ? '' : undefined}
+  open={nueva}
+>
+  <summary class="flex cursor-pointer list-none items-center gap-3 p-3">
+    <span class="grid size-12 shrink-0 place-items-center overflow-hidden rounded-lg bg-bg-2">
+      <img src={o?.imagen ?? ''} alt="" class="size-full object-cover" data-vista-mini hidden={!o?.imagen} />
+    </span>
+    <span class="min-w-0 flex-1">
+      <span class="block truncate font-semibold text-night" data-resumen-nombre>{o?.nombre || 'Nueva opción'}</span>
+      <span class="block truncate text-[12px] text-muted">
+        <code data-resumen-id>{o?.id ?? '—'}</code>
+        {o?.padre && <> · de <code>{o.padre}</code></>}
+      </span>
+      <span class="block truncate text-[12.5px] font-semibold text-night" data-resumen-precio>
+        {precio ? `${precio.precio} € ${UNIDADES[precio.unidad]}` : 'sin precio'}
+      </span>
+    </span>
+    <span
+      class="rounded-full bg-bg-2 px-2 py-0.5 text-[11px] font-bold text-muted uppercase"
+      data-resumen-inactiva
+      hidden={o?.activo !== false}
+    >
+      Oculta
+    </span>
+    <span class="size-2 rounded-full bg-blue-light" data-marca-sucio hidden aria-label="Sin guardar"></span>
+  </summary>
+
+  <div class="grid gap-4 border-t border-line p-4">
+    {/*
+      Breakpoints por contenedor (@xl:, @md:) y no por ventana: el mismo
+      formulario vive en el panel estrecho del editor y en la lista completa.
+      En estrecho, el nombre ocupa toda la fila; id y orden comparten la siguiente.
+    */}
+    <div class="grid grid-cols-[minmax(0,1fr)_96px] gap-3 @xl:grid-cols-[1fr_1fr_140px]">
+      <label class={`${label} col-span-full @xl:order-2 @xl:col-span-1`}>
+        Nombre
+        <input class={input} data-campo="nombre" value={o?.nombre ?? ''} maxlength="80" required />
+      </label>
+
+      <label class={`${label} @xl:order-1`}>
+        Identificador
+        <input
+          class={input}
+          data-campo="id"
+          value={o?.id ?? ''}
+          readonly={!nueva}
+          required
+          pattern="[a-z0-9_]+(\.[a-z0-9_]+)*"
+          placeholder={tienePadre ? 'padre.nombre_corto' : 'nombre_corto'}
+        />
+        <span class="font-normal text-muted">
+          {nueva ? 'Minúsculas, números, "_" y ".". No se puede cambiar después.' : 'No editable.'}
+        </span>
+      </label>
+
+      <label class={`${label} @xl:order-3`}>
+        Orden
+        <input class={input} data-campo="orden" type="number" step="1" value={o?.orden ?? 0} />
+      </label>
+    </div>
+
+    {
+      tienePadre && (
+        <label class={label}>
+          Pertenece a
+          <select class={input} data-campo="padre" required>
+            <option value="">— Elige —</option>
+            {padres.map((p) => (
+              <option value={p.id} selected={o?.padre === p.id}>
+                {p.nombre} ({p.id})
+              </option>
+            ))}
+          </select>
+        </label>
+      )
+    }
+
+    <label class={label}>
+      Descripción
+      <textarea class={`${input} min-h-18 py-2`} data-campo="descripcion" maxlength="400" rows="2">{o?.descripcion ?? ''}</textarea>
+    </label>
+
+    <div class="grid gap-3 @xl:grid-cols-2">
+      <div class={label}>
+        Imagen
+        <div class="grid gap-2">
+          <img
+            src={o?.imagen ?? ''}
+            alt=""
+            class="aspect-[16/9] w-full max-w-[260px] rounded-lg border border-line object-cover"
+            data-vista
+            hidden={!o?.imagen}
+          />
+          <div class="grid min-w-0 gap-1.5">
+            <input class={input} data-campo="imagen" value={o?.imagen ?? ''} placeholder="/configurador/foto.webp o URL" />
+            <div class="flex gap-2">
+              <label
+                class="inline-flex min-h-9 cursor-pointer items-center rounded-lg border border-line px-3 text-[13px] font-semibold hover:border-night"
+              >
+                Subir imagen
+                <input type="file" accept="image/webp,.webp" class="sr-only" data-subir />
+              </label>
+              <button
+                type="button"
+                class="min-h-9 cursor-pointer rounded-lg px-3 text-[13px] text-muted hover:text-rust"
+                data-quitar-imagen
+              >
+                Quitar
+              </button>
+              <span class="self-center text-[12px] text-muted">{IMAGEN_AYUDA}</span>
+            </div>
+          </div>
+        </div>
+        <span class="font-normal text-muted" data-estado-subida role="status"></span>
+      </div>
+
+      <label class={label}>
+        Icono (se usa si no hay imagen)
+        <select class={input} data-campo="icono">
+          <option value="">— Sin icono —</option>
+          {nombresIconos.map((n) => <option value={n} selected={o?.icono === n}>{n}</option>)}
+        </select>
+      </label>
+    </div>
+
+    <div class="grid gap-3 @xl:grid-cols-2">
+      <label class={label}>
+        Etiquetas / elementos (separados por coma)
+        <input class={input} data-campo="etiquetas" value={(o?.etiquetas ?? []).join(', ')} />
+      </label>
+      <label class={label}>
+        Aviso corto (opcional)
+        <input class={input} data-campo="aviso" value={o?.aviso ?? ''} maxlength="60" placeholder="Sujeto a valoración" />
+      </label>
+    </div>
+
+    {
+      tipo === 'equipo' && (
+        <div class="grid gap-3 @xl:grid-cols-2">
+          <label class={label}>
+            Categoría
+            <select class={input} data-campo="categoria">
+              {CATEGORIAS_EQUIPO.map((c) => (
+                <option value={c.id} selected={o?.categoria === c.id}>
+                  {c.nombre}
+                </option>
+              ))}
+            </select>
+          </label>
+          <label class={`${check} @xl:self-end @xl:pb-2`}>
+            <input type="checkbox" data-campo="incluido" checked={o?.incluido} />
+            Incluido de serie (no se puede quitar)
+          </label>
+          <fieldset class="col-span-full m-0 grid gap-1.5 rounded-lg border border-line p-3">
+            <legend class="px-1 text-[12.5px] font-semibold">Recomendado para</legend>
+            <div class="grid gap-1 @md:grid-cols-2 @3xl:grid-cols-3" data-campo-lista="recomendado_para">
+              {subconfigs.map((s) => (
+                <label class={check}>
+                  <input type="checkbox" value={s.id} checked={o?.recomendado_para.includes(s.id)} />
+                  {s.nombre} <span class="text-muted">({s.padre})</span>
+                </label>
+              ))}
+            </div>
+          </fieldset>
+        </div>
+      )
+    }
+
+    {
+      (tipo === 'uso' || tipo === 'cocina_servicio') && (
+        <fieldset class="m-0 grid gap-1.5 rounded-lg border border-line p-3">
+          <legend class="px-1 text-[12.5px] font-semibold">
+            Visible solo para {tipo === 'uso' ? 'estos proyectos' : 'estos usos'} (ninguno = siempre)
+          </legend>
+          <div class="flex flex-wrap gap-x-5 gap-y-1" data-campo-lista="visible_para">
+            {contextos.map((c) => (
+              <label class={check}>
+                <input type="checkbox" value={c.id} checked={o?.visible_para.includes(c.id)} />
+                {c.nombre}
+              </label>
+            ))}
+          </div>
+        </fieldset>
+      )
+    }
+
+    <div class="grid gap-2 @xl:flex @xl:flex-wrap @xl:gap-x-6">
+      {
+        tipo === 'uso' && (
+          <label class={check}>
+            <input type="checkbox" data-campo="mostrar_cocina" checked={o?.mostrar_cocina} />
+            Mostrar el paso «Servicio de cocina»
+          </label>
+        )
+      }
+      <label class={check}>
+        <input type="checkbox" data-campo="a_medida" checked={o?.a_medida} />
+        Pide texto libre al elegirla («A medida», «Otro»)
+      </label>
+      <label class={check}>
+        <input type="checkbox" data-campo="activo" checked={o ? o.activo : true} />
+        Visible en la web
+      </label>
+    </div>
+
+    <div class="grid grid-cols-2 items-end gap-3 rounded-lg bg-bg-2 p-3 @xl:grid-cols-[1fr_1fr_auto]">
+      <label class={label}>
+        Precio interno (€ sin IVA)
+        <input
+          class={input}
+          data-campo="precio"
+          type="number"
+          min="0"
+          step="0.01"
+          value={precio?.precio ?? 0}
+        />
+      </label>
+      <label class={label}>
+        Unidad
+        <select class={input} data-campo="unidad">
+          {
+            (Object.keys(UNIDADES) as Unidad[]).map((u) => (
+              <option value={u} selected={(precio?.unidad ?? unidadPorDefecto) === u}>
+                {UNIDADES[u]}
+              </option>
+            ))
+          }
+        </select>
+      </label>
+      <p class="col-span-full m-0 text-[12px] text-muted @xl:col-span-1 @xl:pb-2">El cliente nunca ve este precio.</p>
+    </div>
+
+    <div class="flex">
+      {
+        protegida ? (
+          <p class="m-0 text-[12.5px] text-muted">
+            Opción base del configurador: se puede ocultar, pero no borrar.
+          </p>
+        ) : (
+          <button
+            type="button"
+            class="-ml-3 inline-flex min-h-9 cursor-pointer items-center gap-1.5 rounded-lg px-3 text-[13px] font-semibold text-rust hover:bg-rust/8"
+            data-borrar
+          >
+            Borrar opción
+          </button>
+        )
+      }
+    </div>
+  </div>
+</details>

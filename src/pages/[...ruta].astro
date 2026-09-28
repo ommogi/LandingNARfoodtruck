@@ -1,0 +1,20 @@
+---
+/**
+ * Ruta comodin para URLs que no existen. Responde siempre 404.
+ *
+ * Existe por el panel de gestion: Astro solo ejecuta el middleware cuando la
+ * URL coincide con alguna ruta, y la URL secreta /{ADMIN_PATH} no tiene
+ * archivo propio (es una variable de entorno). Con esta ruta cualquier URL
+ * coincide, src/middleware.ts llega a verla y, si es la del panel, la reescribe
+ * a /admin/... antes de que se renderice esto.
+ *
+ * Las rutas estaticas del sitio tienen prioridad sobre un comodin, asi que no
+ * cambia nada para el resto de la web.
+ */
+export const prerender = false;
+
+return new Response('Not found', {
+  status: 404,
+  headers: { 'Content-Type': 'text/plain; charset=utf-8', 'Cache-Control': 'no-store' },
+});
+---

@@ -1,0 +1,37 @@
+---
+/**
+ * Vista previa del configurador para el editor del panel. Va dentro de un
+ * iframe de /{ADMIN_PATH}/configurador.
+ *
+ *   GET   el catalogo guardado (con las opciones ocultas).
+ *   POST  el borrador que manda el editor en cada cambio (campo `borrador`),
+ *         sin guardar nada: solo se pinta.
+ *
+ * Es exactamente el mismo ConfiguradorApp que /configurador, en modo editor.
+ * El middleware ya ha exigido sesion de admin para llegar aqui.
+ */
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import ConfiguradorApp from '../../components/configurador/ConfiguradorApp.astro';
+import { getCatalogo } from '../../lib/configurador-server';
+import { catalogoDesdeBorrador } from '../../lib/configurador-borrador';
+import type { Catalogo } from '../../data/configurador';
+
+export const prerender = false;
+
+const guardado = await getCatalogo(Astro.locals.supabase);
+let catalogo: Catalogo = { ...guardado, editor: true };
+
+if (Astro.request.method === 'POST') {
+  try {
+    const datos = await Astro.request.formData();
+    const borrador = String(datos.get('borrador') ?? '');
+    if (borrador.length < 800_000) catalogo = catalogoDesdeBorrador(JSON.parse(borrador), guardado);
+  } catch {
+    /* Borrador ilegible: se ensena lo guardado. */
+  }
+}
+---
+
+<BaseLayout title="Vista previa · Configurador" description="Vista previa del editor" path="/configurador" noindex bare>
+  <ConfiguradorApp catalogo={catalogo} />
+</BaseLayout>

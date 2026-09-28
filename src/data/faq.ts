@@ -63,7 +63,7 @@ export const faqItems: FaqItem[] = [
   {
     question: '¿Cuánto cuesta?',
     answer:
-      'El precio depende de la configuración de equipamiento, de la duración y de la distancia hasta la ubicación. En la página de configuraciones tienes el precio de partida de cada opción; el presupuesto final te lo enviamos cerrado y sin compromiso.',
+      'Partimos del alquiler base del food truck, desde 450 € + IVA al día. El precio final depende del equipamiento y los servicios que añadas en el configurador, de la duración y de la distancia hasta la ubicación. El presupuesto te lo enviamos cerrado y sin compromiso.',
     category: 'alquiler',
   },
   {
@@ -96,7 +96,7 @@ export const faqItems: FaqItem[] = [
   {
     question: '¿Qué equipamiento lleva dentro?',
     answer:
-      'Según la configuración elegida: plancha, fogones, freidora, neveras, congelador, campana extractora, fregadero doble, iluminación LED y almacenamiento. Cada configuración incluye el equipamiento de la anterior y suma el suyo propio.',
+      'De serie lleva nevera, congelador, zona de trabajo de acero inoxidable e iluminación LED. En el configurador puedes añadir lo que necesites: plancha, freidora, fogones, horno, cafetera, crepera, gofrera y consumibles.',
     category: 'truck',
   },
   {

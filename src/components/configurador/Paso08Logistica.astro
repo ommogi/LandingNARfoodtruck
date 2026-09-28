@@ -1,0 +1,223 @@
+---
+/**
+ * Paso 8 · Ubicacion y logistica. El cliente aporta condiciones; FOODD calcula
+ * internamente distancias, tiempos y costes.
+ *
+ * En Roadshow las ciudades y fechas vienen del paso 2 y aqui solo se completan
+ * los datos de cada parada (tarjetas plegables que pinta el script).
+ */
+import Icon from '../Icon.astro';
+import { esIcono } from '../icons';
+import PasoCabecera from './PasoCabecera.astro';
+import Aviso from './Aviso.astro';
+import AnadirOpcion from './AnadirOpcion.astro';
+import T from './T.astro';
+import { PROVINCIAS, opcionesDe, type Catalogo } from '../../data/configurador';
+import { refEdicion, t } from '../../data/configurador-textos';
+
+interface Props {
+  c: Catalogo;
+}
+
+const { c } = Astro.props;
+const espacios = opcionesDe(c, 'espacio');
+const accesos = opcionesDe(c, 'acceso');
+const modos = opcionesDe(c, 'logistica');
+---
+
+<section class="cf-paso" data-paso="logistica" hidden>
+  <PasoCabecera c={c} paso="logistica" />
+
+  <!-- Flujo normal -->
+  <div class="cf-stack" data-cuando="!roadshow">
+    <div class="cf-caja cf-modulo">
+      <Icon name="pin" size={30} class="cf-modulo-icon" />
+      <div class="cf-stack is-gap-pequeno">
+        <div>
+          <h3 class="cf-h3 is-serif"><T c={c} k="logistica.b1" /></h3>
+          <p class="cf-h2-sub"><T c={c} k="logistica.b1Sub" /></p>
+        </div>
+        <div class="cf-form-grid">
+          <label class="cf-campo">
+            <span class="cf-label"><T c={c} k="logistica.localidad" /> <span class="cf-req">*</span></span>
+            <input class="field" data-bind="logistica.localidad" maxlength="80" autocomplete="address-level2" />
+          </label>
+          <label class="cf-campo">
+            <span class="cf-label"><T c={c} k="logistica.provincia" /> <span class="cf-req">*</span></span>
+            <select class="field field-select" data-bind="logistica.provincia">
+              <option value="">{t(c, 'logistica.provinciaVacia')}</option>
+              {PROVINCIAS.map((p) => <option value={p}>{p}</option>)}
+            </select>
+          </label>
+          <label class="cf-campo">
+            <span class="cf-label"><T c={c} k="logistica.cp" /></span>
+            <input class="field" data-bind="logistica.cp" maxlength="5" inputmode="numeric" autocomplete="postal-code" />
+          </label>
+          <label class="cf-campo is-ancho">
+            <span class="cf-label"><T c={c} k="logistica.direccion" /></span>
+            <input class="field" data-bind="logistica.direccion" maxlength="160" autocomplete="street-address" />
+          </label>
+        </div>
+        <div class="cf-fila is-entre">
+          <label class="cf-check"><input type="checkbox" data-bind="logistica.sinDireccion" /> <T c={c} k="logistica.sinDireccion" /></label>
+          <a class="cf-link" href="#" target="_blank" rel="noopener" data-cf-maps hidden><T c={c} k="logistica.maps" /> <Icon name="arrow" size={14} /></a>
+        </div>
+      </div>
+    </div>
+
+    <div class="cf-grid cf-grid-2">
+      <div class="cf-caja cf-modulo">
+        <Icon name="clock" size={30} class="cf-modulo-icon" />
+        <div class="cf-stack is-gap-pequeno">
+          <div>
+            <h3 class="cf-h3 is-serif"><T c={c} k="logistica.b2" /></h3>
+            <p class="cf-h2-sub"><T c={c} k="logistica.b2Sub" /></p>
+          </div>
+          <div class="cf-fila">
+            <label class="cf-campo">
+              <span class="cf-label"><T c={c} k="logistica.inicio" /></span>
+              <input class="field" type="time" data-bind="logistica.inicio" />
+            </label>
+            <label class="cf-campo">
+              <span class="cf-label"><T c={c} k="logistica.fin" /></span>
+              <input class="field" type="time" data-bind="logistica.fin" />
+            </label>
+          </div>
+          <label class="cf-check"><input type="checkbox" data-bind="logistica.sinHorario" /> <T c={c} k="logistica.sinHorario" /></label>
+          <p class="cf-card-text"><T c={c} k="logistica.b2Nota" /></p>
+        </div>
+      </div>
+
+      <div class="cf-caja cf-modulo">
+        <Icon name="users" size={30} class="cf-modulo-icon" />
+        <div class="cf-stack is-gap-pequeno">
+          <div>
+            <h3 class="cf-h3 is-serif"><T c={c} k="logistica.b3" /></h3>
+            <p class="cf-h2-sub"><T c={c} k="logistica.b3Sub" /></p>
+          </div>
+          <div class="cf-fila">
+            <label class="cf-numero">
+              <input class="field" type="number" min="1" max="100000" inputmode="numeric" data-bind="logistica.asistentes" aria-label="Asistentes" />
+              <T c={c} k="logistica.personas" />
+            </label>
+            <label class="cf-check"><input type="checkbox" data-bind="logistica.asistentesNoSe" /> <T c={c} k="logistica.noSe" /></label>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="cf-caja cf-modulo">
+      <Icon name="house" size={30} class="cf-modulo-icon" />
+      <div class="cf-stack is-gap-pequeno">
+        <div>
+          <h3 class="cf-h3 is-serif"><T c={c} k="logistica.b4" /></h3>
+          <p class="cf-h2-sub"><T c={c} k="logistica.b4Sub" /></p>
+        </div>
+        <div class="cf-grid cf-grid-4" role="group" aria-label="Tipo de espacio">
+          {
+            espacios.map((e) => (
+              <button
+                type="button"
+                class:list={['cf-card cf-card-linea is-compacta', !e.activo && 'is-oculta']}
+                data-cf-edit={refEdicion(c, `o:${e.id}`)}
+                data-elegir="logistica.espacio"
+                data-valor={e.id}
+                aria-pressed="false"
+              >
+                <span class="cf-radio" aria-hidden="true"><Icon name="tick" size={14} /></span>
+                {esIcono(e.icono) && <Icon name={e.icono} size={30} class="cf-card-icon" />}
+                <span>
+                  <span class="cf-card-title is-normal">{e.nombre}</span>
+                  <span class="cf-card-text">{e.descripcion}</span>
+                </span>
+              </button>
+            ))
+          }
+          <AnadirOpcion c={c} tipo="espacio" texto="Añadir" />
+        </div>
+      </div>
+    </div>
+
+    <div class="cf-caja cf-modulo">
+      <Icon name="truck" size={30} class="cf-modulo-icon" />
+      <div class="cf-stack is-gap-pequeno">
+        <div>
+          <h3 class="cf-h3 is-serif"><T c={c} k="logistica.b5" /></h3>
+          <p class="cf-h2-sub"><T c={c} k="logistica.b5Sub" /></p>
+        </div>
+        <div class="cf-pills" role="group" aria-label="Acceso">
+          {accesos.map((a) => (
+            <button
+              type="button"
+              class:list={['cf-pill-btn', !a.activo && 'is-oculta']}
+              data-cf-edit={refEdicion(c, `o:${a.id}`)}
+              data-elegir="logistica.acceso"
+              data-valor={a.id}
+              aria-pressed="false"
+            >{a.nombre}</button>
+          ))}
+          <AnadirOpcion c={c} tipo="acceso" texto="Añadir" />
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Roadshow: una tarjeta por parada -->
+  <div class="cf-stack" data-cuando="roadshow" hidden>
+    <div>
+      <h2 class="cf-h2 is-serif is-grande"><T c={c} k="logistica.roadshowTitulo" /></h2>
+      <p class="cf-h2-sub"><T c={c} k="logistica.roadshowSub" /></p>
+    </div>
+    <div class="cf-paradas-logistica" data-cf-paradas-logistica></div>
+    <Aviso c={c} kTitulo="logistica.roadshowAvisoTitulo" k="logistica.roadshowAviso" />
+  </div>
+
+  <div class="cf-caja cf-modulo">
+    <Icon name="cog" size={30} class="cf-modulo-icon" />
+    <div class="cf-stack is-gap-pequeno">
+      <div>
+        <h3 class="cf-h3 is-serif"><span data-cuando="!roadshow">06. </span><T c={c} k="logistica.b6" /></h3>
+        <p class="cf-h2-sub"><T c={c} k="logistica.b6Sub" /></p>
+      </div>
+      <div class="cf-grid cf-grid-2" role="group" aria-label="Modalidad logística">
+        {
+          modos.map((m) => (
+            <button
+              type="button"
+              class:list={['cf-card cf-card-linea is-compacta', !m.activo && 'is-oculta']}
+              data-cf-edit={refEdicion(c, `o:${m.id}`)}
+              data-elegir="logistica.modo"
+              data-valor={m.id}
+              aria-pressed="false"
+            >
+              <span class="cf-radio" aria-hidden="true"><Icon name="tick" size={14} /></span>
+              {esIcono(m.icono) && <Icon name={m.icono} size={30} class="cf-card-icon" />}
+              <span>
+                <span class="cf-card-title is-normal">{m.nombre}</span>
+                <span class="cf-card-text">{m.descripcion}</span>
+              </span>
+            </button>
+          ))
+        }
+        <AnadirOpcion c={c} tipo="logistica" texto="Añadir" />
+      </div>
+    </div>
+  </div>
+
+  <div class="cf-caja cf-modulo">
+    <Icon name="chat" size={30} class="cf-modulo-icon" />
+    <div class="cf-stack is-gap-pequeno">
+      <h3 class="cf-h3 is-serif"><span data-cuando="!roadshow">07. </span><T c={c} k="logistica.b7" /></h3>
+      <textarea
+        class="field cf-textarea"
+        data-bind="logistica.notas"
+        maxlength="750"
+        rows="3"
+        placeholder={t(c, 'logistica.b7Placeholder')}
+      />
+      <p class="cf-card-text"><T c={c} k="logistica.fotos" /></p>
+    </div>
+  </div>
+
+  <Aviso c={c} kTitulo="logistica.avisoTitulo" k="logistica.aviso" />
+</section>

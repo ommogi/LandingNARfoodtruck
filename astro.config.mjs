@@ -7,6 +7,15 @@ import tailwindcss from '@tailwindcss/vite';
 /** Paginas con `noindex`: no deben aparecer en el sitemap. */
 const excludedFromSitemap = ['/aviso-legal', '/privacidad', '/cookies'];
 
+/**
+ * Rutas internas del panel de gestion. El sitemap SI incluye las paginas SSR,
+ * asi que hay que sacarlas a mano: aunque respondan 404 desde fuera, listarlas
+ * delataria que existe un panel. La URL secreta real (ADMIN_PATH) no tiene
+ * archivo propio y nunca llega aqui.
+ */
+/** @param {string} page */
+const esRutaInterna = (page) => /^\/(api\/)?admin(\/|$)/.test(new URL(page).pathname);
+
 // https://astro.build/config
 export default defineConfig({
   site: 'https://www.narfoodtruck.com',
@@ -20,7 +29,8 @@ export default defineConfig({
   // a mano al anadir paginas.
   integrations: [
     sitemap({
-      filter: (page) => !excludedFromSitemap.some((path) => page.includes(path)),
+      filter: (page) =>
+        !esRutaInterna(page) && !excludedFromSitemap.some((path) => page.includes(path)),
       lastmod: new Date(),
       // Sin barra final, igual que los canonical y los enlaces de la
       // navegacion. Si el sitemap y el canonical no coinciden, se le esta

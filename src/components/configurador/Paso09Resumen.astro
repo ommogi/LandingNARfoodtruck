@@ -1,0 +1,116 @@
+---
+/**
+ * Paso 9 · Revisa tu FOODD. Todo el contenido lo rellena
+ * src/scripts/configurador/resumen.ts a partir del estado (data-cf-r="clave").
+ * Sin precios ni totales: el cliente solo ve el "Desde".
+ */
+import Icon from '../Icon.astro';
+import PasoCabecera from './PasoCabecera.astro';
+import T from './T.astro';
+import { formatearEuros, type Catalogo, type PasoId } from '../../data/configurador';
+import { t, type ClaveTexto } from '../../data/configurador-textos';
+import type { IconName } from '../icons';
+
+interface Props {
+  c: Catalogo;
+}
+
+const { c } = Astro.props;
+
+const tarjetas: { paso: PasoId; icono: IconName; clave: string }[] = [
+  { paso: 'configuracion', icono: 'megaphone', clave: 'configuracion' },
+  { paso: 'fecha', icono: 'calendar', clave: 'fecha' },
+  { paso: 'equipamiento', icono: 'kitchen', clave: 'equipamiento' },
+  { paso: 'cocina', icono: 'chef', clave: 'cocina' },
+  { paso: 'ambientacion', icono: 'sofa', clave: 'ambientacion' },
+  { paso: 'branding', icono: 'paintbrush', clave: 'branding' },
+  { paso: 'logistica', icono: 'pin', clave: 'logistica' },
+];
+const precio = formatearEuros(c.ajustes.precioDesde).replace(',00 €', ' €');
+---
+
+<section class="cf-paso" data-paso="resumen" hidden>
+  <PasoCabecera c={c} paso="resumen" />
+
+  <article class="cf-hero">
+    <img class="cf-hero-img" src={t(c, 'img.resumenPorDefecto')} alt="" data-cf-r-img="proyecto" />
+    <div class="cf-hero-body">
+      <p class="cf-over"><T c={c} k="resumen.tuProyecto" /></p>
+      <p class="cf-hero-title" data-cf-r="proyecto"></p>
+      <p class="cf-linea"><Icon name="calendar" size={20} /> <span data-cf-r="fechaCorta"></span></p>
+      <p class="cf-linea"><Icon name="pin" size={20} /> <span data-cf-r="lugar"></span></p>
+      <button type="button" class="cf-link cf-hero-editar" data-ir="proyecto"><T c={c} k="resumen.editar" /> <Icon name="pencil" size={14} /></button>
+    </div>
+  </article>
+
+  <!-- Itinerario Roadshow -->
+  <div class="cf-caja" data-cuando="roadshow" hidden>
+    <div class="cf-h2-fila">
+      <h2 class="cf-h3 is-serif"><Icon name="route" size={22} /> <T c={c} k="resumen.itinerario" /></h2>
+      <button type="button" class="cf-link" data-ir="fecha"><T c={c} k="resumen.editarRuta" /> <Icon name="pencil" size={14} /></button>
+    </div>
+    <ol class="cf-itinerario" data-cf-itinerario></ol>
+  </div>
+
+  <div class="cf-grid cf-grid-resumen">
+    {
+      tarjetas.map((ta) => (
+        <article class="cf-resumen-card" data-cf-r-card={ta.paso}>
+          <div class="cf-resumen-head">
+            <Icon name={ta.icono} size={24} class="text-rust" />
+            <h3 class="cf-h3 is-serif"><T c={c} k={`resumen.card.${ta.paso}` as ClaveTexto} /></h3>
+            <button type="button" class="cf-link" data-ir={ta.paso}>
+              <T c={c} k="resumen.editar" /> <Icon name="pencil" size={14} />
+            </button>
+          </div>
+          <div class="cf-resumen-body">
+            <img class="cf-resumen-img" alt="" data-cf-r-img={ta.clave} hidden />
+            <div>
+              <p class="cf-resumen-titulo" data-cf-r={`${ta.clave}Titulo`}></p>
+              <p class="cf-resumen-texto" data-cf-r={ta.clave}></p>
+            </div>
+          </div>
+        </article>
+      ))
+    }
+
+    <article class="cf-resumen-card is-calida cf-antes">
+      <h3 class="cf-over"><T c={c} k="resumen.antesTitulo" /></h3>
+      <div class="cf-antes-cols">
+        <div>
+          <p class="cf-card-title is-normal"><T c={c} k="resumen.necesitamos" /></p>
+          <ul class="cf-checklist is-rust">
+            <li><Icon name="check" size={16} /> <T c={c} k="resumen.necesitamos1" /></li>
+            <li><Icon name="check" size={16} /> <T c={c} k="resumen.necesitamos2" /></li>
+            <li><Icon name="check" size={16} /> <T c={c} k="resumen.necesitamos3" /></li>
+          </ul>
+        </div>
+        <div>
+          <p class="cf-card-title is-normal"><T c={c} k="resumen.revisara" /></p>
+          <ul class="cf-checklist is-rust">
+            <li><Icon name="check" size={16} /> <T c={c} k="resumen.revisara1" /></li>
+            <li><Icon name="check" size={16} /> <T c={c} k="resumen.revisara2" /></li>
+            <li><Icon name="check" size={16} /> <T c={c} k="resumen.revisara3" /></li>
+          </ul>
+        </div>
+      </div>
+    </article>
+  </div>
+
+  <div class="cf-grid cf-grid-2">
+    <article class="cf-resumen-card">
+      <h3 class="cf-over"><T c={c} k="resumen.estado" /></h3>
+      <ul class="cf-estados" data-cf-estados></ul>
+      <div data-cf-pendientes></div>
+    </article>
+    <article class="cf-resumen-card cf-propuesta">
+      <Icon name="euro" size={30} class="text-rust" />
+      <div>
+        <h3 class="cf-over"><T c={c} k="resumen.propuesta" /></h3>
+        <p class="cf-card-sub"><T c={c} k="side.rentalTitulo" /></p>
+        <p class="cf-precio"><T c={c} k="side.desde" vars={{ precio }} /></p>
+        <p class="cf-card-text"><T c={c} k="resumen.propuestaTexto" /></p>
+      </div>
+    </article>
+  </div>
+</section>

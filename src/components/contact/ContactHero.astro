@@ -1,7 +1,7 @@
 ---
 import { Image } from 'astro:assets';
 import Icon from '../Icon.astro';
-import heroImage from '../../assets/gallery/truck-exterior-01.jpg';
+import heroImage from '../../assets/gallery/truck-exterior-01.webp';
 
 /**
  * Hero de /contacto: la promesa a la izquierda, el truck iluminado a la derecha
@@ -33,14 +33,20 @@ const guarantees = [
       </h1>
 
       <p class="m-0 max-w-[440px] text-[17px] text-muted">
-        Cuéntanos qué tienes en mente y te enviaremos una propuesta personalizada en menos de 24
-        horas.
+        Configura tu food truck y te enviaremos una propuesta personalizada en menos de 24 horas.
+        ¿Tienes dudas? Escríbenos y te ayudamos.
       </p>
 
-      <a class="button button-primary mt-7" href="#formulario" data-track="cta_contact_hero_click">
-        <Icon name="send" size={20} />
-        Solicitar presupuesto
-      </a>
+      <div class="mt-7 flex flex-wrap gap-3.5 max-b560:grid">
+        <a class="button button-primary max-b560:w-full" href="/configurador" data-track="cta_contact_hero_click">
+          <Icon name="calendar" size={20} />
+          Configura tu food truck
+        </a>
+        <a class="button button-outline max-b560:w-full" href="#formulario" data-track="cta_contact_hero_escribenos">
+          <Icon name="send" size={20} />
+          Escríbenos
+        </a>
+      </div>
 
       <ul class="mt-8 mb-0 flex list-none flex-wrap gap-x-7 gap-y-4 p-0">
         {

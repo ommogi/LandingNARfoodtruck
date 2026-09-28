@@ -1,7 +1,6 @@
 ---
 import '@fontsource/barlow-condensed/600.css';
 import '@fontsource/barlow-condensed/700.css';
-import '@fontsource-variable/inter';
 import '../styles/global.css';
 
 import Header from '../components/Header.astro';
@@ -26,6 +25,11 @@ interface Props {
   schemas?: Record<string, unknown>[];
   /** Texto alternativo de la imagen social. */
   ogImageAlt?: string;
+  /**
+   * Sin cabecera ni pie de la web (el configurador trae su propia cabecera de
+   * pasos). Mantiene fuentes, consentimiento, analitica y JSON-LD.
+   */
+  bare?: boolean;
 }
 
 const {
@@ -36,6 +40,7 @@ const {
   leadSource = 'landing-home',
   schemas = [],
   ogImageAlt = 'Food truck NAR iluminado y abierto durante un evento nocturno',
+  bare = false,
 } = Astro.props;
 
 const canonical = new URL(path, site.url).href;
@@ -117,7 +122,12 @@ try {
     <meta name="description" content={description} />
     <meta name="theme-color" content="#A63921" />
     <link rel="canonical" href={canonical} />
-    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    {/* Sello NAR completo (img/logos/logo_favicon.png), con transparencia salvo en iOS. */}
+    <link rel="preload" href="/fonts/strawford/strawford-regular-webfont.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="icon" href="/favicon-32.png" type="image/png" sizes="32x32" />
+    <link rel="icon" href="/favicon-48.png" type="image/png" sizes="48x48" />
+    <link rel="icon" href="/favicon-192.png" type="image/png" sizes="192x192" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     {noindex && <meta name="robots" content="noindex, follow" />}
 
     <meta property="og:type" content="website" />
@@ -145,11 +155,11 @@ try {
   </head>
   <body data-lead-source={leadSource}>
     <a class="skip-link" href="#contenido">Saltar al contenido</a>
-    <Header />
+    {!bare && <Header />}
     <main id="contenido">
       <slot />
     </main>
-    <Footer />
+    {!bare && <Footer />}
     <slot name="overlays" />
 
     {/*

@@ -1,0 +1,76 @@
+---
+/**
+ * Tarjeta grande con foto (pasos 1, 3, 5, 6 y 7). Es un boton conmutable:
+ * src/scripts/configurador/ lo enlaza al estado por `data-elegir` (una sola
+ * opcion por campo) y pinta aria-pressed.
+ */
+import Icon from '../Icon.astro';
+import { esIcono } from '../icons';
+import type { Catalogo, Opcion } from '../../data/configurador';
+import { refEdicion, t } from '../../data/configurador-textos';
+
+interface Props {
+  c: Catalogo;
+  opcion: Opcion;
+  /** Ruta del estado que fija esta tarjeta, p. ej. "proyecto.tipo". */
+  campo: string;
+  /** Valor que escribe. Por defecto, el id de la opcion. */
+  valor?: string;
+  cuando?: string;
+  horizontal?: boolean;
+  /** Muestra los chips de etiquetas bajo el texto. */
+  chips?: boolean;
+  /** Etiquetas como lista con check en vez de chips (paso 5). */
+  lista?: boolean;
+}
+
+const { c, opcion: o, campo, valor = o.id, cuando, horizontal = false, chips = false, lista = false } = Astro.props;
+---
+
+<button
+  type="button"
+  class:list={['cf-card cf-card-foto', horizontal && 'is-horizontal', !o.activo && 'is-oculta']}
+  data-cf-edit={refEdicion(c, `o:${o.id}`)}
+  data-elegir={campo}
+  data-valor={valor}
+  data-cuando={cuando}
+  aria-pressed="false"
+>
+  <span class="cf-card-img">
+    {
+      o.imagen ? (
+        <img src={o.imagen} alt="" loading="lazy" decoding="async" />
+      ) : (
+        <span class="cf-card-img-icono">{esIcono(o.icono) && <Icon name={o.icono} size={48} />}</span>
+      )
+    }
+    {o.aviso && <span class="cf-badge">{o.aviso}</span>}
+    {!o.activo && <span class="cf-badge is-oculta">{t(c, 'general.oculta')}</span>}
+  </span>
+  <span class="cf-radio" aria-hidden="true"><Icon name="tick" size={14} /></span>
+  <span class="cf-card-body">
+    <span class="cf-card-title">{o.nombre}</span>
+    {o.descripcion && <span class="cf-card-text">{o.descripcion}</span>}
+    {
+      chips && o.etiquetas.length > 0 && (
+        <span class="cf-chips">
+          {o.etiquetas.map((e) => (
+            <span class="cf-chip">{e}</span>
+          ))}
+        </span>
+      )
+    }
+    {
+      lista && o.etiquetas.length > 0 && (
+        <span class="cf-checklist">
+          {o.etiquetas.map((e) => (
+            <span>
+              <Icon name="tick" size={14} /> {e}
+            </span>
+          ))}
+        </span>
+      )
+    }
+    <slot />
+  </span>
+</button>

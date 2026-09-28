@@ -1,0 +1,79 @@
+---
+/**
+ * Foto del food truck recortada (PNG sin fondo) con las cotas dibujadas en CSS:
+ * 2,40 m de altura a la izquierda y 5,40 m de longitud abajo. La imagen viene
+ * ya recortada a su contenido, asi que las lineas se anclan a los bordes de la
+ * figura sin margenes muertos.
+ */
+import { Image } from 'astro:assets';
+import truckCutout from '../../assets/truck-sin-fondo.webp';
+
+interface Props {
+  /** `eager` solo en el hero; el resto de usos van perezosos. */
+  loading?: 'eager' | 'lazy';
+  sizes?: string;
+  class?: string;
+}
+
+const {
+  loading = 'lazy',
+  sizes = '(max-width: 980px) 100vw, 56vw',
+  class: extra = '',
+  ...rest
+} = Astro.props;
+
+/* Linea discontinua azul con topes en los extremos, comun a las dos cotas. */
+const rule = 'border-blue/55 border-dashed';
+---
+
+<figure class={`m-0 grid grid-cols-[auto_auto_1fr] grid-rows-[1fr_auto] gap-x-3 ${extra}`} {...rest}>
+  {/* Cota vertical: etiqueta + regla con topes */}
+  <figcaption
+    class="col-start-1 row-start-1 grid content-center justify-items-end text-right max-b620:hidden"
+  >
+    <b class="text-[clamp(16px,1.8vw,21px)] leading-none font-bold text-blue">2,40 m</b>
+    <span class="mt-1 text-[clamp(11px,1.2vw,14px)] text-blue/85">Altura total</span>
+  </figcaption>
+
+  <div
+    class="col-start-2 row-start-1 flex w-3 flex-col items-stretch justify-between max-b620:hidden"
+    aria-hidden="true"
+  >
+    <span class={`block border-t ${rule}`}></span>
+    <span class={`mx-auto block w-0 flex-1 border-l ${rule}`}></span>
+    <span class={`block border-t ${rule}`}></span>
+  </div>
+
+  <div class="relative col-start-3 row-start-1">
+    {/* Sombra de contacto elipsoidal bajo las ruedas, detras de la imagen */}
+    <span
+      class="absolute inset-x-[8%] bottom-[1%] h-[7%] rounded-[50%] bg-night/22 blur-[14px]"
+      aria-hidden="true"></span>
+
+    <Image
+      src={truckCutout}
+      alt="Food truck azul visto de lado con la ventana abierta: 5,40 metros de longitud total y 2,40 metros de altura total"
+      widths={[480, 720, 836]}
+      sizes={sizes}
+      loading={loading}
+      fetchpriority={loading === 'eager' ? 'high' : undefined}
+      class="relative h-auto w-full [filter:drop-shadow(0_16px_14px_rgb(10_28_38/0.18))]"
+    />
+  </div>
+
+  {/* Cota horizontal bajo la imagen */}
+  <div class="col-start-3 row-start-2 mt-3.5 grid justify-items-center">
+    <div class="flex w-full items-center" aria-hidden="true">
+      <span class={`h-3 border-l ${rule}`}></span>
+      <span class={`h-0 flex-1 border-t ${rule}`}></span>
+      <b
+        class="mx-3 text-[clamp(16px,1.8vw,21px)] leading-none font-bold whitespace-nowrap text-blue"
+      >
+        5,40 m
+      </b>
+      <span class={`h-0 flex-1 border-t ${rule}`}></span>
+      <span class={`h-3 border-l ${rule}`}></span>
+    </div>
+    <span class="mt-1 text-[clamp(11px,1.2vw,14px)] text-blue/85">Longitud total</span>
+  </div>
+</figure>

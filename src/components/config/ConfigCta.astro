@@ -1,0 +1,82 @@
+---
+/**
+ * Entrada al configurador (/configurador). Sustituye a las cuatro
+ * configuraciones cerradas (ConfigCards): el equipamiento ya no se elige por
+ * paquetes, se configura paso a paso sobre el FOODD Rental Base.
+ *
+ * El "Desde" sale del respaldo del configurador y no de Supabase: esta pagina
+ * es estatica. Si el cliente cambia el precio publico en el panel, actualizar
+ * tambien AJUSTES_RESPALDO en src/data/configurador.ts.
+ */
+import Icon from '../Icon.astro';
+import type { IconName } from '../icons';
+import { AJUSTES_RESPALDO } from '../../data/configurador';
+
+const pasos: { icon: IconName; title: string; text: string }[] = [
+  { icon: 'confetti', title: 'Tu proyecto', text: 'Evento, gastronomía o activación de marca.' },
+  { icon: 'calendar', title: 'Fecha', text: 'Comprueba la disponibilidad al momento.' },
+  { icon: 'kitchen', title: 'Equipamiento y servicios', text: 'Maquinaria, cocinero, ambientación y branding.' },
+  { icon: 'send', title: 'Presupuesto', text: 'Te enviamos una propuesta personalizada.' },
+];
+---
+
+<section class="section" aria-labelledby="configurador-cta-title">
+  <div class="container">
+    <div
+      class="grid grid-cols-[1.05fr_1fr] overflow-hidden rounded-card border border-[rgb(56_40_30_/_8%)] bg-white/96 shadow-card max-b980:grid-cols-1"
+      data-reveal
+    >
+      <div class="relative min-h-[320px] max-b980:min-h-[240px]">
+        <img
+          src="/configurador/viaja.webp"
+          alt="Food truck NAR abierto y listo para el servicio"
+          loading="lazy"
+          decoding="async"
+          class="absolute inset-0 size-full object-cover"
+        />
+      </div>
+
+      <div class="flex flex-col gap-5 p-[38px] max-b560:p-[22px]">
+        <div>
+          <p class="eyebrow eyebrow-rust">Configurador</p>
+          <h2 id="configurador-cta-title" class="m-0 text-[clamp(28px,3.2vw,42px)] leading-[1] font-bold text-night">
+            Diseña tu food truck
+            <em class="block text-rust not-italic">a medida.</em>
+          </h2>
+          <p class="mt-4 mb-0 max-w-[480px] text-[14.5px] text-muted">
+            Elige tu proyecto, la fecha, el equipamiento, el cocinero, la ambientación y el branding en
+            unos minutos, y recibe un presupuesto personalizado.
+          </p>
+        </div>
+
+        <ol class="m-0 grid list-none grid-cols-2 gap-x-5 gap-y-4 p-0 max-b560:grid-cols-1">
+          {
+            pasos.map((paso, index) => (
+              <li class="grid grid-cols-[38px_1fr] items-start gap-3">
+                <span class="grid size-[38px] place-items-center rounded-full bg-bg-2 text-rust" aria-hidden="true">
+                  <Icon name={paso.icon} size={20} />
+                </span>
+                <div>
+                  <b class="block text-[13.5px] text-night">
+                    {index + 1}. {paso.title}
+                  </b>
+                  <small class="text-[12.5px] leading-[1.45] text-muted">{paso.text}</small>
+                </div>
+              </li>
+            ))
+          }
+        </ol>
+
+        <div class="mt-auto flex flex-wrap items-center gap-x-6 gap-y-3 border-t border-line pt-5">
+          <a class="button button-primary max-b620:w-full" href="/configurador" data-track="cta_config_configurador">
+            Configura tu food truck
+            <Icon name="arrow" size={20} />
+          </a>
+          <p class="m-0 text-[14px] text-muted">
+            Desde <b class="text-[20px] text-night">{AJUSTES_RESPALDO.precioDesde} €</b> + IVA / día
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

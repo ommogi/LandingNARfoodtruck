@@ -1,0 +1,31 @@
+---
+/** Pantalla final tras enviar. La referencia la escribe envio.ts. */
+import Icon from '../Icon.astro';
+import T from './T.astro';
+import type { Catalogo } from '../../data/configurador';
+
+interface Props {
+  c: Catalogo;
+}
+
+const { c } = Astro.props;
+---
+
+<section class="cf-paso cf-exito" data-cf-exito hidden tabindex="-1">
+  <span class="cf-exito-icono"><Icon name="check" size={44} /></span>
+  <p class="cf-pill"><T c={c} k="exito.pastilla" /></p>
+  <h1 class="cf-title"><T c={c} k="exito.titulo" /></h1>
+  <p class="cf-subtitle">
+    <T c={c} k="exito.referencia" /> <strong data-cf-referencia></strong>
+  </p>
+  <p class="cf-card-text" data-cf-r="proyecto"></p>
+
+  <ol class="cf-exito-pasos">
+    <li><span class="cf-num is-rust">1</span> <T c={c} k="exito.paso1" /></li>
+    <li><span class="cf-num is-rust">2</span> <T c={c} k="exito.paso2" /></li>
+    <li><span class="cf-num is-rust">3</span> <T c={c} k="exito.paso3" /></li>
+  </ol>
+
+  <p class="cf-card-text"><T c={c} k="exito.texto" /></p>
+  <a class="cf-btn cf-btn-primary" href="/"><T c={c} k="exito.boton" /></a>
+</section>

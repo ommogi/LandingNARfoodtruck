@@ -27,10 +27,11 @@ const leyenda = [
   <div class="flex flex-wrap items-end justify-between gap-3">
     <div>
       <h3 class="m-0 text-[22px] leading-none font-bold text-blue">
-        Selecciona la fecha de tu evento
+        Selecciona las fechas de tu evento
       </h3>
       <p class="mt-1.5 mb-0 text-[13px] text-muted">
-        Elige tu fecha y te confirmamos la disponibilidad en menos de 24 horas.
+        Puedes elegir varios días; pulsa otra vez sobre uno para quitarlo. Te confirmamos la
+        disponibilidad en menos de 24 horas.
       </p>
     </div>
 
@@ -39,7 +40,7 @@ const leyenda = [
         <Icon name="chevron-left" size={20} />
       </button>
       <select
-        class="min-h-11 min-w-[180px] cursor-pointer rounded-lg border border-line bg-white px-3 font-semibold"
+        class="field field-select min-h-11 w-auto min-w-[180px] font-semibold"
         data-cal-month
         aria-label="Mes del calendario"
       >
@@ -62,9 +63,41 @@ const leyenda = [
       class="grid grid-cols-7"
       data-cal-grid
       role="group"
-      aria-label="Días del mes"
+      aria-label="Días del mes. Puedes seleccionar varios."
     >
     </div>
+  </div>
+
+  {/*
+   * Fechas elegidas. Con seleccion multiple la rejilla sola no basta: los dias
+   * de otros meses dejan de verse al navegar, y sin esta lista no habria forma
+   * de saber que sigue marcado ni de quitarlo sin volver a su mes.
+   *
+   * Esqueleto vacio: las fichas las pinta renderSeleccion() en booking.ts.
+   */}
+  <div
+    class="grid gap-2 rounded-xl border border-line bg-white p-3"
+    hidden
+    data-cal-seleccion
+  >
+    <div class="flex flex-wrap items-center justify-between gap-2">
+      <p
+        class="m-0 text-xs font-bold tracking-[0.04em] text-muted uppercase"
+        data-cal-seleccion-titulo
+        role="status"
+        aria-live="polite"
+      >
+      </p>
+      <button
+        class="cursor-pointer border-0 bg-transparent p-0 text-[12.5px] font-semibold text-rust underline"
+        type="button"
+        data-cal-limpiar
+      >
+        Quitar todas
+      </button>
+    </div>
+
+    <ul class="m-0 flex list-none flex-wrap gap-2 p-0" data-cal-chips></ul>
   </div>
 
   <ul class="m-0 flex list-none flex-wrap gap-x-6 gap-y-2 p-0 text-[12.5px] text-muted">

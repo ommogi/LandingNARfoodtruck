@@ -8,6 +8,9 @@
 
 import { initLeadForm } from './lead';
 import { closeModal, onEscape, openModal, setMenu, track } from './modal';
+// Los botones de +/- del campo de invitados. Se importa aqui, que es el script
+// que cargan todas las paginas, porque el campo sale en los formularios.
+import './stepper';
 
 const header = document.querySelector<HTMLElement>('[data-header]');
 const menuButton = document.querySelector<HTMLButtonElement>('[data-menu-button]');
@@ -15,7 +18,6 @@ const nav = document.querySelector<HTMLElement>('[data-nav]');
 
 const videoModal = document.querySelector<HTMLElement>('[data-video-modal]');
 const videoPlayer = document.querySelector<HTMLVideoElement>('[data-video-player]');
-const formModal = document.querySelector<HTMLElement>('[data-form-modal]');
 
 /* --------------------------------------------------- Menu movil */
 
@@ -52,22 +54,7 @@ document.querySelectorAll<HTMLElement>('[data-video-close]').forEach((el) => {
   el.addEventListener('click', closeVideo);
 });
 
-document.querySelectorAll<HTMLElement>('[data-form-open]').forEach((trigger) => {
-  trigger.addEventListener('click', () => {
-    if (!formModal) return;
-    openModal(formModal, trigger);
-    track(trigger.dataset.track ?? 'form_open');
-  });
-});
-
-document.querySelectorAll<HTMLElement>('[data-form-close]').forEach((el) => {
-  el.addEventListener('click', () => formModal && closeModal(formModal));
-});
-
-onEscape(() => {
-  closeVideo();
-  if (formModal && !formModal.hidden) closeModal(formModal);
-});
+onEscape(closeVideo);
 
 /* --------------------------------------------------- Cabecera y reveal */
 

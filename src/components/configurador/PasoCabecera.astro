@@ -1,0 +1,41 @@
+---
+/**
+ * Cabecera comun: pastilla "PASO N DE 10 · ETIQUETA", titulo y subtitulo.
+ * El numero lo reescribe el script (data-cf-num): si el paso de cocina no
+ * aplica, el total baja a 9.
+ */
+import T from './T.astro';
+import type { Catalogo, PasoId } from '../../data/configurador';
+import { refEdicion, t, type ClaveTexto } from '../../data/configurador-textos';
+
+interface Props {
+  c: Catalogo;
+  paso: PasoId;
+  /** Cabecera reducida (paso 4, segun anotacion del diseno). */
+  compacta?: boolean;
+  /** Titulo alternativo cuando el proyecto es un Roadshow (paso 2). */
+  kRoadshow?: ClaveTexto;
+}
+
+const { c, paso, compacta = false, kRoadshow } = Astro.props;
+const textos = c.ajustes.pasos[paso];
+const tituloRoadshow = kRoadshow ? t(c, kRoadshow) : undefined;
+---
+
+<header class:list={['cf-head', compacta && 'is-compacta']}>
+  <div class="cf-head-main" data-cf-edit={refEdicion(c, `p:${paso}`)}>
+    <p class="cf-pill"><span data-cf-num={paso}></span> · <T c={c} k={`paso.${paso}` as ClaveTexto} /></p>
+    <h1
+      class="cf-title"
+      tabindex="-1"
+      data-cf-titulo
+      data-cf-paso-titulo={paso}
+      data-titulo-normal={tituloRoadshow ? textos.titulo : undefined}
+      data-titulo-roadshow={tituloRoadshow}
+    >
+      {textos.titulo}
+    </h1>
+    <p class="cf-subtitle" data-cf-paso-subtitulo={paso}>{textos.subtitulo}</p>
+  </div>
+  <slot />
+</header>

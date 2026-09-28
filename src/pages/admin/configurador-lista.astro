@@ -1,0 +1,203 @@
+---
+/**
+ * Lista completa del catalogo del configurador: todas las opciones de los 10
+ * pasos agrupadas por tipo, con sus precios internos. Es la vista secundaria del
+ * editor visual (/{ADMIN_PATH}/configurador), util para revisar o editar en
+ * bloque, sobre todo lo oculto. Los textos fijos y las listas pequenas solo se
+ * editan en el editor visual.
+ *
+ * Igual que el panel de disponibilidad: nada se guarda hasta pulsar "Guardar
+ * cambios", y solo viaja lo que ha cambiado. La logica vive en
+ * src/scripts/admin-configurador.ts.
+ *
+ * Los precios se leen con la sesion del admin: la politica RLS de
+ * configurador_precios solo deja pasar a es_admin().
+ */
+import AdminLayout from '../../layouts/AdminLayout.astro';
+import OpcionAdmin from '../../components/admin/OpcionAdmin.astro';
+import {
+  PASOS,
+  RENTAL_BASE_ID,
+  TIPO_ETIQUETA,
+  TIPOS_OPCION,
+  type TipoOpcion,
+} from '../../data/configurador';
+import { getCatalogo, getPreciosAdmin } from '../../lib/configurador-server';
+
+export const prerender = false;
+
+const catalogo = await getCatalogo(Astro.locals.supabase);
+const precios = await getPreciosAdmin(Astro.locals.supabase);
+const rental = precios.get(RENTAL_BASE_ID) ?? { precio: 450, unidad: 'dia' as const };
+
+const porTipo = (tipo: TipoOpcion) =>
+  catalogo.opciones
+    .filter((o) => o.tipo === tipo)
+    .sort((a, b) => (a.padre ?? '').localeCompare(b.padre ?? '') || a.orden - b.orden);
+
+const proyectos = porTipo('proyecto');
+const usos = porTipo('uso');
+const subconfigs = porTipo('subconfig');
+
+const padresDe = (tipo: TipoOpcion) => (tipo === 'subtipo' ? proyectos : tipo === 'subconfig' ? usos : []);
+const contextosDe = (tipo: TipoOpcion) => (tipo === 'uso' ? proyectos : tipo === 'cocina_servicio' ? usos : []);
+
+const card = 'rounded-card border border-line bg-white p-5 shadow-card';
+const input =
+  'min-h-11 w-full rounded-lg border border-line bg-white px-3 text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue';
+const label = 'grid gap-1.5 text-[13px] font-semibold text-ink';
+const pasosEditables = PASOS;
+---
+
+<AdminLayout title="Configurador · lista completa" email={Astro.locals.userEmail} ancho>
+  <div class="grid gap-6">
+    <p class="m-0 text-[14px]">
+      <a class="font-semibold text-blue underline" href={`${Astro.locals.adminBase}/configurador`}>← Volver al editor visual</a>
+    </p>
+    <p class="m-0 text-[14px] text-muted">
+      Aquí editas todo lo que aparece en el configurador de <a class="font-semibold text-blue underline" href="/configurador" target="_blank">/configurador</a>:
+      opciones, textos, imágenes y el <strong class="text-ink">precio interno</strong> de cada opción. Los
+      precios nunca se muestran al cliente: solo aparecen en el email que recibes con cada solicitud.
+      Los cambios no se aplican hasta que pulses «Guardar cambios» y tardan hasta un minuto en verse.
+    </p>
+
+    <!-- Ajustes generales -->
+    <section class={card} data-ajustes>
+      <h2 class="m-0 mb-4 font-display text-[22px] leading-none text-blue">Ajustes generales</h2>
+
+      <div class="grid gap-4 b820:grid-cols-3">
+        <label class={label}>
+          Precio público «Desde» (€/día)
+          <input class={input} type="number" min="0" step="1" data-ajuste="precioDesde" value={catalogo.ajustes.precioDesde} />
+          <span class="font-normal text-muted">Lo que ve el cliente en la barra lateral.</span>
+        </label>
+        <label class={label}>
+          Precio interno Rental Base
+          <input class={input} type="number" min="0" step="0.01" data-ajuste="rentalPrecio" value={rental.precio} />
+          <span class="font-normal text-muted">Siempre por día. Es la primera línea del desglose.</span>
+        </label>
+        <label class={label}>
+          WhatsApp del asesor
+          <input
+            class={input}
+            inputmode="numeric"
+            pattern="[0-9]{0,15}"
+            placeholder="34600000000"
+            data-ajuste="whatsapp"
+            value={catalogo.ajustes.whatsapp}
+          />
+          <span class="font-normal text-muted">Solo números, con prefijo. Vacío = usa el de la web.</span>
+        </label>
+        <label class={`${label} b820:col-span-3`}>
+          Texto «Incluye» de la barra lateral
+          <textarea class={`${input} py-2`} rows="2" maxlength="400" data-ajuste="textoIncluye">{catalogo.ajustes.textoIncluye}</textarea>
+        </label>
+      </div>
+
+      <details class="mt-5 rounded-xl border border-line">
+        <summary class="cursor-pointer p-3 text-[14px] font-semibold text-night">Títulos y subtítulos de los pasos</summary>
+        <div class="grid gap-4 border-t border-line p-4">
+          {
+            pasosEditables.map((p, i) => (
+              <div class="grid gap-2 b820:grid-cols-[180px_1fr_2fr] b820:items-center">
+                <span class="text-[13px] font-semibold text-muted">
+                  {i + 1}. {p.etiqueta}
+                </span>
+                <input
+                  class={input}
+                  maxlength="120"
+                  data-paso={p.id}
+                  data-paso-campo="titulo"
+                  value={catalogo.ajustes.pasos[p.id].titulo}
+                  aria-label={`Título del paso ${p.etiqueta}`}
+                />
+                <input
+                  class={input}
+                  maxlength="300"
+                  data-paso={p.id}
+                  data-paso-campo="subtitulo"
+                  value={catalogo.ajustes.pasos[p.id].subtitulo}
+                  aria-label={`Subtítulo del paso ${p.etiqueta}`}
+                />
+              </div>
+            ))
+          }
+        </div>
+      </details>
+    </section>
+
+    <!-- Catalogo por tipo -->
+    {
+      TIPOS_OPCION.map((tipo) => (
+        <section class={card} data-seccion={tipo}>
+          <div class="mb-3 flex flex-wrap items-center justify-between gap-3">
+            <h2 class="m-0 font-display text-[22px] leading-none text-blue">{TIPO_ETIQUETA[tipo]}</h2>
+            <button
+              type="button"
+              class="min-h-10 cursor-pointer rounded-lg border border-night bg-white px-4 text-[14px] font-semibold text-night hover:bg-bg-2"
+              data-anadir={tipo}
+            >
+              + Añadir opción
+            </button>
+          </div>
+
+          <div class="grid gap-2" data-lista={tipo}>
+            {porTipo(tipo).map((o) => (
+              <OpcionAdmin
+                opcion={o}
+                tipo={tipo}
+                precio={precios.get(o.id) ?? null}
+                padres={padresDe(tipo)}
+                subconfigs={subconfigs}
+                contextos={contextosDe(tipo)}
+              />
+            ))}
+          </div>
+
+          <template data-plantilla={tipo}>
+            <OpcionAdmin
+              opcion={null}
+              tipo={tipo}
+              precio={null}
+              padres={padresDe(tipo)}
+              subconfigs={subconfigs}
+              contextos={contextosDe(tipo)}
+            />
+          </template>
+        </section>
+      ))
+    }
+
+    <!-- Barra de guardado -->
+    <div
+      class="sticky bottom-4 z-10 flex flex-wrap items-center justify-between gap-3 rounded-card border border-line bg-white p-4 shadow-card"
+    >
+      <p class="m-0 text-[13px] text-muted is-error:text-rust is-success:text-blue" data-save-status role="status">
+        Sin cambios pendientes.
+      </p>
+
+      <div class="flex gap-2">
+        <button
+          class="min-h-11 rounded-lg border border-line bg-white px-4 font-semibold text-ink disabled:cursor-not-allowed disabled:opacity-40 not-disabled:cursor-pointer not-disabled:hover:border-night"
+          type="button"
+          data-descartar
+          disabled
+        >
+          Descartar
+        </button>
+        <button
+          class="min-h-11 rounded-lg bg-rust px-5 font-semibold text-white disabled:cursor-not-allowed disabled:opacity-40 not-disabled:cursor-pointer not-disabled:hover:bg-rust-dark"
+          type="button"
+          data-guardar
+          disabled
+        >
+          Guardar cambios
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    import '../../scripts/admin-configurador';
+  </script>
+</AdminLayout>

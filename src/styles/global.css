@@ -2,6 +2,32 @@
 
 @import 'tailwindcss';
 
+/*
+ * Strawford, la tipografia de texto de la marca (licencia webfont en
+ * ~/Desktop/FOOD TRUCK TOTAL/Strawford-Regular-&-Italic/Webfont). Solo existe
+ * en Regular e Italic: los textos en semibold/bold se engrosan de forma
+ * sintetica hasta que haya esos pesos. Los titulos siguen en Barlow Condensed.
+ */
+@font-face {
+  font-family: 'Strawford';
+  src:
+    url('/fonts/strawford/strawford-regular-webfont.woff2') format('woff2'),
+    url('/fonts/strawford/strawford-regular-webfont.woff') format('woff');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Strawford';
+  src:
+    url('/fonts/strawford/strawford-regularitalic-webfont.woff2') format('woff2'),
+    url('/fonts/strawford/strawford-regularitalic-webfont.woff') format('woff');
+  font-weight: 400;
+  font-style: italic;
+  font-display: swap;
+}
+
 @theme {
   --color-rust: #a63921;
   --color-rust-dark: #842b19;
@@ -17,7 +43,7 @@
   --color-bg-3: #f6f3f0;
 
   --font-display: 'Barlow Condensed', 'Arial Narrow', Arial, sans-serif;
-  --font-body: 'Inter Variable', Inter, Arial, Helvetica, sans-serif;
+  --font-body: 'Strawford', Arial, Helvetica, sans-serif;
 
   /*
    * Breakpoints del diseno actual. Se usan siempre en modo descendente
@@ -256,6 +282,25 @@
     & svg {
       flex: none;
     }
+
+    /*
+     * Apagado. `.is-disabled` acompana a `:disabled` porque el boton de enviar se
+     * apaga con aria-disabled y no con el atributo: asi sigue siendo enfocable y
+     * al pulsarlo puede decir que falta. Ver src/scripts/lead.ts.
+     */
+    &:disabled,
+    &.is-disabled {
+      opacity: 0.55;
+      box-shadow: none;
+      cursor: not-allowed;
+    }
+
+    &:disabled:hover,
+    &.is-disabled:hover,
+    &:disabled:active,
+    &.is-disabled:active {
+      transform: none;
+    }
   }
 
   .button-primary {
@@ -388,9 +433,20 @@
      * `is-disponible` no se pinta: el calendario no afirma disponibilidad, solo
      * marca lo que si consta (is-poca, :disabled). Ver src/data/disponibilidad.ts.
      */
+    /*
+     * Poca disponibilidad. El tinte estaba al 7%: sobre blanco no se distinguia
+     * de un dia libre, asi que la leyenda prometia un rust que la celda no
+     * tenia. Con el aro interior el estado se lee tambien en movil, donde la
+     * etiqueta de texto se oculta (ver el media query de abajo).
+     */
     &.is-poca {
       color: var(--color-rust);
-      background: rgb(166 57 33 / 7%);
+      background: rgb(166 57 33 / 14%);
+      box-shadow: inset 0 0 0 1.5px rgb(166 57 33 / 45%);
+
+      & small {
+        color: var(--color-rust);
+      }
     }
 
     /* Ocupados y fuera de plazo: mismo gris apagado, sin invitar al clic. */
@@ -406,10 +462,16 @@
       opacity: 1;
     }
 
+    /* Gana siempre: sin resetear el aro, un dia `poca` elegido lo conservaria. */
     &.is-selected,
     &.is-selected:hover {
       color: #fff;
       background: var(--color-rust);
+      box-shadow: none;
+
+      & small {
+        color: #fff;
+      }
     }
 
     /*
@@ -425,6 +487,156 @@
       & small {
         display: none;
       }
+    }
+  }
+
+  /*
+   * Ficha de una fecha elegida. La pinta renderSeleccion() en
+   * src/scripts/booking.ts, y por eso es una clase de componente y no utilidades
+   * de Tailwind: las clases escritas dentro de un .ts no las ve el escaneo.
+   */
+  .cal-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 4px 4px 12px;
+    border: 1px solid var(--color-line);
+    border-radius: 999px;
+    background: #fff;
+    font-size: 13px;
+    font-weight: 600;
+    white-space: nowrap;
+
+    /* Mismo tinte que la celda del calendario: el aviso se lee igual aqui. */
+    &.is-poca {
+      color: var(--color-rust);
+      border-color: rgb(166 57 33 / 45%);
+      background: rgb(166 57 33 / 14%);
+    }
+  }
+
+  .cal-chip-quitar {
+    position: relative;
+    display: grid;
+    place-items: center;
+    width: 28px;
+    height: 28px;
+    padding: 0;
+    border: 0;
+    border-radius: 999px;
+    color: inherit;
+    background: transparent;
+    font-size: 18px;
+    line-height: 1;
+    cursor: pointer;
+
+    &:hover {
+      background: rgb(0 0 0 / 8%);
+    }
+
+    /*
+     * La aspa mide 28 px para no engordar la ficha, pero el area que responde al
+     * dedo se estira a 44 sin mover nada de sitio.
+     */
+    &::after {
+      content: '';
+      position: absolute;
+      inset: -8px;
+    }
+  }
+
+  /* ---------------------------------------------------------------- Campos
+   *
+   * El mismo string de clases estaba copiado en los tres formularios, y el de
+   * /contacto ademas habia divergido. Vive aqui y no como constante de Tailwind
+   * en cada .astro por el mismo motivo que .cal-day: src/scripts/stepper.ts
+   * necesita aplicarlo, y las clases escritas dentro de un .ts no las ve el
+   * escaneo de Tailwind.
+   */
+  .field {
+    width: 100%;
+    min-height: 46px;
+    padding: 11px 12px;
+    border: 1px solid var(--color-line);
+    border-radius: 8px;
+    color: var(--color-ink);
+    background: #fff;
+    font-size: 15px;
+    font-weight: 400;
+
+    &::placeholder {
+      color: rgb(93 93 93 / 70%);
+    }
+
+    /* La pone src/scripts/lead.ts cuando el campo no valida. */
+    &.is-invalid {
+      border-color: #b42318;
+      box-shadow: 0 0 0 3px rgb(180 35 24 / 12%);
+    }
+  }
+
+  /*
+   * Sin `appearance: none` el navegador pinta el select a su manera e ignora
+   * buena parte del estilo. Al quitarla desaparece tambien la flecha nativa, asi
+   * que se repone como fondo. La lista que se despliega la sigue dibujando el
+   * sistema: es la parte que no se puede estilar sin reescribir el control
+   * entero, y no compensa.
+   */
+  .field-select {
+    appearance: none;
+    padding-right: 38px;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='9' viewBox='0 0 14 9' fill='none'%3E%3Cpath d='M1 1L7 7L13 1' stroke='%235d5d5d' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    cursor: pointer;
+  }
+
+  /* ---------------------------------------------------------------- Stepper */
+
+  .stepper {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    gap: 8px;
+    align-items: center;
+
+    /*
+     * Con las flechas propias, las del navegador sobran: ademas se comen ancho
+     * del campo y solo aparecen al pasar el raton, asi que el control cambiaba
+     * de tamano util segun donde estuviera el cursor.
+     */
+    & input {
+      appearance: textfield;
+      text-align: center;
+    }
+
+    & input::-webkit-outer-spin-button,
+    & input::-webkit-inner-spin-button {
+      appearance: none;
+      margin: 0;
+    }
+  }
+
+  .stepper-boton {
+    display: grid;
+    place-items: center;
+    width: 44px;
+    height: 44px;
+    flex: none;
+    border: 1px solid var(--color-line);
+    border-radius: 8px;
+    color: var(--color-ink);
+    background: #fff;
+    font-size: 22px;
+    line-height: 1;
+    cursor: pointer;
+
+    &:hover:not(:disabled) {
+      border-color: var(--color-night);
+    }
+
+    &:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
     }
   }
 }

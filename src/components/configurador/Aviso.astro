@@ -1,0 +1,26 @@
+---
+/** Franja informativa de los pasos (i azul), de aviso (! naranja) o ok (✓ verde). */
+import Icon from '../Icon.astro';
+import T from './T.astro';
+import type { Catalogo } from '../../data/configurador';
+import type { ClaveTexto } from '../../data/configurador-textos';
+
+interface Props {
+  c: Catalogo;
+  k: ClaveTexto;
+  kTitulo?: ClaveTexto;
+  tono?: 'info' | 'aviso' | 'ok';
+  cuando?: string;
+}
+
+const { c, k, kTitulo, tono = 'info', cuando } = Astro.props;
+const icono = tono === 'info' ? 'info' : tono === 'ok' ? 'check' : 'alert';
+---
+
+<div class:list={['cf-nota', `is-${tono}`]} data-cuando={cuando}>
+  <Icon name={icono} size={22} class="cf-nota-icon" />
+  <div>
+    {kTitulo && <p class="cf-nota-titulo"><T c={c} k={kTitulo} /></p>}
+    <p class="cf-nota-texto"><T c={c} k={k} /></p>
+  </div>
+</div>

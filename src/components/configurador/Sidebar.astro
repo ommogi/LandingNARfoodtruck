@@ -1,0 +1,85 @@
+---
+/**
+ * Barra lateral "Tu configuracion". En escritorio es fija a la derecha; en
+ * movil es un cajon que abre el boton inferior (cajon.ts). Los valores de
+ * cada fila y sus circulos los pinta el script.
+ */
+import Icon from '../Icon.astro';
+import T from './T.astro';
+import { formatearEuros, type Catalogo, type PasoId } from '../../data/configurador';
+import { refEdicion, t, type ClaveTexto } from '../../data/configurador-textos';
+import type { IconName } from '../icons';
+import { contact } from '../../config/site';
+
+interface Props {
+  c: Catalogo;
+}
+
+const { c } = Astro.props;
+const filas: { paso: PasoId; icono: IconName }[] = [
+  { paso: 'proyecto', icono: 'confetti' },
+  { paso: 'fecha', icono: 'calendar' },
+  { paso: 'configuracion', icono: 'cog' },
+  { paso: 'equipamiento', icono: 'kitchen' },
+  { paso: 'cocina', icono: 'chef' },
+  { paso: 'ambientacion', icono: 'sofa' },
+  { paso: 'branding', icono: 'paintbrush' },
+  { paso: 'logistica', icono: 'pin' },
+  { paso: 'resumen', icono: 'doc' },
+];
+
+const whatsapp = c.ajustes.whatsapp || contact.whatsapp;
+const mensaje = encodeURIComponent(t(c, 'side.ayudaMensaje'));
+const precio = formatearEuros(c.ajustes.precioDesde).replace(',00 €', ' €');
+---
+
+<aside class="cf-side" id="cf-side" data-cf-side aria-label={t(c, 'side.titulo')}>
+  <div class="cf-side-head">
+    <p class="cf-over"><T c={c} k="side.titulo" /></p>
+    <button type="button" class="cf-side-cerrar" data-cf-side-cerrar aria-label="Cerrar resumen">
+      <Icon name="close" size={22} />
+    </button>
+  </div>
+
+  <div class="cf-side-scroll">
+    <div class="cf-rental" data-cf-edit={refEdicion(c, 'a:general')}>
+      <p class="cf-rental-title"><T c={c} k="side.rentalTitulo" /></p>
+      <img
+        src={t(c, 'img.rentalBase')}
+        alt=""
+        width="700"
+        height="357"
+        data-cf-img="img.rentalBase"
+        data-cf-edit={refEdicion(c, 'i:img.rentalBase')}
+      />
+      <p class="cf-rental-precio"><T c={c} k="side.desde" vars={{ precio }} /></p>
+      <p class="cf-rental-texto" data-cf-ajuste="textoIncluye">{c.ajustes.textoIncluye}</p>
+    </div>
+
+    <ul class="cf-side-lista">
+      {
+        filas.map((f) => (
+          <li data-cf-side-fila={f.paso}>
+            <button type="button" data-ir={f.paso}>
+              <Icon name={f.icono} size={22} class="cf-side-icon" />
+              <span class="cf-side-texto">
+                <span class="cf-side-titulo"><T c={c} k={`side.fila.${f.paso}` as ClaveTexto} /></span>
+                <span class="cf-side-valor" data-cf-side-valor>{t(c, 'side.sinSeleccionar')}</span>
+              </span>
+              <span class="cf-side-estado" aria-hidden="true"><Icon name="tick" size={12} /></span>
+            </button>
+          </li>
+        ))
+      }
+    </ul>
+
+    <div class="cf-ayuda">
+      <p class="cf-ayuda-titulo"><T c={c} k="side.ayudaTitulo" /></p>
+      <p class="cf-card-text"><T c={c} k="side.ayudaTexto" /></p>
+      <a class="cf-btn cf-btn-outline" href={`https://wa.me/${whatsapp}?text=${mensaje}`} target="_blank" rel="noopener" data-cf-asesor>
+        <T c={c} k="side.ayudaBoton" /> <Icon name="whatsapp" size={18} />
+      </a>
+    </div>
+  </div>
+</aside>
+<div class="cf-side-velo" data-cf-side-velo hidden></div>

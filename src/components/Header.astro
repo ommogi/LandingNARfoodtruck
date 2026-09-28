@@ -1,6 +1,6 @@
 ---
 import { Image } from 'astro:assets';
-import logo from '../assets/logo-nar-horizontal.png';
+import logo from '../assets/logo-nar-horizontal.webp';
 import { mainNav, site } from '../config/site';
 import Icon from './Icon.astro';
 
@@ -83,25 +83,25 @@ const navLink = [
         ))
       }
       {/* En movil el CTA vive dentro del panel desplegable. */}
-      <button
+      <a
         class="button button-primary hidden mt-3.5 max-b900:inline-flex"
-        type="button"
-        data-form-open
+        href="/configurador"
         data-track="cta_header_click"
       >
         <Icon name="calendar" size={20} />
-        Reservar fecha
-      </button>
+        Configura tu food truck
+      </a>
     </nav>
 
-    <button
+    <a
       class="button button-primary max-b1180:px-4 max-b1180:text-base max-b1024:hidden"
-      type="button"
-      data-form-open
+      href="/configurador"
       data-track="cta_header_click"
     >
       <Icon name="calendar" size={20} />
-      Reservar fecha
-    </button>
+      {/* Entre 1024 y 1100 px el texto largo parte en dos lineas junto al menu. */}
+      <span class="max-b1100:hidden">Configura tu food truck</span>
+      <span class="hidden max-b1100:inline">Configurar</span>
+    </a>
   </div>
 </header>

@@ -1,0 +1,62 @@
+---
+/**
+ * Tarjeta de equipamiento del paso 4. `incluido` pinta la version fija; el
+ * resto es conmutable (data-alternar) sobre equipamiento.seleccion.
+ * `data-recomendado-para` y `data-categoria` los usa el filtro del script.
+ */
+import Icon from '../Icon.astro';
+import T from './T.astro';
+import { esIcono } from '../icons';
+import type { Catalogo, Opcion } from '../../data/configurador';
+import { refEdicion, t } from '../../data/configurador-textos';
+
+interface Props {
+  c: Catalogo;
+  e: Opcion;
+  recomendado?: boolean;
+  incluido?: boolean;
+}
+
+const { c, e, recomendado = false, incluido = false } = Astro.props;
+const buscable = `${e.nombre} ${e.descripcion}`.toLowerCase();
+---
+
+<div
+  class:list={['cf-equipo', incluido && 'is-incluido', !e.activo && 'is-oculta']}
+  data-cf-edit={refEdicion(c, `o:${e.id}`)}
+  data-recomendado-para={recomendado ? e.recomendado_para.join(' ') : undefined}
+  data-en-catalogo={!recomendado && !incluido ? e.recomendado_para.join(' ') : undefined}
+  data-categoria={e.categoria ?? ''}
+  data-buscar={buscable}
+>
+  <span class="cf-equipo-media">
+    {
+      e.imagen ? (
+        <img src={e.imagen} alt="" loading="lazy" decoding="async" />
+      ) : (
+        esIcono(e.icono) && <Icon name={e.icono} size={40} />
+      )
+    }
+    {recomendado && <span class="cf-badge"><Icon name="check" size={14} /> <T c={c} k="equipamiento.recomendado" /></span>}
+    {!e.activo && <span class="cf-badge is-oculta">{t(c, 'general.oculta')}</span>}
+  </span>
+  <p class="cf-card-title">{e.nombre}</p>
+  {e.descripcion && <p class="cf-card-text">{e.descripcion}</p>}
+  {
+    incluido ? (
+      <span class="cf-equipo-estado"><Icon name="tick" size={16} /> <T c={c} k="equipamiento.incluido" /></span>
+    ) : (
+      <button
+        type="button"
+        class="cf-equipo-boton"
+        data-alternar="equipamiento.seleccion"
+        data-valor={e.id}
+        aria-pressed="false"
+        aria-label={`${t(c, 'equipamiento.anadir')} ${e.nombre}`}
+      >
+        <span class="cf-equipo-add"><Icon name="plus" size={16} /> <T c={c} k="equipamiento.anadir" /></span>
+        <span class="cf-equipo-added"><Icon name="tick" size={16} /> <T c={c} k="equipamiento.anadido" /></span>
+      </button>
+    )
+  }
+</div>

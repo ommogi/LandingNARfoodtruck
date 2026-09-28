@@ -1,21 +1,34 @@
 ---
 /**
- * Fila de tres tarjetas: plano interior, para quien es cada configuracion y el
- * CTA de reserva. El plano tiene id propio porque el boton "Ver plano" de los
+ * Fila de tres tarjetas: plano interior, para quien es el truck y el CTA al
+ * configurador. El plano tiene id propio porque el boton "Ver plano" de los
  * modales cierra el dialogo y trae al usuario hasta aqui.
+ *
+ * El plano es la ficha tecnica del fabricante: lleva el texto dentro de la
+ * imagen, asi que el alt repite medidas y equipamiento, y un clic la abre a
+ * tamano completo para leer las cotas.
  */
+import { Image, getImage } from 'astro:assets';
 import Icon from '../Icon.astro';
-import FloorPlan from './FloorPlan.astro';
+import plano from '../../assets/plano-distribucion.webp';
 import { idealPara } from '../../data/configuraciones';
 
 const card =
-  'rounded-card border border-[rgb(56_40_30_/_8%)] bg-white/96 px-[26px] pt-[26px] pb-[22px] shadow-card max-b560:px-[18px]';
+  'flex flex-col rounded-card border border-[rgb(56_40_30_/_8%)] bg-white/96 px-[26px] pt-[26px] pb-[22px] shadow-card max-b560:px-[18px]';
 const cardTitle = 'm-0 mb-2.5 text-[22px] leading-[1.1] font-bold text-blue';
+
+const planoGrande = await getImage({ src: plano, width: 1600, format: 'webp' });
+const planoAlt =
+  'Plano de distribución interior del remolque Airstream de 4 m. Tamaño exterior 4000 × 2180 × 2100 mm; ' +
+  'interior 3920 × 2100 × 1950 mm. Equipamiento: freidora de gas, plancha de gas, cocina de gas de 2 fuegos, ' +
+  'campana extractora, fregadero doble, congelador bajo encimera de 1,2 m, frigorífico bajo encimera de 1,5 m, ' +
+  'frigorífico para bebidas bajo encimera, gofrera doble y crepera. Encimeras con armarios inferiores de 950 y ' +
+  '650 mm de altura y ventana de servicio de 2000 mm.';
 ---
 
 <section class="section" aria-labelledby="distribucion-title">
   <div
-    class="container grid grid-cols-[1.25fr_0.9fr_0.85fr] items-start gap-[18px] max-b1100:grid-cols-2 max-b820:grid-cols-1"
+    class="container grid grid-cols-[1.25fr_0.9fr_0.85fr] items-stretch gap-[18px] max-b1100:grid-cols-2 max-b820:grid-cols-1"
     data-reveal
   >
     <article class={card} id="distribucion-interior">
@@ -24,12 +37,30 @@ const cardTitle = 'm-0 mb-2.5 text-[22px] leading-[1.1] font-bold text-blue';
         Conoce la distribución y medidas de nuestro food truck para planificar tu espacio de trabajo
         de manera eficiente.
       </p>
-      <FloorPlan />
+      <div class="flex flex-1 flex-col justify-center gap-2">
+        <a
+          class="block rounded-md focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-rust"
+          href={planoGrande.src}
+          target="_blank"
+          rel="noopener"
+          data-track="config_plano_ampliar"
+        >
+          <Image
+            src={plano}
+            alt={planoAlt}
+            widths={[480, 800, 1200]}
+            sizes="(max-width: 820px) 100vw, 480px"
+            loading="lazy"
+            class="h-auto w-full rounded-md"
+          />
+        </a>
+        <p class="m-0 text-[12px] text-muted">Pulsa el plano para verlo a tamaño completo.</p>
+      </div>
     </article>
 
     <article class={card}>
       <h2 class={cardTitle}>Ideal para</h2>
-      <ul class="m-0 grid list-none gap-[18px] p-0">
+      <ul class="m-0 flex flex-1 list-none flex-col justify-between gap-[18px] p-0">
         {
           idealPara.map((item) => (
             <li class="grid grid-cols-[42px_1fr] items-start gap-3.5">
@@ -45,19 +76,16 @@ const cardTitle = 'm-0 mb-2.5 text-[22px] leading-[1.1] font-bold text-blue';
     </article>
 
     <article class={card}>
-      <h2 class={cardTitle}>¿Listo para reservar?</h2>
+      <h2 class={cardTitle}>¿Listo para empezar?</h2>
       <p class="mt-0 mb-5 text-[12.5px] leading-[1.5] text-muted">
-        Consulta disponibilidad para tu fecha y asegura tu reserva.
+        Configura tu food truck, comprueba la disponibilidad de tu fecha y recibe tu presupuesto.
       </p>
-      <button
-        class="button button-primary button-block"
-        type="button"
-        data-form-open
-        data-track="cta_config_reservar"
-      >
-        <Icon name="calendar" size={20} />
-        Reservar fecha
-      </button>
+      <div class="flex flex-1 items-end">
+        <a class="button button-primary button-block" href="/configurador" data-track="cta_config_layout">
+          <Icon name="calendar" size={20} />
+          Configura tu food truck
+        </a>
+      </div>
     </article>
   </div>
 </section>

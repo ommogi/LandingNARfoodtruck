@@ -4,7 +4,6 @@ import ContactHero from '../components/contact/ContactHero.astro';
 import ContactProcess from '../components/contact/ContactProcess.astro';
 import ContactForm from '../components/contact/ContactForm.astro';
 import ContactLocation from '../components/contact/ContactLocation.astro';
-import QuoteFormModal from '../components/QuoteFormModal.astro';
 import { site } from '../config/site';
 ---
 
@@ -19,10 +18,6 @@ import { site } from '../config/site';
   <ContactForm />
   <ContactLocation />
 
-  {/* El boton "Reservar fecha" del header abre este modal en todas las paginas. */}
-  <Fragment slot="overlays">
-    <QuoteFormModal />
-  </Fragment>
 </BaseLayout>
 
 <script>

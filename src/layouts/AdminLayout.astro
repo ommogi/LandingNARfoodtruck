@@ -1,0 +1,115 @@
+---
+/**
+ * Envoltorio del panel de gestion.
+ *
+ * A proposito NO usa BaseLayout: el panel no lleva cabecera de navegacion, ni
+ * pie, ni banner de cookies, ni analitica, ni JSON-LD. Nada de eso pinta en una
+ * herramienta interna, y cargarlo solo anadiria ruido y peso.
+ *
+ * Siempre noindex: /admin tampoco entra en el sitemap (ver astro.config.mjs).
+ */
+import '@fontsource/barlow-condensed/600.css';
+import '@fontsource/barlow-condensed/700.css';
+import '../styles/global.css';
+
+interface Props {
+  title: string;
+  /** Email de la sesion. Si viene, se muestra la barra con el boton de salir. */
+  email?: string;
+  /** Paneles con tablas anchas (configurador) piden mas ancho que el calendario. */
+  ancho?: boolean;
+  /** Todo el ancho de la ventana (editor visual del configurador). */
+  completo?: boolean;
+}
+
+const { title, email, ancho = false, completo = false } = Astro.props;
+
+/*
+ * Pestanas del panel, sobre la URL secreta. Astro.url puede llegar ya
+ * reescrito a /admin/... (lo hace src/middleware.ts), asi que se comparan por
+ * el sufijo y no por la ruta completa.
+ */
+const base = Astro.locals.adminBase;
+const secciones = [
+  { sufijo: '', texto: 'Disponibilidad' },
+  { sufijo: '/configurador', texto: 'Configurador' },
+  { sufijo: '/clave', texto: 'Cuenta' },
+];
+const ruta = Astro.url.pathname.replace(/\/$/, '');
+const sufijoActual = (ruta.startsWith('/admin') ? ruta.slice('/admin'.length) : ruta.slice(base.length)).replace(
+  /^\/configurador-lista$/,
+  '/configurador',
+);
+---
+
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex, nofollow" />
+    <meta name="referrer" content="same-origin" />
+    <title>{title} · NAR Food Truck</title>
+    <link rel="preload" href="/fonts/strawford/strawford-regular-webfont.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="icon" href="/favicon-32.png" type="image/png" sizes="32x32" />
+    <link rel="icon" href="/favicon-192.png" type="image/png" sizes="192x192" />
+  </head>
+  <body class="bg-bg-1" data-admin-base={base}>
+    <div
+      class:list={[
+        'mx-auto grid min-h-dvh content-start gap-6 px-4 py-8',
+        completo ? 'max-w-none px-5' : ancho ? 'max-w-[1180px]' : 'max-w-[980px]',
+      ]}
+    >
+      <header class="flex flex-wrap items-center justify-between gap-3">
+        <div>
+          <p class="m-0 text-[11px] font-bold tracking-[0.12em] text-muted uppercase">
+            NAR Food Truck
+          </p>
+          <h1 class="m-0 font-display text-[30px] leading-tight text-night">{title}</h1>
+        </div>
+
+        {
+          email && (
+            <div class="flex items-center gap-3 text-[13px] text-muted">
+              <span>{email}</span>
+              <form method="post" action={`${base}/logout`}>
+                <button
+                  class="min-h-9 cursor-pointer rounded-lg border border-line bg-white px-3 font-semibold text-ink hover:border-night"
+                  type="submit"
+                >
+                  Salir
+                </button>
+              </form>
+            </div>
+          )
+        }
+      </header>
+
+      {
+        email && (
+          <nav class="flex gap-1 border-b border-line" aria-label="Secciones del panel">
+            {secciones.map((s) => (
+              <a
+                href={`${base}${s.sufijo}`}
+                class:list={[
+                  '-mb-px border-b-2 px-4 py-2.5 text-[14px] font-semibold',
+                  sufijoActual === s.sufijo
+                    ? 'border-rust text-night'
+                    : 'border-transparent text-muted hover:text-night',
+                ]}
+                aria-current={sufijoActual === s.sufijo ? 'page' : undefined}
+              >
+                {s.texto}
+              </a>
+            ))}
+          </nav>
+        )
+      }
+
+      <main>
+        <slot />
+      </main>
+    </div>
+  </body>
+</html>

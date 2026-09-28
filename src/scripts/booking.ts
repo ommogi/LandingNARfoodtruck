@@ -11,13 +11,19 @@
  */
 
 import {
+  DISPONIBILIDAD_VACIA,
   ESTADO_ETIQUETA,
   ESTADO_TEXTO,
   MESES,
-  MESES_VISIBLES,
+  contarFechas,
+  esFechaReservable,
   estadoFecha,
+  formatearDiaMes,
+  formatearFecha,
   formatearFechaLarga,
+  parsearFechas,
   toIso,
+  type Disponibilidad,
   type EstadoFecha,
 } from '../data/disponibilidad';
 import { configNames, isConfigId } from '../data/config-ids';
@@ -47,6 +53,11 @@ if (modal && form) {
   const prevButton = form.querySelector<HTMLButtonElement>('[data-cal-prev]');
   const nextMonthButton = form.querySelector<HTMLButtonElement>('[data-cal-next]');
 
+  const seleccion = form.querySelector<HTMLElement>('[data-cal-seleccion]');
+  const seleccionTitulo = form.querySelector<HTMLElement>('[data-cal-seleccion-titulo]');
+  const chips = form.querySelector<HTMLElement>('[data-cal-chips]');
+  const limpiarButton = form.querySelector<HTMLButtonElement>('[data-cal-limpiar]');
+
   const summary = {
     date: form.querySelector<HTMLElement>('[data-summary-date]'),
     config: form.querySelector<HTMLElement>('[data-summary-config]'),
@@ -64,6 +75,13 @@ if (modal && form) {
 
   let currentStep = 1;
 
+  /**
+   * Apaga el boton mientras falte algo del paso actual y escribe el que en la
+   * pista. Lo crea initLeadForm al final del archivo, asi que hasta entonces es
+   * null y todas las llamadas van con `?.`.
+   */
+  let refrescarGate: (() => boolean) | null = null;
+
   const setStatus = (message: string, state: 'error' | '' = '') => {
     if (!status) return;
     status.textContent = message;
@@ -73,18 +91,31 @@ if (modal && form) {
 
   /* --------------------------------------------------- Calendario */
 
+  /**
+   * Disponibilidad real, que la mantiene el cliente desde /admin. Se arranca con
+   * el fallback para poder pintar el calendario de inmediato y se refresca con
+   * GET /api/disponibilidad al abrir el asistente. Asi no hay ni calendario en
+   * blanco ni una peticion por visita que no lo use.
+   */
+  let dispo: Disponibilidad = DISPONIBILIDAD_VACIA;
+
   /** Mes que se esta viendo. Siempre el dia 1, para operar con setMonth(). */
   const view = new Date();
   view.setDate(1);
   view.setHours(0, 0, 0, 0);
 
-  /** Primer y ultimo mes navegables, calculados al cargar la pagina. */
+  /** Primer mes navegable. El ultimo depende de los ajustes y se recalcula. */
   const firstMonth = new Date(view);
-  const lastMonth = new Date(view.getFullYear(), view.getMonth() + MESES_VISIBLES, 1);
+  let lastMonth = new Date(firstMonth);
 
   const monthKey = (date: Date) => `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
 
-  if (monthSelect) {
+  /** Recalcula el rango navegable y repuebla el selector de mes. */
+  const buildMonths = () => {
+    lastMonth = new Date(firstMonth.getFullYear(), firstMonth.getMonth() + dispo.mesesVisibles, 1);
+
+    if (!monthSelect) return;
+    monthSelect.textContent = '';
     const cursor = new Date(firstMonth);
     while (cursor <= lastMonth) {
       const option = document.createElement('option');
@@ -93,29 +124,128 @@ if (modal && form) {
       monthSelect.append(option);
       cursor.setMonth(cursor.getMonth() + 1);
     }
-  }
+  };
+
+  /**
+   * Dias elegidos, en ISO. Se pueden marcar varios y no tienen por que ser
+   * consecutivos: hay alquileres de fin de semana, de feria de tres dias y
+   * peticiones con fechas alternativas sueltas.
+   *
+   * El input oculto deja de ser el estado y pasa a ser solo su serializacion:
+   * lo escribe syncDateInput() para que FormData lo recoja sin que lead.ts
+   * tenga que saber nada de esto.
+   */
+  const fechas = new Set<string>();
+  const fechasOrdenadas = () => [...fechas].sort();
+  const syncDateInput = () => {
+    if (dateInput) dateInput.value = fechasOrdenadas().join(',');
+  };
+
+  /** Coletilla del estado `poca`, que acompana a la fecha hasta el resumen. */
+  const aviso = (iso: string) =>
+    estadoFecha(iso, dispo) === 'poca' ? ' · Poca disponibilidad' : '';
 
   const updateRecap = () => {
-    const iso = dateInput?.value ?? '';
-    const texto = iso
-      ? formatearFechaLarga(iso)
+    const elegidas = fechasOrdenadas();
+    const primera = elegidas[0] as string;
+    const ultima = elegidas[elegidas.length - 1] as string;
+
+    /*
+     * La coletilla acompana a la fecha por los cuatro pasos y llega al resumen
+     * final. El aviso del paso 1 lo borra goToStep(), y el resumen es justo
+     * donde se confirma: si el dato desaparece por el camino, quien reserva un
+     * dia justo se entera por correo y ya es tarde. Con varias fechas se
+     * mantiene por fecha, y no agregado: hay que saber cual de ellas va justa.
+     */
+    const unica = elegidas.length
+      ? `${formatearFechaLarga(primera)}${aviso(primera)}`
       : noDate?.checked
         ? 'Sin fecha definida'
         : 'Ninguna todavía';
 
-    if (recap) recap.textContent = texto;
-    if (summary.date) summary.date.textContent = iso ? formatearFechaLarga(iso) : texto;
+    // En el pie no cabe la lista entera: recuento y horquilla.
+    if (recap) {
+      recap.textContent =
+        elegidas.length > 1
+          ? `${contarFechas(elegidas.length)} · del ${formatearDiaMes(primera)} al ${formatearDiaMes(ultima)}`
+          : unica;
+    }
+
+    // El resumen si las lista todas: es el paso donde se confirma el envio.
+    if (summary.date) {
+      summary.date.textContent =
+        elegidas.length > 1
+          ? elegidas.map((iso) => `${formatearFecha(iso)}${aviso(iso)}`).join('\n')
+          : unica;
+    }
   };
 
-  const setSelectedDate = (iso: string) => {
-    if (!dateInput) return;
-    dateInput.value = iso;
+  /** Fichas de las fechas elegidas, bajo el calendario. */
+  const renderSeleccion = () => {
+    const elegidas = fechasOrdenadas();
 
-    // Elegir dia y "aun no tengo fecha" se excluyen entre si.
-    if (noDate?.checked) noDate.checked = false;
+    if (seleccion) seleccion.hidden = elegidas.length === 0;
+    if (seleccionTitulo) {
+      seleccionTitulo.textContent = elegidas.length
+        ? `${contarFechas(elegidas.length)} ${elegidas.length === 1 ? 'seleccionada' : 'seleccionadas'}`
+        : '';
+    }
+    if (!chips) return;
 
+    chips.textContent = '';
+
+    elegidas.forEach((iso) => {
+      const item = document.createElement('li');
+
+      const chip = document.createElement('span');
+      chip.className = `cal-chip${estadoFecha(iso, dispo) === 'poca' ? ' is-poca' : ''}`;
+
+      const texto = document.createElement('span');
+      texto.textContent = formatearFecha(iso);
+
+      const quitar = document.createElement('button');
+      quitar.type = 'button';
+      quitar.className = 'cal-chip-quitar';
+      quitar.dataset.quitar = iso;
+      quitar.setAttribute('aria-label', `Quitar el ${formatearFecha(iso)}`);
+      quitar.textContent = '×';
+
+      chip.append(texto, quitar);
+      item.append(chip);
+      chips.append(item);
+    });
+  };
+
+  /** Anade o quita un dia. El calendario es un grupo de botones conmutables. */
+  const toggleFecha = (iso: string) => {
+    if (fechas.has(iso)) {
+      fechas.delete(iso);
+    } else {
+      fechas.add(iso);
+      // Elegir dia y "aun no tengo fecha" se excluyen entre si.
+      if (noDate?.checked) noDate.checked = false;
+    }
+
+    syncDateInput();
     updateRecap();
-    setStatus('');
+    renderSeleccion();
+    // El input de la fecha esta oculto y no emite eventos: hay que avisar.
+    refrescarGate?.();
+
+    /*
+     * El estado `poca` existe para avisar, no solo para pintar la celda de otro
+     * color: quien elige uno de esos dias tiene que saber que va justo. El color
+     * y el rotulo son faciles de pasar por alto, y en movil el rotulo ni
+     * siquiera se muestra. No es un error, asi que va en tono neutro.
+     */
+    const pocas = fechasOrdenadas().filter((f) => estadoFecha(f, dispo) === 'poca');
+    setStatus(
+      pocas.length === 0
+        ? ''
+        : pocas.length === 1
+          ? `El ${formatearFecha(pocas[0] as string)} nos queda poca disponibilidad. Podemos seguir, pero confírmalo cuanto antes.`
+          : `En ${pocas.length} de las fechas elegidas nos queda poca disponibilidad. Podemos seguir, pero confírmalo cuanto antes.`,
+    );
   };
 
   /** Celda vacia de los meses vecinos: rellena la semana sin ser seleccionable. */
@@ -142,7 +272,7 @@ if (modal && form) {
 
     for (let day = 1; day <= daysInMonth; day += 1) {
       const iso = toIso(new Date(year, month, day));
-      const estado: EstadoFecha = estadoFecha(iso);
+      const estado: EstadoFecha = estadoFecha(iso, dispo);
       const seleccionable = estado === 'disponible' || estado === 'poca';
 
       const cell = document.createElement('button');
@@ -156,8 +286,9 @@ if (modal && form) {
         `${formatearFechaLarga(iso)}. ${ESTADO_TEXTO[estado]}`,
       );
 
-      if (seleccionable) cell.setAttribute('aria-pressed', String(dateInput?.value === iso));
-      if (dateInput?.value === iso) cell.classList.add('is-selected');
+      // aria-pressed y no aria-selected: son botones conmutables, y varios a la vez.
+      if (seleccionable) cell.setAttribute('aria-pressed', String(fechas.has(iso)));
+      if (fechas.has(iso)) cell.classList.add('is-selected');
 
       const numero = document.createElement('span');
       numero.textContent = String(day);
@@ -203,10 +334,17 @@ if (modal && form) {
     const cell = (event.target as HTMLElement).closest<HTMLButtonElement>('button[data-day]');
     if (!cell || cell.disabled) return;
 
-    setSelectedDate(cell.dataset.day as string);
+    const iso = cell.dataset.day as string;
+    toggleFecha(iso);
     renderMonth();
-    grid.querySelector<HTMLButtonElement>('.is-selected')?.focus();
-    track('booking_date', { estado: estadoFecha(cell.dataset.day as string) });
+
+    /*
+     * Se recupera el foco por la fecha y no por .is-selected: al quitar un dia
+     * esa clase ya no esta en su celda, y el foco se perderia al principio del
+     * documento justo despues de un clic.
+     */
+    grid.querySelector<HTMLButtonElement>(`button[data-day="${iso}"]`)?.focus();
+    track('booking_date', { estado: estadoFecha(iso, dispo), total: fechas.size });
   });
 
   /** Flechas, Inicio y Fin mueven el foco por la rejilla sin salir del mes. */
@@ -235,12 +373,37 @@ if (modal && form) {
     cell.focus();
   });
 
+  /* Quitar una fecha desde su ficha, sin tener que volver a su mes. */
+  chips?.addEventListener('click', (event) => {
+    const boton = (event.target as HTMLElement).closest<HTMLButtonElement>('[data-quitar]');
+    if (!boton) return;
+
+    toggleFecha(boton.dataset.quitar as string);
+    renderMonth();
+    // La ficha pulsada ya no existe: el foco va al bloque, que sigue en pantalla.
+    limpiarButton?.focus();
+  });
+
+  limpiarButton?.addEventListener('click', () => {
+    fechas.clear();
+    syncDateInput();
+    updateRecap();
+    renderSeleccion();
+    renderMonth();
+    refrescarGate?.();
+    setStatus('');
+    grid?.querySelector<HTMLButtonElement>('button:not(:disabled)')?.focus();
+  });
+
   noDate?.addEventListener('change', () => {
-    if (noDate.checked && dateInput) {
-      dateInput.value = '';
+    if (noDate.checked) {
+      fechas.clear();
+      syncDateInput();
+      renderSeleccion();
       renderMonth();
     }
     updateRecap();
+    refrescarGate?.();
     setStatus('');
   });
 
@@ -254,9 +417,9 @@ if (modal && form) {
     ].filter((field) => field.name !== 'website');
 
   const validateStep = (step: number) => {
-    // El paso 1 no tiene campos con required: la fecha es un input oculto.
-    if (step === 1 && !dateInput?.value && !noDate?.checked) {
-      setStatus('Elige una fecha o marca que aún no la tienes definida.', 'error');
+    // El paso 1 no tiene campos con required: las fechas van en un input oculto.
+    if (step === 1 && fechas.size === 0 && !noDate?.checked) {
+      setStatus('Elige al menos una fecha o marca que aún no las tienes definidas.', 'error');
       return false;
     }
 
@@ -302,6 +465,8 @@ if (modal && form) {
 
     setStatus('');
     if (panel) panel.scrollTop = 0;
+    // Despues de reescribir el rotulo y la pista: la puerta manda sobre las dos.
+    refrescarGate?.();
     if (!silent) track('booking_step', { step: currentStep });
   };
 
@@ -349,7 +514,9 @@ if (modal && form) {
 
   const reset = () => {
     form.reset();
-    if (dateInput) dateInput.value = '';
+    fechas.clear();
+    syncDateInput();
+    renderSeleccion();
     form
       .querySelectorAll('.is-invalid')
       .forEach((field) => field.classList.remove('is-invalid'));
@@ -358,7 +525,65 @@ if (modal && form) {
     goToStep(1, true);
   };
 
+  /**
+   * Trae la disponibilidad una sola vez por visita y repinta. Si la peticion
+   * falla se sigue con el fallback: el asistente nunca se queda sin calendario,
+   * y de todas formas /api/presupuesto revalida la fecha al enviar.
+   */
+  let cargaDispo: Promise<void> | null = null;
+
+  const cargarDisponibilidad = () => {
+    cargaDispo ??= fetch('/api/disponibilidad', { headers: { Accept: 'application/json' } })
+      .then((response) => {
+        if (!response.ok) throw new Error(String(response.status));
+        return response.json() as Promise<Disponibilidad>;
+      })
+      .then((data) => {
+        dispo = data;
+        buildMonths();
+
+        /*
+         * El mes que se estaba viendo puede haberse quedado fuera del rango si
+         * el cliente ha reducido los meses visibles.
+         */
+        if (view > lastMonth) view.setFullYear(lastMonth.getFullYear(), lastMonth.getMonth(), 1);
+
+        // Una fecha ya elegida puede haber dejado de estar libre entre medias.
+        const caidas = fechasOrdenadas().filter((iso) => !esFechaReservable(iso, dispo));
+        if (caidas.length) {
+          caidas.forEach((iso) => fechas.delete(iso));
+          syncDateInput();
+          if (currentStep === 1) {
+            setStatus(
+              caidas.length === 1
+                ? `El ${formatearFecha(caidas[0] as string)} ya no está disponible. Elige otra fecha, por favor.`
+                : `${caidas.length} de las fechas elegidas ya no están disponibles y se han quitado. Elige otras, por favor.`,
+              'error',
+            );
+          }
+        }
+
+        /*
+         * Se repinta todo aunque no se haya caido ninguna: la coletilla y el
+         * tinte de `poca` salen de `dispo`, y un dia elegido antes de la carga
+         * puede haber pasado a poca disponibilidad sin dejar de ser reservable.
+         */
+        updateRecap();
+        renderSeleccion();
+        renderMonth();
+      })
+      .catch((error) => {
+        console.warn('[booking] No se pudo cargar la disponibilidad:', error);
+        // Se deja a null para reintentar la proxima vez que se abra el asistente.
+        cargaDispo = null;
+      });
+
+    return cargaDispo;
+  };
+
   const open = (trigger?: HTMLElement, options: { config?: string; step?: number } = {}) => {
+    void cargarDisponibilidad();
+
     // Tras un envio correcto el formulario esta oculto: se vuelve a empezar.
     if (success && !success.classList.contains('hidden')) {
       success.classList.add('hidden');
@@ -401,7 +626,7 @@ if (modal && form) {
     if (!modal.hidden) closeModal(modal);
   });
 
-  initLeadForm(form, {
+  const lead = initLeadForm(form, {
     extraData: () => ({ config: form.querySelector<HTMLInputElement>('[name="config"]:checked')?.value ?? '' }),
     onSuccess: () => {
       form.hidden = true;
@@ -409,9 +634,36 @@ if (modal && form) {
       success?.setAttribute('tabindex', '-1');
       success?.focus();
     },
+    /*
+     * El boton es el mismo para avanzar y para enviar, asi que la puerta mira
+     * solo el paso que se esta viendo: con el formulario entero se quedaria
+     * apagado en el paso 1 por campos que aun no ha visto nadie.
+     */
+    gate: {
+      campos: () => stepFields(currentStep),
+      // El paso 1 no se puede expresar con checkValidity(): la fecha vive en un
+      // input oculto y sin required. Misma condicion que validateStep().
+      extraOk: () => currentStep !== 1 || fechas.size > 0 || Boolean(noDate?.checked),
+      extraLabel: 'elegir una fecha (o marcar que aún no la tienes)',
+      aviso: hint,
+      textoOk: () => HINTS[currentStep] ?? '',
+    },
   });
 
+  refrescarGate = lead?.refrescarGate ?? null;
+
+  /*
+   * El navegador restaura el valor de los campos al recargar o al volver atras,
+   * incluidos los ocultos. Se rehidrata el conjunto desde el input para que no
+   * queden fechas en el formulario que la rejilla no pinta.
+   */
+  parsearFechas(dateInput?.value ?? '').forEach((iso) => fechas.add(iso));
+  syncDateInput();
+
+  buildMonths();
   renderMonth();
+  renderSeleccion();
+  updateRecap();
   goToStep(1, true);
 }
 

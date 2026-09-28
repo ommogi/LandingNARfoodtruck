@@ -1,0 +1,30 @@
+---
+/**
+ * Configurador FOODD en 10 pasos.
+ *
+ * Se renderiza en servidor para leer el catalogo vivo de Supabase (lo edita el
+ * cliente desde el editor visual del panel). El HTML se cachea en el CDN 60 s,
+ * igual que /api/disponibilidad: Supabase recibe como mucho una consulta por
+ * minuto. Todo el configurador vive en ConfiguradorApp, que comparte con la
+ * vista previa del editor.
+ */
+import BaseLayout from '../layouts/BaseLayout.astro';
+import ConfiguradorApp from '../components/configurador/ConfiguradorApp.astro';
+import { getCatalogo } from '../lib/configurador-server';
+
+export const prerender = false;
+
+const catalogo = await getCatalogo();
+
+Astro.response.headers.set('Cache-Control', 'public, max-age=0, s-maxage=60, stale-while-revalidate=300');
+---
+
+<BaseLayout
+  title="Configura tu FOODD | NAR Food Truck"
+  description="Configura tu food truck paso a paso: proyecto, fecha, equipamiento, cocinero, ambientación, branding y logística. Recibe un presupuesto personalizado."
+  path="/configurador"
+  leadSource="configurador"
+  bare
+>
+  <ConfiguradorApp catalogo={catalogo} />
+</BaseLayout>

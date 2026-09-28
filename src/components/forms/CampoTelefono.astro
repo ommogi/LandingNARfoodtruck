@@ -1,0 +1,60 @@
+---
+/**
+ * Telefono: desplegable de prefijo + campo del numero.
+ *
+ * El `name="phone"` se queda en el input VISIBLE y no en uno oculto: la
+ * validacion nativa (required, minlength) no se aplica a los campos ocultos, y
+ * setFieldValidity() de src/scripts/lead.ts depende enteramente de ella.
+ *
+ * El prefijo viaja aparte como `phonePrefix` y los junta /api/presupuesto, que
+ * ademas comprueba que sea uno de los conocidos antes de meterlo en el correo.
+ */
+import Icon from '../Icon.astro';
+import { PREFIJOS, PREFIJO_POR_DEFECTO } from '../../data/prefijos';
+
+interface Props {
+  /** El icono de WhatsApp que lleva el formulario de /contacto. */
+  icono?: boolean;
+  placeholder?: string;
+}
+
+const { icono = false, placeholder } = Astro.props;
+---
+
+<span class="grid grid-cols-[auto_1fr] gap-2">
+  <select
+    class="field field-select w-auto min-w-[104px] font-semibold"
+    name="phonePrefix"
+    aria-label="Prefijo del país"
+  >
+    {
+      PREFIJOS.map((entrada) => (
+        <option value={entrada.prefijo} selected={entrada.prefijo === PREFIJO_POR_DEFECTO}>
+          {entrada.prefijo} {entrada.pais}
+        </option>
+      ))
+    }
+  </select>
+
+  <span class="relative block">
+    <input
+      class:list={['field', icono && 'pr-11']}
+      type="tel"
+      name="phone"
+      autocomplete="tel"
+      placeholder={placeholder}
+      required
+      minlength="6"
+      maxlength="40"
+    />
+    {
+      icono && (
+        <Icon
+          name="whatsapp"
+          size={20}
+          class="pointer-events-none absolute top-1/2 right-3 -translate-y-1/2 text-muted"
+        />
+      )
+    }
+  </span>
+</span>

@@ -1,6 +1,6 @@
 ---
 import { Image } from 'astro:assets';
-import hero from '../../assets/hero-foodtruck.png';
+import hero from '../../assets/hero-foodtruck.webp';
 import Icon from '../Icon.astro';
 import { site } from '../../config/site';
 
@@ -28,8 +28,12 @@ const points = [
       class="size-full object-cover object-center max-b820:object-[62%_center]"
     />
   </div>
+  {/*
+    La foto es solo ambiente: un velo negro en todo el ancho (mas denso donde
+    esta el texto) la apaga para que el titular mande.
+  */}
   <div
-    class="absolute inset-0 bg-[linear-gradient(90deg,rgb(10_28_38_/_92%)_0%,rgb(10_28_38_/_70%)_38%,rgb(0_0_0_/_14%)_72%,rgb(0_0_0_/_26%)_100%)] max-b820:bg-[linear-gradient(90deg,rgb(10_28_38_/_93%),rgb(10_28_38_/_62%))]"
+    class="absolute inset-0 bg-[linear-gradient(90deg,rgb(0_0_0_/_88%)_0%,rgb(0_0_0_/_75%)_45%,rgb(0_0_0_/_60%)_100%)] max-b820:bg-[rgb(0_0_0_/_80%)]"
     aria-hidden="true"
   >
   </div>
@@ -61,15 +65,14 @@ const points = [
       </ul>
 
       <div class="flex flex-wrap gap-3.5 max-b560:grid print:hidden">
-        <button
+        <a
           class="button button-primary max-b560:w-full"
-          type="button"
-          data-form-open
+          href="/configurador"
           data-track="cta_hero_click"
         >
           <Icon name="calendar" size={20} />
-          Solicitar presupuesto
-        </button>
+          Configura tu food truck
+        </a>
         <button class="button button-ghost max-b560:w-full" type="button" data-video-open>
           <Icon name="play" size={20} />
           Ver vídeo

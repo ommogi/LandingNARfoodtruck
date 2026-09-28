@@ -13,26 +13,26 @@
  * en src/scripts/booking.ts.
  */
 import { Image } from 'astro:assets';
-import logo from '../../assets/logo-nar-horizontal.png';
+import logo from '../../assets/logo-nar-horizontal.webp';
 import { contact, eventTypes, site, social } from '../../config/site';
 import { configurations, formatPrice } from '../../data/configuraciones';
+import CampoInvitados from '../forms/CampoInvitados.astro';
+import CampoTelefono from '../forms/CampoTelefono.astro';
 import Icon from '../Icon.astro';
 import BookingAside from './BookingAside.astro';
 import BookingCalendar from './BookingCalendar.astro';
 
 const pasos = [
-  { n: 1, label: 'Fecha', next: 'Detalles del evento' },
+  { n: 1, label: 'Fechas', next: 'Detalles del evento' },
   { n: 2, label: 'Detalles', next: 'Datos del evento' },
   { n: 3, label: 'Evento', next: 'Tus datos de contacto' },
   { n: 4, label: 'Contacto', next: '' },
 ];
 
 const label = 'grid gap-1.5 text-sm font-semibold';
-/* `is-invalid` lo pone src/scripts/lead.ts cuando el campo no valida. */
-const field = [
-  'w-full min-h-[46px] px-3 py-[11px] rounded-lg border border-line bg-white font-normal',
-  'is-invalid:border-[#b42318] is-invalid:shadow-[0_0_0_3px_rgb(180_35_24_/_12%)]',
-].join(' ');
+/* El estilo del campo es la clase .field de global.css, compartida con los otros
+ * dos formularios. `is-invalid` la pone src/scripts/lead.ts al no validar. */
+const field = 'field';
 const required = 'text-rust no-underline';
 
 const accentBg = { blue: 'bg-blue', rust: 'bg-rust', night: 'bg-night' };
@@ -116,14 +116,20 @@ const accentText = { blue: 'text-blue', rust: 'text-rust', night: 'text-night' }
           <section data-step="1" aria-label="Paso 1: fecha">
             <BookingCalendar />
 
-            {/* Lo rellena el calendario al seleccionar un dia. */}
+            {/*
+              Lo rellena el calendario: los dias elegidos, en ISO y separados por
+              comas. Va en un unico campo porque lead.ts arma el cuerpo con
+              Object.fromEntries(new FormData(...)), que se quedaria solo con el
+              ultimo de varios inputs con el mismo name. Lo parsea
+              parsearFechas() en src/data/disponibilidad.ts.
+            */}
             <input type="hidden" name="date" data-booking-date />
 
             <label
               class="mt-4 grid grid-cols-[auto_1fr] items-start gap-2.5 text-sm font-normal"
             >
               <input class="mt-[3px] size-5 min-h-5" type="checkbox" data-booking-nodate />
-              <span>Aún no tengo la fecha definida. Quiero que me propongáis opciones.</span>
+              <span>Aún no tengo las fechas definidas. Quiero que me propongáis opciones.</span>
             </label>
           </section>
 
@@ -201,15 +207,7 @@ const accentText = { blue: 'text-blue', rust: 'text-rust', night: 'text-night' }
 
             <label class={`${label} mt-4 max-w-[280px]`}>
               <span>Número de invitados</span>
-              <input
-                class={field}
-                type="number"
-                name="guests"
-                min="1"
-                max="5000"
-                inputmode="numeric"
-                placeholder="Aproximado"
-              />
+              <CampoInvitados placeholder="Aprox." />
             </label>
 
             <p class="mt-3 mb-0 text-[12.5px] text-muted">
@@ -228,7 +226,7 @@ const accentText = { blue: 'text-blue', rust: 'text-rust', night: 'text-night' }
             <div class="grid grid-cols-2 gap-4 max-b620:grid-cols-1">
               <label class={label}>
                 <span>Tipo de evento <abbr class={required} title="obligatorio">*</abbr></span>
-                <select class={field} name="eventType" required>
+                <select class={`${field} field-select`} name="eventType" required>
                   <option value="">Selecciona</option>
                   {eventTypes.map((type) => <option>{type}</option>)}
                 </select>
@@ -260,7 +258,7 @@ const accentText = { blue: 'text-blue', rust: 'text-rust', night: 'text-night' }
           <section data-step="4" aria-label="Paso 4: contacto" hidden>
             <h3 class="m-0 text-[22px] leading-none font-bold text-blue">¿Cómo te contactamos?</h3>
             <p class="mt-1.5 mb-4 text-[13px] text-muted">
-              Te respondemos con la disponibilidad real de la fecha en menos de 24 horas.
+              Te respondemos con la disponibilidad real de las fechas en menos de 24 horas.
             </p>
 
             <div class="grid grid-cols-2 gap-4 max-b620:grid-cols-1">
@@ -283,15 +281,7 @@ const accentText = { blue: 'text-blue', rust: 'text-rust', night: 'text-night' }
 
               <label class={label}>
                 <span>Teléfono <abbr class={required} title="obligatorio">*</abbr></span>
-                <input
-                  class={field}
-                  type="tel"
-                  name="phone"
-                  autocomplete="tel"
-                  required
-                  minlength="6"
-                  maxlength="40"
-                />
+                <CampoTelefono />
               </label>
             </div>
 
@@ -300,8 +290,11 @@ const accentText = { blue: 'text-blue', rust: 'text-rust', night: 'text-night' }
               class="mt-5 mb-4 grid grid-cols-3 gap-4 rounded-xl border border-line bg-white p-4 text-sm max-b620:grid-cols-1"
             >
               <div>
-                <dt class="text-xs font-bold tracking-[0.04em] text-muted uppercase">Fecha</dt>
-                <dd class="m-0 mt-1 font-semibold" data-summary-date>Por definir</dd>
+                <dt class="text-xs font-bold tracking-[0.04em] text-muted uppercase">Fechas</dt>
+                {/* whitespace-pre-line: con varias fechas updateRecap() escribe una por linea. */}
+                <dd class="m-0 mt-1 font-semibold whitespace-pre-line" data-summary-date>
+                  Por definir
+                </dd>
               </div>
               <div>
                 <dt class="text-xs font-bold tracking-[0.04em] text-muted uppercase">
@@ -316,7 +309,13 @@ const accentText = { blue: 'text-blue', rust: 'text-rust', night: 'text-night' }
             </dl>
 
             <label class="grid grid-cols-[auto_1fr] items-start gap-2.5 text-sm font-normal">
-              <input class="mt-[3px] size-5 min-h-5" type="checkbox" name="consent" required />
+              <input
+                class="mt-[3px] size-5 min-h-5"
+                type="checkbox"
+                name="consent"
+                data-label="aceptar la política de privacidad"
+                required
+              />
               <span>
                 He leído y acepto la <a
                   class="text-rust underline"
@@ -341,7 +340,7 @@ const accentText = { blue: 'text-blue', rust: 'text-rust', night: 'text-night' }
           >
             <div>
               <p class="m-0 text-xs font-bold tracking-[0.04em] text-muted uppercase">
-                Fecha seleccionada
+                Fechas seleccionadas
               </p>
               <p class="mt-1.5 mb-0 flex items-center gap-2.5 font-semibold">
                 <Icon name="calendar" size={22} class="text-rust" />
@@ -354,7 +353,7 @@ const accentText = { blue: 'text-blue', rust: 'text-rust', night: 'text-night' }
                 ¿Tienes dudas?
               </p>
               <p class="mt-1.5 mb-2 text-[12.5px] leading-[1.4] text-muted">
-                Escríbenos por WhatsApp y te ayudamos a encontrar la mejor fecha.
+                Escríbenos por WhatsApp y te ayudamos a encontrar las mejores fechas.
               </p>
               <a
                 class="button button-line min-h-11 px-4 text-base"
@@ -407,7 +406,7 @@ const accentText = { blue: 'text-blue', rust: 'text-rust', night: 'text-night' }
           <Icon name="check-circle" size={54} class="mx-auto text-[#17663a]" />
           <h3 class="mt-4 mb-2 text-[26px] font-bold">Solicitud enviada</h3>
           <p class="mx-auto mb-0 max-w-[440px] text-sm text-muted">
-            Gracias. Hemos recibido tu solicitud y te confirmamos la disponibilidad de la fecha en
+            Gracias. Hemos recibido tu solicitud y te confirmamos la disponibilidad de las fechas en
             menos de 24 horas.
           </p>
         </div>

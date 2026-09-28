@@ -48,24 +48,4 @@ document.querySelectorAll<HTMLElement>('[data-config-plan]').forEach((el) => {
   });
 });
 
-/*
- * "Seleccionar esta configuracion": cierra la ficha y abre el asistente de
- * reserva con esa configuracion marcada, para que llegue como dato estructurado
- * (acaba en el asunto del correo) y no como texto libre.
- *
- * Se comunica por evento y no llamando a booking.ts para no depender de su
- * estado interno; el que escucha es src/scripts/booking.ts.
- */
-document.querySelectorAll<HTMLElement>('[data-config-select]').forEach((trigger) => {
-  trigger.addEventListener('click', () => {
-    const id = trigger.dataset.configSelect as string;
-
-    closeConfig();
-    document.dispatchEvent(
-      new CustomEvent('booking:open', { detail: { config: id, step: 1 } }),
-    );
-    track('config_select', { config: id });
-  });
-});
-
 export {};

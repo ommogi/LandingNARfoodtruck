@@ -1,0 +1,25 @@
+---
+/**
+ * Boton «+ Añadir opción» de la vista previa del editor. Fuera del editor no
+ * pinta nada. El panel lo recibe como data-cf-add="tipo|padre".
+ */
+import Icon from '../Icon.astro';
+import type { Catalogo, TipoOpcion } from '../../data/configurador';
+
+interface Props {
+  c: Catalogo;
+  tipo: TipoOpcion;
+  padre?: string | null;
+  texto?: string;
+}
+
+const { c, tipo, padre = null, texto = 'Añadir opción' } = Astro.props;
+---
+
+{
+  c.editor && (
+    <button type="button" class="cf-anadir" data-cf-add={`${tipo}|${padre ?? ''}`}>
+      <Icon name="plus" size={18} /> {texto}
+    </button>
+  )
+}

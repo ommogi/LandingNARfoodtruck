@@ -1,0 +1,68 @@
+---
+/**
+ * Contrasena del panel: crearla (primer acceso), restablecerla (tras el
+ * codigo por correo) o cambiarla con la sesion abierta. La logica esta en
+ * src/scripts/admin-clave.ts y el guardado en /api/admin/clave.
+ */
+import AdminLayout from '../../layouts/AdminLayout.astro';
+import { COOKIE_CLAVE_PENDIENTE, MIN_LARGO_CLAVE } from '../../lib/admin';
+
+export const prerender = false;
+
+const recuperando = Boolean(Astro.cookies.get(COOKIE_CLAVE_PENDIENTE)?.value);
+
+const input =
+  'min-h-11 w-full rounded-lg border border-line bg-white px-3 text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue';
+const label = 'grid gap-1.5 text-[13px] font-semibold text-ink';
+---
+
+<AdminLayout title={recuperando ? 'Crea tu contraseña' : 'Cuenta'} email={Astro.locals.userEmail}>
+  <div class="grid max-w-[460px] gap-4">
+    <form class="grid gap-4 rounded-card border border-line bg-white p-6 shadow-card" data-clave-form data-recuperando={recuperando ? '' : undefined}>
+      <p class="m-0 text-[14px] text-muted">
+        {
+          recuperando
+            ? 'Has entrado con el código del correo. Elige una contraseña nueva para acceder al panel a partir de ahora.'
+            : 'Cambia la contraseña con la que entras al panel.'
+        }
+      </p>
+
+      {
+        !recuperando && (
+          <label class={label}>
+            Contraseña actual
+            <input class={input} type="password" name="actual" autocomplete="current-password" required />
+          </label>
+        )
+      }
+
+      <label class={label}>
+        Contraseña nueva
+        <input class={input} type="password" name="nueva" autocomplete="new-password" required minlength={MIN_LARGO_CLAVE} maxlength="128" />
+        <span class="font-normal text-muted">Mínimo {MIN_LARGO_CLAVE} caracteres. Mejor una frase larga que una palabra rara.</span>
+      </label>
+
+      <label class={label}>
+        Repite la contraseña nueva
+        <input class={input} type="password" name="repetida" autocomplete="new-password" required minlength={MIN_LARGO_CLAVE} maxlength="128" />
+      </label>
+
+      <label class="flex items-center gap-2 text-[13px] text-muted">
+        <input type="checkbox" data-clave-ver /> Mostrar contraseñas
+      </label>
+
+      <button
+        class="min-h-11 cursor-pointer rounded-lg bg-rust px-4 font-semibold text-white hover:bg-rust-dark disabled:cursor-not-allowed disabled:opacity-60"
+        type="submit"
+        data-clave-enviar
+      >
+        Guardar contraseña
+      </button>
+      <p class="m-0 min-h-5 text-[13px] is-error:text-rust is-success:text-blue" data-clave-status role="status"></p>
+    </form>
+  </div>
+
+  <script>
+    import '../../scripts/admin-clave';
+  </script>
+</AdminLayout>

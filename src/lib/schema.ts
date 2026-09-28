@@ -13,10 +13,10 @@
  */
 
 import { site, contact, social } from '../config/site';
-import { configurations } from '../data/configuraciones';
+import { AJUSTES_RESPALDO } from '../data/configurador';
 import type { FaqItem } from '../data/faq';
 import type { ProcessStep } from '../data/proceso';
-import logo from '../assets/logo-nar-horizontal.png';
+import logo from '../assets/logo-nar-horizontal.webp';
 
 /* --------------------------------------------------- Identificadores */
 
@@ -71,8 +71,8 @@ export function organizationNode() {
       '@type': 'AdministrativeArea',
       name: site.areaServed,
     },
-    // Rango de precio real: 890 - 1690 EUR/dia segun configuracion.
-    priceRange: '890€ - 1690€',
+    // Precio de partida del FOODD Rental Base (+ IVA / dia); el resto va a presupuesto.
+    priceRange: `Desde ${AJUSTES_RESPALDO.precioDesde}€`,
     currenciesAccepted: 'EUR',
     knowsAbout: [
       'Alquiler de food trucks',
@@ -122,11 +122,12 @@ export function webPageNode({ title, description, canonical }: WebPageInput) {
 /* --------------------------------------------------- Servicio y precios */
 
 /**
- * El servicio de alquiler con las cuatro configuraciones como ofertas.
- * Los precios salen de src/data/configuraciones.ts, los mismos que se pintan
- * en las tarjetas de /configuraciones.
+ * El servicio de alquiler con el FOODD Rental Base como oferta de partida.
+ * El precio es el mismo "Desde" que pinta /configuraciones (ConfigCta); el
+ * equipamiento extra se presupuesta en /configurador y no se anuncia aqui.
  */
 export function serviceOffersNode() {
+  const precio = AJUSTES_RESPALDO.precioDesde;
   return {
     '@type': 'Service',
     '@id': `${site.url}/#service`,
@@ -138,31 +139,27 @@ export function serviceOffersNode() {
       '@type': 'AdministrativeArea',
       name: site.areaServed,
     },
-    hasOfferCatalog: {
-      '@type': 'OfferCatalog',
-      name: 'Configuraciones de equipamiento',
-      itemListElement: configurations.map((config) => ({
-        '@type': 'Offer',
-        name: `Configuración ${config.name}`,
-        description: config.cardText,
-        price: config.price,
+    offers: {
+      '@type': 'Offer',
+      name: 'FOODD Rental Base',
+      description:
+        'Remolque con nevera, congelador, zona de trabajo e iluminación. Equipamiento y servicios adicionales bajo presupuesto.',
+      price: precio,
+      priceCurrency: 'EUR',
+      priceSpecification: {
+        '@type': 'UnitPriceSpecification',
+        price: precio,
         priceCurrency: 'EUR',
-        priceSpecification: {
-          '@type': 'UnitPriceSpecification',
-          price: config.price,
-          priceCurrency: 'EUR',
-          unitText: 'día',
-          referenceQuantity: {
-            '@type': 'QuantitativeValue',
-            value: 1,
-            unitCode: 'DAY',
-          },
+        valueAddedTaxIncluded: false,
+        unitText: 'día',
+        referenceQuantity: {
+          '@type': 'QuantitativeValue',
+          value: 1,
+          unitCode: 'DAY',
         },
-        availability: 'https://schema.org/InStock',
-        // Sin fragmento: los `id` de las tarjetas cuelgan de modales ocultos,
-        // asi que un ancla llevaria a contenido que no se ve al llegar.
-        url: `${site.url}/configuraciones`,
-      })),
+      },
+      availability: 'https://schema.org/InStock',
+      url: `${site.url}/configurador`,
     },
   };
 }

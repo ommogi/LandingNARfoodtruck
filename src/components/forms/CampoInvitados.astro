@@ -1,0 +1,38 @@
+---
+/**
+ * Numero de invitados con botones de restar y sumar a los lados.
+ *
+ * El campo sigue siendo un <input type="number"> normal: se puede teclear, y la
+ * validacion nativa (min, max, required) funciona igual que antes. Los botones
+ * solo llaman a stepUp()/stepDown(); la logica esta en src/scripts/stepper.ts.
+ */
+interface Props {
+  required?: boolean;
+  placeholder?: string;
+  /** Clases del contenedor, para los anchos que cada formulario ya usaba. */
+  class?: string;
+}
+
+const { required = false, placeholder, class: clase } = Astro.props;
+---
+
+<span class:list={['stepper', clase]} data-stepper-grupo>
+  <button class="stepper-boton" type="button" data-stepper="-1" aria-label="Quitar invitados">
+    −
+  </button>
+
+  <input
+    class="field"
+    type="number"
+    name="guests"
+    min="1"
+    max="5000"
+    inputmode="numeric"
+    placeholder={placeholder}
+    required={required}
+  />
+
+  <button class="stepper-boton" type="button" data-stepper="1" aria-label="Añadir invitados">
+    +
+  </button>
+</span>

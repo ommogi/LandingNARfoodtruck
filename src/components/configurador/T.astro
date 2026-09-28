@@ -1,0 +1,25 @@
+---
+/**
+ * Texto editable del configurador. Fuera del editor es un <span> normal; en
+ * la vista previa del panel lleva data-cf-edit para poder pulsarlo, y
+ * data-cf-vars para que el cambio en vivo pueda rellenar las plantillas.
+ */
+import { t, refEdicion, type ClaveTexto } from '../../data/configurador-textos';
+import type { Catalogo } from '../../data/configurador';
+
+interface Props {
+  c: Catalogo;
+  k: ClaveTexto;
+  vars?: Record<string, string | number>;
+  class?: string;
+}
+
+const { c, k, vars, class: clase } = Astro.props;
+---
+
+<span
+  class:list={['cf-t', clase]}
+  data-cf-t={k}
+  data-cf-edit={refEdicion(c, `t:${k}`)}
+  data-cf-vars={c.editor && vars ? JSON.stringify(vars) : undefined}
+>{t(c, k, vars)}</span>

@@ -2,38 +2,30 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 import ConfigHero from '../components/config/ConfigHero.astro';
 import ConfigInterior from '../components/config/ConfigInterior.astro';
-import ConfigCards from '../components/config/ConfigCards.astro';
+import ConfigCta from '../components/config/ConfigCta.astro';
 import ConfigLayout from '../components/config/ConfigLayout.astro';
 import ConfigPerks from '../components/config/ConfigPerks.astro';
-import QuoteFormModal from '../components/QuoteFormModal.astro';
-import BookingModal from '../components/booking/BookingModal.astro';
 import { serviceOffersNode } from '../lib/schema';
 
-/* Las cuatro ofertas salen de src/data/configuraciones.ts, los mismos precios
-   que pintan las tarjetas de esta pagina. */
+/* La oferta del JSON-LD es el FOODD Rental Base, el mismo "Desde" que pinta
+   ConfigCta. El equipamiento ya no va por paquetes: se elige en /configurador. */
 ---
 
 <BaseLayout
-  title="Configuraciones del food truck: Base, Compact, Profesional y Max | NAR"
-  description="Cuatro configuraciones de equipamiento desde 890 € al día. Compara equipamiento, medidas interiores y especificaciones técnicas de nuestro food truck."
+  title="Configura tu food truck a medida | NAR"
+  description="Configura tu food truck a medida: equipamiento, cocinero, ambientación y branding. Desde 450 € + IVA al día. Consulta medidas interiores y especificaciones técnicas."
   path="/configuraciones"
   leadSource="landing-configuraciones"
   schemas={[serviceOffersNode()]}
 >
   <ConfigHero />
   <ConfigInterior />
-  <ConfigCards />
+  <ConfigCta />
   <ConfigLayout />
   <ConfigPerks />
 
-  <Fragment slot="overlays">
-    <QuoteFormModal />
-    <BookingModal />
-  </Fragment>
 </BaseLayout>
 
 <script>
   import '../scripts/landing';
-  import '../scripts/booking';
-  import '../scripts/configuraciones';
 </script>

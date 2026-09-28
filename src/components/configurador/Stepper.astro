@@ -1,0 +1,52 @@
+---
+/**
+ * Cabecera del configurador: logo NAR, los 10 pasos y salida. Cada paso es un
+ * boton que lleva a el si ya se puede llegar (lo decide navegacion.ts). En
+ * movil se reduce a "Paso N de 10" con barra de progreso.
+ */
+import { Image } from 'astro:assets';
+import Icon from '../Icon.astro';
+import T from './T.astro';
+import logo from '../../assets/logo-nar-horizontal.webp';
+import { PASOS, type Catalogo } from '../../data/configurador';
+import type { ClaveTexto } from '../../data/configurador-textos';
+
+interface Props {
+  c: Catalogo;
+}
+
+const { c } = Astro.props;
+---
+
+<header class="cf-top">
+  <a href="/" class="cf-logo" aria-label="Ir a la web de NAR Food Truck">
+    <Image src={logo} alt="NAR Food Truck" height={44} widths={[160, 320]} sizes="160px" loading="eager" />
+  </a>
+
+  <nav class="cf-steps-nav" aria-label="Pasos del configurador">
+    <ol class="cf-steps">
+      {
+        PASOS.map((p, i) => (
+          <li class="cf-step" data-cf-step={p.id}>
+            <button type="button" data-ir={p.id} disabled>
+              <span class="cf-step-num">
+                <span data-cf-step-n>{i + 1}</span>
+                <Icon name="tick" size={16} class="cf-step-tick" />
+              </span>
+              <span class="cf-step-label"><T c={c} k={`paso.${p.id}` as ClaveTexto} /></span>
+            </button>
+          </li>
+        ))
+      }
+    </ol>
+  </nav>
+
+  <div class="cf-top-movil" aria-hidden="true">
+    <p><strong data-cf-movil-paso></strong> <span data-cf-movil-etiqueta></span></p>
+    <span class="cf-progress"><span data-cf-progress></span></span>
+  </div>
+
+  <a href="/" class="cf-salir" aria-label="Salir del configurador">
+    <Icon name="close" size={24} />
+  </a>
+</header>

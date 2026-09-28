@@ -1,0 +1,71 @@
+---
+/** Paso 3 · ¿Como quieres utilizar FOODD? Familia de uso y subconfiguracion. */
+import Icon from '../Icon.astro';
+import OpcionFoto from './OpcionFoto.astro';
+import OpcionIcono from './OpcionIcono.astro';
+import PasoCabecera from './PasoCabecera.astro';
+import Aviso from './Aviso.astro';
+import AnadirOpcion from './AnadirOpcion.astro';
+import T from './T.astro';
+import { opcionesDe, type Catalogo } from '../../data/configurador';
+import { t } from '../../data/configurador-textos';
+
+interface Props {
+  c: Catalogo;
+}
+
+const { c } = Astro.props;
+const usos = opcionesDe(c, 'uso');
+/* En el editor se ven todos los usos, tambien los restringidos a un tipo de proyecto. */
+const cuandoUso = (visible: string[]) => (visible.length && !c.editor ? `proyecto.tipo=${visible.join('|')}` : undefined);
+---
+
+<section class="cf-paso" data-paso="configuracion" hidden>
+  <PasoCabecera c={c} paso="configuracion">
+    <p class="cf-head-lema">
+      <Icon name="sparkles" size={28} />
+      <T c={c} k="general.lema" />
+    </p>
+  </PasoCabecera>
+
+  <div class="cf-grid cf-grid-4" role="group" aria-label="Uso de FOODD">
+    {usos.map((o) => <OpcionFoto c={c} opcion={o} campo="configuracion.uso" cuando={cuandoUso(o.visible_para)} chips />)}
+    <AnadirOpcion c={c} tipo="uso" />
+  </div>
+
+  {
+    usos.map((u) => {
+      const subs = opcionesDe(c, 'subconfig', u.id);
+      if (!subs.length && !c.editor) return null;
+      return (
+        <div class="cf-panel" data-cuando={`configuracion.uso=${u.id}`} hidden>
+          <div class="cf-panel-head">
+            <Icon name="chef" size={40} class="cf-panel-icon" />
+            <div>
+              <p class="cf-panel-title"><T c={c} k="configuracion.panelTitulo" /></p>
+              <p class="cf-panel-text"><T c={c} k="configuracion.panelTexto" /></p>
+            </div>
+          </div>
+          <div class="cf-grid cf-grid-auto" role="group" aria-label={`Configuración ${u.nombre}`}>
+            {subs.map((s) => (
+              <OpcionIcono c={c} opcion={s} campo="configuracion.sub" />
+            ))}
+            <AnadirOpcion c={c} tipo="subconfig" padre={u.id} />
+          </div>
+          <label class="cf-campo" data-cuando="configAMedida" hidden>
+            <span class="cf-label"><T c={c} k="configuracion.textoLabel" /></span>
+            <textarea
+              class="field cf-textarea"
+              data-bind="configuracion.descripcion"
+              maxlength="500"
+              rows="3"
+              placeholder={t(c, 'configuracion.textoPlaceholder')}
+            />
+            <span class="cf-contador" data-contador="configuracion.descripcion" data-max="500"></span>
+          </label>
+          <Aviso c={c} k="configuracion.aviso" />
+        </div>
+      );
+    })
+  }
+</section>

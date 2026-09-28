@@ -1,0 +1,41 @@
+---
+/**
+ * Tarjeta compacta con icono (subtipos, subconfiguraciones, chips de servicio,
+ * espacio). `multiple` la convierte en conmutable dentro de una lista.
+ */
+import Icon from '../Icon.astro';
+import { esIcono } from '../icons';
+import type { Catalogo, Opcion } from '../../data/configurador';
+import { refEdicion, t } from '../../data/configurador-textos';
+
+interface Props {
+  c: Catalogo;
+  opcion: Opcion;
+  campo: string;
+  multiple?: boolean;
+  cuando?: string;
+  compacta?: boolean;
+  /** Oculta la descripcion (chips del paso 5). */
+  sinTexto?: boolean;
+}
+
+const { c, opcion: o, campo, multiple = false, cuando, compacta = false, sinTexto = false } = Astro.props;
+const enlace = multiple ? { 'data-alternar': campo } : { 'data-elegir': campo };
+---
+
+<button
+  type="button"
+  class:list={['cf-card cf-card-icono', compacta && 'is-compacta', !o.activo && 'is-oculta']}
+  data-cf-edit={refEdicion(c, `o:${o.id}`)}
+  {...enlace}
+  data-valor={o.id}
+  data-cuando={cuando}
+  aria-pressed="false"
+>
+  <span class="cf-radio" aria-hidden="true"><Icon name="tick" size={14} /></span>
+  {esIcono(o.icono) && <Icon name={o.icono} size={compacta ? 22 : 34} class="cf-card-icon" />}
+  <span class="cf-card-title">{o.nombre}</span>
+  {!sinTexto && o.descripcion && <span class="cf-card-text">{o.descripcion}</span>}
+  {o.aviso && <span class="cf-aviso-mini">{o.aviso}</span>}
+  {!o.activo && <span class="cf-aviso-mini">{t(c, 'general.oculta')}</span>}
+</button>

@@ -1,0 +1,144 @@
+---
+/** Paso 6 · Ambientacion alrededor de FOODD. */
+import Icon from '../Icon.astro';
+import PasoCabecera from './PasoCabecera.astro';
+import Aviso from './Aviso.astro';
+import AnadirOpcion from './AnadirOpcion.astro';
+import T from './T.astro';
+import { opcionesDe, type Catalogo } from '../../data/configurador';
+import { lista, refEdicion, t } from '../../data/configurador-textos';
+
+interface Props {
+  c: Catalogo;
+}
+
+const { c } = Astro.props;
+const ambientes = opcionesDe(c, 'ambientacion');
+const normales = ambientes.filter((a) => !a.a_medida);
+const aMedida = ambientes.filter((a) => a.a_medida);
+const categorias = lista(c, 'categoriasAmbientacion');
+const personas = lista(c, 'personasAmbientacion', { conOcultos: Boolean(c.editor) });
+---
+
+<section class="cf-paso" data-paso="ambientacion" hidden>
+  <PasoCabecera c={c} paso="ambientacion" />
+
+  <div class="cf-grid cf-grid-2" role="group" aria-label="Ambientación">
+    <button type="button" class="cf-card cf-card-foto is-horizontal" data-elegir="ambientacion.quiere" data-valor="false" aria-pressed="false">
+      <span class="cf-card-body">
+        <span class="cf-card-title"><T c={c} k="ambientacion.soloTitulo" /></span>
+        <span class="cf-card-sub"><T c={c} k="ambientacion.soloSub" /></span>
+        <span class="cf-card-text"><T c={c} k="ambientacion.soloTexto" /></span>
+      </span>
+      <span class="cf-card-img" data-cf-edit={refEdicion(c, 'i:img.soloFoodd')}>
+        <img src={t(c, 'img.soloFoodd')} alt="" loading="lazy" data-cf-img="img.soloFoodd" />
+      </span>
+      <span class="cf-radio" aria-hidden="true"><Icon name="tick" size={14} /></span>
+    </button>
+    <button type="button" class="cf-card cf-card-foto is-horizontal" data-elegir="ambientacion.quiere" data-valor="true" aria-pressed="false">
+      <span class="cf-card-body">
+        <span class="cf-card-title"><T c={c} k="ambientacion.conTitulo" /></span>
+        <span class="cf-card-sub"><T c={c} k="ambientacion.conSub" /></span>
+        <span class="cf-card-text"><T c={c} k="ambientacion.conTexto" /></span>
+      </span>
+      <span class="cf-card-img" data-cf-edit={refEdicion(c, 'i:img.conAmbientacion')}>
+        <img src={t(c, 'img.conAmbientacion')} alt="" loading="lazy" data-cf-img="img.conAmbientacion" />
+      </span>
+      <span class="cf-radio" aria-hidden="true"><Icon name="tick" size={14} /></span>
+    </button>
+  </div>
+
+  <div class="cf-stack" data-cuando="ambientacion.quiere=true" hidden>
+    <div>
+      <h2 class="cf-h2 is-serif is-grande"><T c={c} k="ambientacion.elegirTitulo" /></h2>
+      <p class="cf-h2-sub"><T c={c} k="ambientacion.elegirSub" /></p>
+    </div>
+
+    <div class="cf-grid cf-grid-3" role="group" aria-label="Ambiente">
+      {
+        normales.map((a) => (
+          <button
+            type="button"
+            class:list={['cf-card cf-card-foto is-ambiente', !a.activo && 'is-oculta']}
+            data-cf-edit={refEdicion(c, `o:${a.id}`)}
+            data-elegir="ambientacion.opcion"
+            data-valor={a.id}
+            aria-pressed="false"
+          >
+            <span class="cf-card-img">{a.imagen && <img src={a.imagen} alt="" loading="lazy" decoding="async" />}</span>
+            <span class="cf-radio" aria-hidden="true"><Icon name="tick" size={14} /></span>
+            <span class="cf-card-body">
+              <span class="cf-card-title is-serif">{a.nombre}</span>
+              <span class="cf-card-text">{a.descripcion}</span>
+              {a.etiquetas.length > 0 && (
+                <span class="cf-elementos">
+                  {a.etiquetas.map((e) => (
+                    <span>{e}</span>
+                  ))}
+                </span>
+              )}
+            </span>
+          </button>
+        ))
+      }
+      <AnadirOpcion c={c} tipo="ambientacion" texto="Añadir ambiente" />
+    </div>
+
+    {
+      aMedida.map((a) => (
+        <button
+          type="button"
+          class:list={['cf-card cf-banner', !a.activo && 'is-oculta']}
+          data-cf-edit={refEdicion(c, `o:${a.id}`)}
+          data-elegir="ambientacion.opcion"
+          data-valor={a.id}
+          aria-pressed="false"
+        >
+          <span class="cf-radio" aria-hidden="true"><Icon name="tick" size={14} /></span>
+          <Icon name="sliders" size={32} class="cf-card-icon" />
+          <span>
+            <span class="cf-card-sub"><T c={c} k="ambientacion.diferente" /></span>
+            <span class="cf-card-title">{a.nombre}</span>
+          </span>
+          <span class="cf-card-text">{a.descripcion}</span>
+        </button>
+      ))
+    }
+
+    <div class="cf-caja cf-stack" data-cuando="ambAMedida" hidden>
+      <label class="cf-campo">
+        <span class="cf-label"><T c={c} k="ambientacion.medidaLabel" /></span>
+        <textarea class="field cf-textarea" data-bind="ambientacion.descripcion" maxlength="500" rows="3" placeholder={t(c, 'ambientacion.medidaPlaceholder')} />
+      </label>
+      <div class="cf-campo">
+        <span class="cf-label"><T c={c} k="ambientacion.categoriasLabel" /></span>
+        <div class="cf-checks is-fila" data-cf-edit={refEdicion(c, 'l:categoriasAmbientacion')}>
+          {
+            categorias.map((cat) => (
+              <button type="button" class="cf-check-btn" data-alternar="ambientacion.categorias" data-valor={cat.id} aria-pressed="false">
+                <span class="cf-check-caja" aria-hidden="true"><Icon name="tick" size={12} /></span>
+                {cat.nombre}
+              </button>
+            ))
+          }
+        </div>
+      </div>
+    </div>
+
+    <div class="cf-campo">
+      <span class="cf-label"><T c={c} k="ambientacion.personasLabel" /></span>
+      <div class="cf-pills" role="group" aria-label="Capacidad del espacio" data-cf-edit={refEdicion(c, 'l:personasAmbientacion')}>
+        {
+          personas.map((p) => (
+            <button type="button" class:list={['cf-pill-btn', p.oculto && 'is-oculta']} data-elegir="ambientacion.personas" data-valor={p.id} aria-pressed="false">
+              {p.nombre}
+            </button>
+          ))
+        }
+      </div>
+      <span class="cf-card-text"><T c={c} k="ambientacion.personasNota" /></span>
+    </div>
+
+    <Aviso c={c} k="ambientacion.aviso" />
+  </div>
+</section>

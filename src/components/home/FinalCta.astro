@@ -2,7 +2,7 @@
 import Icon from '../Icon.astro';
 ---
 
-<section id="presupuesto" class="section pt-0 print:hidden">
+<section id="configurar" class="section pt-0 print:hidden">
   <div class="container">
     <div
       class="grid grid-cols-[90px_1fr_auto] items-center gap-[26px] rounded-card bg-[linear-gradient(90deg,var(--color-rust-dark),var(--color-rust))] px-[46px] py-[30px] text-white max-b820:grid-cols-[70px_1fr] max-b820:p-[26px] max-b560:grid-cols-1 max-b560:text-center"
@@ -17,20 +17,19 @@ import Icon from '../Icon.astro';
           ¿Tienes una fecha en mente?
         </h2>
         <p class="m-0 max-w-[680px] text-[15px]">
-          Cuéntanos tu evento y te enviaremos una propuesta personalizada sin compromiso en menos de
-          24 horas.
+          Configura tu food truck en unos minutos, comprueba la disponibilidad de tu fecha y recibe
+          una propuesta personalizada en menos de 24 horas.
         </p>
       </div>
 
-      <button
+      <a
         class="button button-light max-b820:col-span-full max-b820:w-full"
-        type="button"
-        data-form-open
+        href="/configurador"
         data-track="cta_final_click"
       >
         <Icon name="calendar" size={20} />
-        Solicitar presupuesto
-      </button>
+        Configura tu food truck
+      </a>
     </div>
   </div>
 </section>

@@ -6,7 +6,7 @@
  * incrustado en la imagen, para que sea legible y traducible.
  */
 import { Image } from 'astro:assets';
-import heroImage from '../../assets/hero-foodtruck.png';
+import heroImage from '../../assets/hero-foodtruck.webp';
 import Icon from '../Icon.astro';
 
 const stats = [
@@ -65,15 +65,14 @@ const stat = [
       </p>
 
       <div class="flex flex-wrap gap-3.5 print:hidden">
-        <button
+        <a
           class="button button-primary max-b620:w-full"
-          type="button"
-          data-booking-open
+          href="/configurador"
           data-track="cta_servicios_hero"
         >
           <Icon name="calendar" size={20} />
-          Consultar disponibilidad
-        </button>
+          Configura tu food truck
+        </a>
         <a
           class="button button-line max-b620:w-full"
           href="/configuraciones"
