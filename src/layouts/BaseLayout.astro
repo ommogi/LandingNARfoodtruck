@@ -6,9 +6,9 @@ import '../styles/global.css';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
 import CookieBanner from '../components/CookieBanner.astro';
-import { site } from '../config/site';
+import { site, mainNav, legalNav } from '../config/site';
 import { CONSENT_STORAGE_KEY } from '../lib/consent';
-import { organizationNode, webPageNode, websiteNode } from '../lib/schema';
+import { breadcrumbNode, organizationNode, webPageNode, websiteNode } from '../lib/schema';
 
 interface Props {
   title: string;
@@ -58,10 +58,17 @@ const ga4Id = import.meta.env.PUBLIC_GA4_ID;
 
 /* Un unico bloque JSON-LD por pagina: negocio + sitio + pagina, mas lo que
    aporte cada pagina. Los nodos se referencian por @id. */
+const isHome = path === '/';
+/* Nombre de la miga: la etiqueta del menu si la pagina esta en el, si no la
+   primera parte del title ("Configura tu FOODD | NAR" -> "Configura tu FOODD"). */
+const breadcrumbName =
+  [...mainNav, ...legalNav].find((item) => item.href === path)?.label ?? title.split(' | ')[0];
+
 const graph = [
   organizationNode(),
   websiteNode(),
-  webPageNode({ title, description, canonical }),
+  webPageNode({ title, description, canonical, hasBreadcrumb: !isHome }),
+  ...(isHome ? [] : [breadcrumbNode(breadcrumbName, canonical)]),
   ...schemas,
 ];
 

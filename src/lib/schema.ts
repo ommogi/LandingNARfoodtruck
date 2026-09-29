@@ -103,9 +103,11 @@ interface WebPageInput {
   title: string;
   description: string;
   canonical: string;
+  /** true si la pagina emite breadcrumbNode (todas menos la home). */
+  hasBreadcrumb?: boolean;
 }
 
-export function webPageNode({ title, description, canonical }: WebPageInput) {
+export function webPageNode({ title, description, canonical, hasBreadcrumb = false }: WebPageInput) {
   return {
     '@type': 'WebPage',
     '@id': `${canonical}#webpage`,
@@ -116,6 +118,23 @@ export function webPageNode({ title, description, canonical }: WebPageInput) {
     isPartOf: ref(WEBSITE_ID),
     about: ref(ORGANIZATION_ID),
     primaryImageOfPage: { '@type': 'ImageObject', url: ogImage },
+    ...(hasBreadcrumb && { breadcrumb: ref(`${canonical}#breadcrumb`) }),
+  };
+}
+
+/**
+ * Migas Inicio > pagina. La web es plana (todas las paginas cuelgan de la
+ * home), asi que basta con dos niveles. Ayuda a que Google muestre la ruta
+ * legible en lugar de la URL en los resultados.
+ */
+export function breadcrumbNode(name: string, canonical: string) {
+  return {
+    '@type': 'BreadcrumbList',
+    '@id': `${canonical}#breadcrumb`,
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'Inicio', item: `${site.url}/` },
+      { '@type': 'ListItem', position: 2, name, item: canonical },
+    ],
   };
 }
 
