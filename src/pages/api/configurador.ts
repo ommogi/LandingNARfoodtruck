@@ -26,11 +26,15 @@ import {
   faltaEnPaso,
   fechasServicio,
   formatearEuros,
+  MAX_POR_MUEBLE,
+  MOBILIARIO_AMBIENTE,
   muestraCocina,
   nombreDe,
   opcionPorId,
   pasosVisibles,
+  TEXTO_ROADSHOW_AMBIENTACION,
   textoFecha,
+  textoMobiliario,
   type Catalogo,
   type EstadoConfigurador,
   type Parada,
@@ -159,6 +163,16 @@ const sanear = (raw: unknown, catalogo: Catalogo): EstadoConfigurador => {
     .map((x) => deLista(x, ids('categoriasAmbientacion')))
     .filter((x): x is string => Boolean(x));
   e.ambientacion.personas = deLista(a.personas, ids('personasAmbientacion'));
+  // Solo piezas del ambiente elegido, enteras y con tope.
+  const piezas = MOBILIARIO_AMBIENTE[e.ambientacion.opcion ?? '']?.muebles.filter((m) => !m.incluido) ?? [];
+  const cantidades = obj(a.cantidades);
+  e.ambientacion.cantidades = Object.fromEntries(
+    piezas.map((m) => {
+      const v = Number(cantidades[m.id]);
+      return [m.id, Number.isInteger(v) ? Math.min(MAX_POR_MUEBLE, Math.max(0, v)) : 0];
+    }),
+  );
+  e.ambientacion.roadshow = a.roadshow === 'adaptar' ? 'adaptar' : 'mantener';
 
   const b = obj(r.branding);
   e.branding.quiere = typeof b.quiere === 'boolean' ? b.quiere : null;
@@ -347,6 +361,8 @@ ${avisoPrecios}`;
       ? [
           ['Ambiente', n(e.ambientacion.opcion)],
           ['Capacidad', nombreLista('personasAmbientacion', e.ambientacion.personas)],
+          ['Mobiliario', textoMobiliario(e) || undefined],
+          ['Roadshow', roadshow ? TEXTO_ROADSHOW_AMBIENTACION[e.ambientacion.roadshow] : undefined],
           ['Descripción', e.ambientacion.descripcion || undefined],
           ['Categorías', e.ambientacion.categorias.map((x) => nombreLista('categoriasAmbientacion', x)).join(', ') || undefined],
         ]

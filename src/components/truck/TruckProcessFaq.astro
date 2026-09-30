@@ -8,9 +8,9 @@ import { faqItems } from '../../data/faq';
 
 const steps = [
   {
-    icon: 'calendar',
-    title: 'Consulta disponibilidad',
-    text: 'Cuéntanos la fecha, lugar y tipo de evento.',
+    icon: 'cog',
+    title: 'Configura el food truck',
+    text: 'Configura el food truck según tus necesidades.',
   },
   {
     icon: 'chat',
@@ -93,7 +93,7 @@ import FaqRespuesta from '../faq/FaqRespuesta.astro';
       <div class="grid gap-2.5">
         {
           faqs.map((faq) => (
-            <details class="faq-item group rounded-[10px] border border-line bg-white">
+            <details class="faq-item group rounded-[10px] border border-line bg-white" name="truck-faq">
               <summary class="flex cursor-pointer list-none items-center justify-between gap-3.5 px-4 py-[13px] text-[13.5px] font-semibold hover:text-rust [&::-webkit-details-marker]:hidden">
                 {faq.question}
                 <span

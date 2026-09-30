@@ -1,7 +1,8 @@
 ---
 /**
- * Paso 4 · Equipa tu FOODD. Tres bloques: incluido (fijo), recomendado para la
- * subconfiguracion elegida (nunca preseleccionado) y todo el catalogo con
+ * Paso 4 · Equipa tu food truck. Tres bloques: incluido (fijo), recomendado para
+ * la subconfiguracion elegida (llega ya anadido y se puede quitar: lo aplica
+ * src/scripts/configurador/estado.ts) y todo el catalogo con
  * buscador y pestanas. La visibilidad de "recomendado" y el filtro los aplica
  * src/scripts/configurador/equipamiento.ts.
  */
@@ -27,16 +28,6 @@ const categorias = lista(c, 'categoriasEquipo').filter((cat) => extras.some((e) 
 
 <section class="cf-paso" data-paso="equipamiento" hidden>
   <PasoCabecera c={c} paso="equipamiento" compacta />
-
-  <div class="cf-tira">
-    <Icon name="calendar" size={22} />
-    <div>
-      <p class="cf-tira-label"><T c={c} k="equipamiento.tiraLabel" /></p>
-      <p class="cf-tira-valor" data-cf-texto="proyecto"></p>
-    </div>
-    <p class="cf-tira-nota"><T c={c} k="equipamiento.tiraNota" /></p>
-    <button type="button" class="cf-link" data-ir="configuracion"><T c={c} k="equipamiento.cambiar" /> <Icon name="pencil" size={14} /></button>
-  </div>
 
   <div class="cf-bloque cf-bloque-caja">
     <h2 class="cf-h2 is-serif"><Icon name="doc" size={24} /> <T c={c} k="equipamiento.incluidoTitulo" /></h2>

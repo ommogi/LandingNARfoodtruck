@@ -3,7 +3,6 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 import FaqHero from '../components/faq/FaqHero.astro';
 import FaqAccordion from '../components/faq/FaqAccordion.astro';
 import FaqSupport from '../components/faq/FaqSupport.astro';
-import FaqPerks from '../components/faq/FaqPerks.astro';
 import TruckFinalCta from '../components/truck/TruckFinalCta.astro';
 import { faqItems } from '../data/faq';
 import { site } from '../config/site';
@@ -27,7 +26,6 @@ const canonical = new URL('/faq', site.url).href;
     title="¿Listo para vivir una experiencia inolvidable?"
     track="cta_faq_final"
   />
-  <FaqPerks />
 
 </BaseLayout>
 

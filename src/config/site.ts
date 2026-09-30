@@ -6,9 +6,9 @@
  * PENDIENTE ANTES DE PUBLICAR: telefono, email, redes y dominio son
  * los valores de ejemplo de la guia. Sustituir por datos verificados.
  *
- * PENDIENTE DE CONFIRMAR CON NAR: `areaServed` asume Valencia y alrededores.
- * Si tambien cubren Castellon y Alicante hay que ampliarlo aqui: afecta al
- * SEO local y a los textos de cobertura de toda la web.
+ * Zona de servicio confirmada por NAR (correcciones de sept. 2026): toda
+ * Espana, con base en Valencia. `areaServed` alimenta el schema y los textos
+ * de cobertura de toda la web.
  */
 
 export const site = {
@@ -17,13 +17,13 @@ export const site = {
   url: 'https://www.narfoodtruck.com',
   claim: 'Experiencias sobre ruedas desde 1981',
   description:
-    'Alquiler de food trucks premium para bodas, empresas, ferias y eventos privados en Valencia. Transporte, montaje y retirada incluidos.',
+    'Alquiler de food trucks premium para bodas, empresas, ferias y eventos privados en toda España, desde Valencia. Transporte, montaje y retirada incluidos.',
   locality: 'Valencia',
   region: 'Comunitat Valenciana',
   country: 'ES',
-  areaServed: 'Valencia y alrededores',
+  areaServed: 'Toda España',
   /** Zona ampliada tal y como se nombra en textos de cobertura. */
-  areaServedLong: 'toda la Comunitat Valenciana',
+  areaServedLong: 'toda España',
   foundingYear: 1981,
 } as const;
 
@@ -56,12 +56,12 @@ export interface NavItem {
 export const mainNav: NavItem[] = [
   { label: 'Inicio', href: '/#inicio' },
   { label: 'El Truck', href: '/el-truck' },
-  { label: 'Nosotros', href: '/nosotros' },
-  { label: 'Eventos', href: '/#eventos' },
-  { label: 'Configuraciones', href: '/configuraciones' },
   { label: 'Servicios', href: '/servicios' },
+  { label: 'Configuraciones', href: '/configuraciones' },
+  { label: 'Eventos', href: '/#eventos' },
   { label: 'Galería', href: '/galeria' },
   { label: 'FAQ', href: '/faq' },
+  { label: 'Nosotros', href: '/nosotros' },
   { label: 'Contacto', href: '/contacto' },
 ];
 
@@ -77,22 +77,22 @@ export const footerNavColumns: { label: string; items: NavItem[] }[] = [
     items: [
       { label: 'Inicio', href: '/#inicio' },
       { label: 'El Truck', href: '/el-truck' },
-      { label: 'Nosotros', href: '/nosotros' },
-    ],
-  },
-  {
-    label: 'Eventos y configuraciones',
-    items: [
-      { label: 'Eventos', href: '/#eventos' },
-      { label: 'Configuraciones', href: '/configuraciones' },
       { label: 'Servicios', href: '/servicios' },
     ],
   },
   {
-    label: 'Galería, ayuda y contacto',
+    label: 'Configuraciones, eventos y galería',
     items: [
+      { label: 'Configuraciones', href: '/configuraciones' },
+      { label: 'Eventos', href: '/#eventos' },
       { label: 'Galería', href: '/galeria' },
+    ],
+  },
+  {
+    label: 'Ayuda, nosotros y contacto',
+    items: [
       { label: 'FAQ', href: '/faq' },
+      { label: 'Nosotros', href: '/nosotros' },
       { label: 'Contacto', href: '/contacto' },
     ],
   },

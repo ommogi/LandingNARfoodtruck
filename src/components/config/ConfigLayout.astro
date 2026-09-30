@@ -15,7 +15,9 @@ import { idealPara } from '../../data/configuraciones';
 
 const card =
   'flex flex-col rounded-card border border-[rgb(56_40_30_/_8%)] bg-white/96 px-[26px] pt-[26px] pb-[22px] shadow-card max-b560:px-[18px]';
-const cardTitle = 'm-0 mb-2.5 text-[22px] leading-[1.1] font-bold text-blue';
+/* Eyebrow + titular en dos lineas, como el resto de secciones de la pagina. */
+const cardEyebrow = 'eyebrow eyebrow-rust mb-1.5';
+const cardTitle = 'm-0 mb-3 text-[clamp(24px,2.2vw,30px)] leading-[0.98] font-bold text-night uppercase';
 
 const planoGrande = await getImage({ src: plano, width: 1600, format: 'webp' });
 const planoAlt =
@@ -28,38 +30,55 @@ const planoAlt =
 
 <section class="section" aria-labelledby="distribucion-title">
   <div
-    class="container grid grid-cols-[1.25fr_0.9fr_0.85fr] items-stretch gap-[18px] max-b1100:grid-cols-2 max-b820:grid-cols-1"
+    class="container grid grid-cols-[1.25fr_0.9fr_0.85fr] items-stretch gap-[18px] has-[details[open]]:items-start max-b1100:grid-cols-2 max-b820:grid-cols-1"
     data-reveal
   >
     <article class={card} id="distribucion-interior">
-      <h2 id="distribucion-title" class={cardTitle}>Distribución interior</h2>
+      <p class={cardEyebrow}>Distribución interior</p>
+      <h2 id="distribucion-title" class={cardTitle}>
+        Un espacio <span class="block">bien aprovechado</span>
+      </h2>
       <p class="mt-0 mb-5 text-[12.5px] leading-[1.5] text-muted">
         Conoce la distribución y medidas de nuestro food truck para planificar tu espacio de trabajo
         de manera eficiente.
       </p>
-      <div class="flex flex-1 flex-col justify-center gap-2">
-        <a
-          class="block rounded-md focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-rust"
-          href={planoGrande.src}
-          target="_blank"
-          rel="noopener"
-          data-track="config_plano_ampliar"
+      {/* Desplegable nativo: el plano no ocupa la tarjeta hasta que se pide. */}
+      <details class="group mt-auto">
+        <summary
+          data-track="config_plano_desplegar"
+          class="button button-primary button-block cursor-pointer list-none justify-between [&::-webkit-details-marker]:hidden"
         >
-          <Image
-            src={plano}
-            alt={planoAlt}
-            widths={[480, 800, 1200]}
-            sizes="(max-width: 820px) 100vw, 480px"
-            loading="lazy"
-            class="h-auto w-full rounded-md"
-          />
-        </a>
-        <p class="m-0 text-[12px] text-muted">Pulsa el plano para verlo a tamaño completo.</p>
-      </div>
+          <span class="flex items-center gap-2.5">
+            <Icon name="plan" size={20} />
+            Ver plano de distribución interior
+          </span>
+          <Icon name="chevron" size={20} class="transition-transform group-open:rotate-180" />
+        </summary>
+        <div class="mt-4 flex flex-col gap-2">
+          <a
+            class="block rounded-md focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-rust"
+            href={planoGrande.src}
+            target="_blank"
+            rel="noopener"
+            data-track="config_plano_ampliar"
+          >
+            <Image
+              src={plano}
+              alt={planoAlt}
+              widths={[480, 800, 1200]}
+              sizes="(max-width: 820px) 100vw, 480px"
+              loading="lazy"
+              class="h-auto w-full rounded-md"
+            />
+          </a>
+          <p class="m-0 text-[12px] text-muted">Pulsa el plano para verlo a tamaño completo.</p>
+        </div>
+      </details>
     </article>
 
     <article class={card}>
-      <h2 class={cardTitle}>Ideal para</h2>
+      <p class={cardEyebrow}>Ideal para</p>
+      <h2 class={cardTitle}>Distintos <span class="block">tipos de eventos</span></h2>
       <ul class="m-0 flex flex-1 list-none flex-col justify-between gap-[18px] p-0">
         {
           idealPara.map((item) => (
@@ -76,7 +95,8 @@ const planoAlt =
     </article>
 
     <article class={card}>
-      <h2 class={cardTitle}>¿Listo para empezar?</h2>
+      <p class={cardEyebrow}>¿Listo para empezar?</p>
+      <h2 class={cardTitle}>Tu food truck <span class="block">te está esperando</span></h2>
       <p class="mt-0 mb-5 text-[12.5px] leading-[1.5] text-muted">
         Configura tu food truck, comprueba la disponibilidad de tu fecha y recibe tu presupuesto.
       </p>

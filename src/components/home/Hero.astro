@@ -5,9 +5,12 @@ import Icon from '../Icon.astro';
 import { site } from '../../config/site';
 
 const points = [
-  { icon: 'pin', text: site.areaServed },
-  { icon: 'bolt', text: 'Montaje rápido en menos de 30 minutos' },
-  { icon: 'truck', text: 'Transporte, instalación y retirada incluidos' },
+  { title: 'Food truck premium', text: 'Diseño profesional preparado para eventos.' },
+  {
+    title: 'Configuración a tu medida',
+    text: 'Elige equipamiento, ambientación y personalización.',
+  },
+  { title: `Cobertura en ${site.areaServedLong}`, text: 'Llevamos NAR hasta donde esté tu evento.' },
 ] as const;
 ---
 
@@ -48,8 +51,7 @@ const points = [
       </h1>
       <p class="my-[22px] max-w-[600px] text-lg text-white/90 max-b560:text-base">
         En {site.name} alquilamos food trucks premium totalmente equipados para bodas, empresas,
-        ferias y eventos privados en {site.locality}. Nosotros nos encargamos de todo para que tú
-        solo disfrutes.
+        ferias y eventos privados. Nosotros nos encargamos de todo para que tú solo disfrutes.
       </p>
 
       <ul
@@ -57,9 +59,12 @@ const points = [
       >
         {
           points.map((point) => (
-            <li class="grid max-w-[190px] grid-cols-[26px_1fr] items-center gap-2.5 text-[13px] leading-[1.35] max-b560:max-w-none">
-              <Icon name={point.icon} size={26} class="text-rust" />
-              <strong class="font-semibold">{point.text}</strong>
+            <li class="max-w-[200px] text-[13px] leading-[1.35] max-b560:max-w-none">
+              <strong class="block font-display text-[15px] font-bold tracking-[0.03em] uppercase">
+                <span class="text-rust" aria-hidden="true">+ </span>
+                {point.title}
+              </strong>
+              <span class="mt-1 block text-white/80">{point.text}</span>
             </li>
           ))
         }

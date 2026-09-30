@@ -34,7 +34,7 @@ const buscable = `${e.nombre} ${e.descripcion}`.toLowerCase();
       e.imagen ? (
         <img src={e.imagen} alt="" loading="lazy" decoding="async" />
       ) : (
-        esIcono(e.icono) && <Icon name={e.icono} size={40} />
+        esIcono(e.icono) && <Icon name={e.icono} size={30} />
       )
     }
     {recomendado && <span class="cf-badge"><Icon name="check" size={14} /> <T c={c} k="equipamiento.recomendado" /></span>}
@@ -56,6 +56,7 @@ const buscable = `${e.nombre} ${e.descripcion}`.toLowerCase();
       >
         <span class="cf-equipo-add"><Icon name="plus" size={16} /> <T c={c} k="equipamiento.anadir" /></span>
         <span class="cf-equipo-added"><Icon name="tick" size={16} /> <T c={c} k="equipamiento.anadido" /></span>
+        <span class="cf-equipo-quitar"><Icon name="close" size={16} /> <T c={c} k="equipamiento.quitar" /></span>
       </button>
     )
   }

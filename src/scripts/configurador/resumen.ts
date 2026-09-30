@@ -1,6 +1,6 @@
 /**
  * Textos derivados del estado: filas de la barra lateral, tarjetas del resumen
- * (paso 9), mini resumen del paso 10 y tira del paso 4. Solo escribe
+ * (paso 9) y mini resumen del paso 10. Solo escribe
  * textContent; ningun precio pasa por aqui. Todas las frases salen de
  * configurador-textos.ts, asi que el admin las puede cambiar.
  */
@@ -12,7 +12,9 @@ import {
   nombreDe,
   opcionPorId,
   pasoCompleto,
+  TEXTO_ROADSHOW_AMBIENTACION,
   textoFecha,
+  textoMobiliario,
   type Catalogo,
   type PasoId,
 } from '../../data/configurador';
@@ -177,7 +179,15 @@ export const crearResumen = (raiz: HTMLElement, catalogo: Catalogo) => {
     poner(
       'ambientacion',
       est.ambientacion.quiere
-        ? opcionPorId(catalogo, est.ambientacion.opcion)?.etiquetas.join(', ') || est.ambientacion.descripcion
+        ? unir(
+            [
+              textoMobiliario(est) ||
+                opcionPorId(catalogo, est.ambientacion.opcion)?.etiquetas.join(', ') ||
+                est.ambientacion.descripcion,
+              esRoadshow(est) && est.ambientacion.opcion && TEXTO_ROADSHOW_AMBIENTACION[est.ambientacion.roadshow],
+            ],
+            '. ',
+          )
         : tx('r.sinAmbientacion'),
     );
     ponerImagen('ambientacion', est.ambientacion.quiere ? opcionPorId(catalogo, est.ambientacion.opcion)?.imagen : null);
@@ -191,11 +201,6 @@ export const crearResumen = (raiz: HTMLElement, catalogo: Catalogo) => {
 
     poner('logisticaTitulo', textoLugar());
     poner('logistica', textoLogistica());
-
-    // Tira del paso 4
-    raiz.querySelectorAll<HTMLElement>('[data-cf-texto="proyecto"]').forEach((el) => {
-      el.textContent = unir([textoProyecto(), textoConfig()]) || '—';
-    });
 
     // Insignia de disponibilidad (paso 10)
     const d = estadoDisponibilidad();

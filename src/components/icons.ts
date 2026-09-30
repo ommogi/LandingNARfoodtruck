@@ -9,6 +9,13 @@
  */
 
 import AppWindow from '@lucide/astro/icons/app-window';
+import Armchair from '@lucide/astro/icons/armchair';
+import Sprout from '@lucide/astro/icons/sprout';
+import RotateCcw from '@lucide/astro/icons/rotate-ccw';
+import MesaAlta from './icons/muebles/MesaAlta.astro';
+import MesaBaja from './icons/muebles/MesaBaja.astro';
+import Silla from './icons/muebles/Silla.astro';
+import Taburete from './icons/muebles/Taburete.astro';
 import ArrowRight from '@lucide/astro/icons/arrow-right';
 import Briefcase from '@lucide/astro/icons/briefcase';
 import Cake from '@lucide/astro/icons/cake';
@@ -199,6 +206,14 @@ export const icons = {
   sliders: SlidersHorizontal,
   snowflake: Snowflake,
   sofa: Sofa,
+  armchair: Armchair,
+  sprout: Sprout,
+  refresh: RotateCcw,
+  /* Mobiliario de la ambientacion (paso 6): Lucide no tiene mesas ni taburetes. */
+  'mesa-alta': MesaAlta,
+  'mesa-baja': MesaBaja,
+  silla: Silla,
+  taburete: Taburete,
   soup: Soup,
   sparkles: Sparkles,
   sun: Sun,

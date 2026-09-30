@@ -15,7 +15,7 @@ const coverage = [
   'Empresas',
   'Bodas y celebraciones',
   'Ferias y festivales',
-  `Toda la ${site.region}`,
+  site.areaServed,
 ] as const;
 
 const mapSrc = `https://maps.google.com/maps?q=${encodeURIComponent(`${site.locality},España`)}&z=10&output=embed`;
@@ -33,7 +33,7 @@ const mapSrc = `https://maps.google.com/maps?q=${encodeURIComponent(`${site.loca
       <h2 class="m-0 mb-2 text-[clamp(22px,2.6vw,28px)] font-bold" id="contact-location-title">
         Estamos en {site.locality}
       </h2>
-      <p class="m-0 mb-5 text-sm text-white/70">Damos servicio en {site.areaServedLong}.</p>
+      <p class="m-0 mb-5 text-sm text-white/70">Damos servicio a {site.areaServedLong}.</p>
 
       <ul class="m-0 grid list-none gap-2 p-0">
         {

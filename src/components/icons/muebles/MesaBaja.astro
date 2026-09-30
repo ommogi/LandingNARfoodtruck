@@ -1,0 +1,26 @@
+---
+/** Mesa baja o auxiliar. Mismo formato que Lucide (24x24, trazo 2) para convivir en icons.ts. */
+interface Props {
+  size?: number;
+  fill?: string;
+  class?: string;
+  [atributo: string]: unknown;
+}
+const { size = 24, fill = 'none', class: className, ...resto } = Astro.props;
+---
+
+<svg
+  xmlns="http://www.w3.org/2000/svg"
+  width={size}
+  height={size}
+  viewBox="0 0 24 24"
+  fill={fill}
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+  class={className}
+  {...resto}
+>
+  <path d="M3 10h18" /><path d="M6 10v8" /><path d="M18 10v8" /><path d="M6 14h12" />
+</svg>

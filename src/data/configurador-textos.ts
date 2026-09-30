@@ -141,10 +141,7 @@ export const TEXTOS = {
   'configuracion.aviso': largo('configuracion', 'Aviso del panel', 'En el siguiente paso te recomendaremos el equipamiento ideal para tu configuración.'),
 
   /* ---------------- Paso 4 */
-  'equipamiento.tiraLabel': tx('equipamiento', 'Tira: etiqueta', 'Tu proyecto'),
-  'equipamiento.tiraNota': tx('equipamiento', 'Tira: nota', 'Las recomendaciones se actualizan según tu tipo de proyecto y configuración.'),
-  'equipamiento.cambiar': tx('equipamiento', 'Tira: enlace', 'Cambiar configuración'),
-  'equipamiento.incluidoTitulo': tx('equipamiento', 'Incluido: título', 'Ya incluido en tu FOODD'),
+  'equipamiento.incluidoTitulo': tx('equipamiento', 'Incluido: título', 'Ya incluido en tu food truck'),
   'equipamiento.incluidoSub': tx('equipamiento', 'Incluido: texto', 'Este equipamiento forma parte de la configuración base y está incluido en todos los alquileres.'),
   'equipamiento.recomendadoTitulo': tx('equipamiento', 'Recomendado: título', 'Recomendado para tu configuración'),
   'equipamiento.recomendadoSub': tx('equipamiento', 'Recomendado: texto', 'Según el tipo de proyecto y configuración que has elegido, este es el equipamiento que mejor se adapta.'),
@@ -161,6 +158,7 @@ export const TEXTOS = {
   'equipamiento.recomendado': tx('equipamiento', 'Etiqueta recomendado', 'Recomendado'),
   'equipamiento.anadir': tx('equipamiento', 'Botón añadir', 'Añadir'),
   'equipamiento.anadido': tx('equipamiento', 'Botón añadido', 'Añadido'),
+  'equipamiento.quitar': tx('equipamiento', 'Botón quitar (al pasar por encima)', 'Quitar'),
 
   /* ---------------- Paso 5 */
   'cocina.b1': tx('cocina', 'Bloque 1: título', '1. Cocinero'),
@@ -199,6 +197,22 @@ export const TEXTOS = {
   'ambientacion.categoriasLabel': tx('ambientacion', 'A medida: categorías', '¿Qué te gustaría incluir? (opcional)'),
   'ambientacion.personasLabel': tx('ambientacion', 'Capacidad: pregunta', '¿Para cuántas personas quieres preparar el espacio?'),
   'ambientacion.personasNota': tx('ambientacion', 'Capacidad: nota', 'Capacidad aproximada del espacio ambientado, no el total de asistentes.'),
+  'ambientacion.detalleTitulo': tx('ambientacion', 'Detalle: título ({nombre} = ambiente)', 'Configura tu ambiente {nombre}'),
+  'ambientacion.cambiar': tx('ambientacion', 'Detalle: botón cambiar', 'Cambiar ambiente'),
+  'ambientacion.detallePersonas': tx('ambientacion', 'Detalle: capacidad', '¿Para cuántas personas quieres ambientar la zona del food truck?'),
+  'ambientacion.detallePersonasNota': tx('ambientacion', 'Detalle: capacidad nota', 'No tiene que coincidir con el número total de asistentes al evento.'),
+  'ambientacion.propuestaTitulo': tx('ambientacion', 'Detalle: propuesta título', 'Selección recomendada para tu espacio.'),
+  'ambientacion.propuestaSub': tx('ambientacion', 'Detalle: propuesta texto', 'Puedes ajustar las cantidades si lo necesitas.'),
+  'ambientacion.restablecer': tx('ambientacion', 'Detalle: restablecer', 'Restablecer propuesta'),
+  'ambientacion.incluida': tx('ambientacion', 'Detalle: pieza incluida', 'Incluida'),
+  'ambientacion.idealPara': tx('ambientacion', 'Detalle: ideal para', 'Ideal para'),
+  'ambientacion.roadshowTitulo': tx('ambientacion', 'Roadshow: título', 'Ambientación del Roadshow'),
+  'ambientacion.roadshowTexto': largo('ambientacion', 'Roadshow: texto', 'Tu ambiente estará presente en todas las paradas o adaptado según cada ubicación.'),
+  'ambientacion.roadshowMantener': tx('ambientacion', 'Roadshow: mantener', 'Mantener este ambiente en todas las paradas'),
+  'ambientacion.roadshowMantenerTexto': largo('ambientacion', 'Roadshow: mantener texto', 'Utilizaremos la misma configuración de ambientación en todas las ubicaciones de tu Roadshow.'),
+  'ambientacion.roadshowAdaptar': tx('ambientacion', 'Roadshow: adaptar', 'Necesito adaptar la ambientación según la parada'),
+  'ambientacion.roadshowAdaptarTexto': largo('ambientacion', 'Roadshow: adaptar texto', 'Podrás indicarnos necesidades especiales para cada ubicación.'),
+  'ambientacion.roadshowNota': largo('ambientacion', 'Roadshow: nota', 'El mobiliario y los elementos de ambientación están sujetos a disponibilidad para las fechas y ubicaciones seleccionadas. Confirmaremos la composición definitiva en la propuesta.'),
   'ambientacion.aviso': largo('ambientacion', 'Aviso', 'La ambientación está sujeta a disponibilidad de stock para tu fecha. Si hace falta más mobiliario, lo gestionaremos con proveedores.'),
 
   /* ---------------- Paso 7 */

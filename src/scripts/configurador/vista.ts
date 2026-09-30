@@ -7,6 +7,9 @@
  *   data-bind="ruta"                      input, select, textarea o checkbox
  *   data-cuando="expr"                    se oculta si la expresion es falsa
  *   data-contador="ruta" data-max="500"   "12 / 500"
+ *   data-mueble="id" data-delta="1|-1"    +/- del mobiliario del paso 6
+ *   data-mueble-cantidad="id"             muestra la cantidad de esa pieza
+ *   data-mueble-restablecer               vuelve a la propuesta de partida
  *
  * Expresiones de data-cuando: terminos unidos por "&".
  *   ruta=a|b     el valor (como texto) es a o b
@@ -17,10 +20,11 @@
 
 import {
   esRoadshow,
+  MOBILIARIO_AMBIENTE,
   opcionPorId,
   type Catalogo,
 } from '../../data/configurador';
-import { alternar, escribir, leer, store } from './estado';
+import { ajustarMueble, alternar, escribir, leer, restablecerMobiliario, store } from './estado';
 
 type Campo = HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement;
 
@@ -38,6 +42,7 @@ export const crearVista = (raiz: HTMLElement, catalogo: Catalogo) => {
       ),
     configAMedida: () => Boolean(opcionPorId(catalogo, e().configuracion.sub)?.a_medida),
     ambAMedida: () => Boolean(opcionPorId(catalogo, e().ambientacion.opcion)?.a_medida),
+    ambConMobiliario: () => Boolean(e().ambientacion.opcion && MOBILIARIO_AMBIENTE[e().ambientacion.opcion!]),
     brandAMedida: () => Boolean(opcionPorId(catalogo, e().branding.tipo)?.a_medida),
   };
 
@@ -72,7 +77,25 @@ export const crearVista = (raiz: HTMLElement, catalogo: Catalogo) => {
     }
 
     const alt = target.closest<HTMLElement>('[data-alternar]');
-    if (alt) alternar(alt.dataset.alternar as string, alt.dataset.valor ?? '', catalogo);
+    if (alt) {
+      alternar(alt.dataset.alternar as string, alt.dataset.valor ?? '', catalogo);
+      return;
+    }
+
+    const mueble = target.closest<HTMLElement>('[data-mueble]');
+    if (mueble) {
+      ajustarMueble(mueble.dataset.mueble as string, Number(mueble.dataset.delta) || 0);
+      return;
+    }
+
+    if (target.closest('[data-mueble-restablecer]')) {
+      restablecerMobiliario();
+      return;
+    }
+
+    if (target.closest('[data-amb-cambiar]')) {
+      raiz.querySelector('[data-cf-ambientes]')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
   });
 
   const alEscribir = (event: Event) => {
@@ -117,6 +140,19 @@ export const crearVista = (raiz: HTMLElement, catalogo: Catalogo) => {
 
     raiz.querySelectorAll<HTMLElement>('[data-cuando]').forEach((el) => {
       el.hidden = !cumple(el.dataset.cuando as string);
+    });
+
+    // Mobiliario del paso 6: cantidades y botones de restar al llegar a 0.
+    const cantidades = e().ambientacion.cantidades;
+    raiz.querySelectorAll<HTMLElement>('[data-mueble-cantidad]').forEach((el) => {
+      el.textContent = String(cantidades[el.dataset.muebleCantidad as string] ?? 0);
+    });
+    raiz.querySelectorAll<HTMLButtonElement>('[data-mueble][data-delta="-1"]').forEach((b) => {
+      b.disabled = (cantidades[b.dataset.mueble as string] ?? 0) <= 0;
+    });
+    // Solo se ve el detalle del ambiente elegido.
+    raiz.querySelectorAll<HTMLElement>('[data-amb-detalle]').forEach((el) => {
+      el.hidden = el.dataset.ambDetalle !== e().ambientacion.opcion;
     });
 
     raiz.querySelectorAll<HTMLElement>('[data-contador]').forEach((el) => {

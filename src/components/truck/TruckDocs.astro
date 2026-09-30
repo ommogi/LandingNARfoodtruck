@@ -3,8 +3,15 @@
  * Descarga de documentacion tecnica. Los PDF viven en public/docs/ (la
  * configuracion base se comprimio de 11,6 MB a ~450 KB optimizando sus imagenes
  * para pantalla). `ready: false` deja el enlace inerte para no ofrecer un 404.
+ *
+ * La distribucion interior no es un PDF: es el plano del fabricante, el mismo
+ * que muestra /configuraciones, y se abre a tamano completo en otra pestana.
  */
+import { getImage } from 'astro:assets';
 import Icon from '../Icon.astro';
+import plano from '../../assets/plano-distribucion.webp';
+
+const planoGrande = await getImage({ src: plano, width: 1600, format: 'webp' });
 
 const docs = [
   {
@@ -22,7 +29,13 @@ const docs = [
     file: '/docs/nar-configuracion-base.pdf',
     ready: true,
   },
-] as const;
+  {
+    title: 'Distribución interior',
+    file: planoGrande.src,
+    ready: true,
+    plano: true,
+  },
+];
 ---
 
 <section class="section" aria-labelledby="docs-title">
@@ -44,12 +57,12 @@ const docs = [
         </p>
       </div>
 
-      <ul class="m-0 grid list-none grid-cols-3 gap-6 p-0 max-b700:grid-cols-1">
+      <ul class="m-0 grid list-none grid-cols-4 gap-6 p-0 max-b1100:grid-cols-2 max-b560:grid-cols-1">
         {
           docs.map((doc) => (
             <li class="grid grid-cols-[34px_1fr] grid-rows-[auto_auto] items-center gap-x-2.5 gap-y-1.5">
               <span class="text-night" aria-hidden="true">
-                <Icon name="doc" size={26} />
+                <Icon name={'plano' in doc ? 'plan' : 'doc'} size={26} />
               </span>
               <h3 class="m-0 text-[13.5px] leading-[1.25] font-bold">{doc.title}</h3>
               <a
@@ -59,13 +72,15 @@ const docs = [
                   !doc.ready && 'pointer-events-none opacity-55',
                 ]}
                 href={doc.file}
-                download
+                {...('plano' in doc
+                  ? { target: '_blank', rel: 'noopener' }
+                  : { download: true })}
                 aria-disabled={doc.ready ? undefined : 'true'}
                 tabindex={doc.ready ? undefined : -1}
                 data-track="doc_download"
               >
-                <Icon name="download" size={18} />
-                Descargar PDF
+                <Icon name={'plano' in doc ? 'search' : 'download'} size={18} />
+                {'plano' in doc ? 'Ver plano' : 'Descargar PDF'}
               </a>
               {!doc.ready && <span class="sr-only">Documento disponible próximamente.</span>}
             </li>

@@ -41,17 +41,17 @@ export const TEXTOS_PASO_RESPALDO: Record<PasoId, TextosPaso> = {
     subtitulo: 'Elige la opción que más se adapte a tu proyecto.',
   },
   fecha: {
-    titulo: '¿Cuándo necesitas FOODD?',
+    titulo: '¿Cuándo lo necesitas?',
     subtitulo: 'Selecciona la fecha de tu proyecto y comprueba la disponibilidad antes de continuar.',
   },
   configuracion: {
-    titulo: '¿Cómo quieres utilizar FOODD?',
+    titulo: '¿Cómo quieres utilizarlo?',
     subtitulo: 'Elige la configuración que mejor se adapta a tu proyecto.',
   },
   equipamiento: {
-    titulo: 'Equipa tu FOODD',
+    titulo: 'Equipa tu food truck',
     subtitulo:
-      'Tu FOODD incluye el equipamiento base necesario. Te recomendamos la maquinaria ideal para tu proyecto: añade o quita lo que necesites.',
+      'Tu food truck incluye el equipamiento base necesario. Te recomendamos la maquinaria ideal para tu proyecto: añade o quita lo que necesites.',
   },
   cocina: {
     titulo: '¿Necesitas cocinero para tu proyecto?',
@@ -64,8 +64,8 @@ export const TEXTOS_PASO_RESPALDO: Record<PasoId, TextosPaso> = {
       'Puedes alquilar únicamente FOODD o completar el proyecto con mobiliario y ambientación exterior.',
   },
   branding: {
-    titulo: '¿Quieres personalizar FOODD con tu marca?',
-    subtitulo: 'Personaliza FOODD con tu identidad visual o mantén su estética original.',
+    titulo: '¿Quieres personalizarlo con tu marca?',
+    subtitulo: 'Personaliza el food truck con tu identidad visual o mantén su estética original.',
   },
   logistica: {
     titulo: '¿Dónde necesitas FOODD?',
@@ -376,7 +376,7 @@ export const OPCIONES_RESPALDO: Opcion[] = [
     descripcion: 'Productos de limpieza e higiene para la jornada.' }),
 
   /* ---------- Paso 5 */
-  op({ id: 'cocina.propio', tipo: 'cocina', nombre: 'Solo FOODD', orden: 1, icono: 'users', imagen: img('viaja'),
+  op({ id: 'cocina.propio', tipo: 'cocina', nombre: 'Solo FOODD', orden: 1, icono: 'users', imagen: img('solo-foodd-cocina'),
     descripcion: 'Trabajaré con mi propio personal. Tú aportas el personal necesario para desarrollar la actividad.',
     etiquetas: ['FOODD', 'Equipamiento seleccionado', 'Tu propio personal'] }),
   op({ id: 'cocina.cocinero', tipo: 'cocina', nombre: 'FOODD + Cocinero', orden: 2, icono: 'chef', imagen: img('cocinero'),
@@ -505,7 +505,16 @@ export interface EstadoConfigurador {
     paradas: Parada[];
   };
   configuracion: { uso: string | null; sub: string | null; descripcion: string };
-  equipamiento: { seleccion: string[]; otros: string };
+  equipamiento: {
+    seleccion: string[];
+    otros: string;
+    /**
+     * Equipos que se anadieron solos por ser los recomendados de la
+     * subconfiguracion. Al cambiar de subconfiguracion se retiran estos (y solo
+     * estos): lo que el cliente anadio a mano se respeta.
+     */
+    auto: string[];
+  };
   cocina: {
     opcion: string | null;
     servicios: string[];
@@ -522,6 +531,10 @@ export interface EstadoConfigurador {
     descripcion: string;
     categorias: string[];
     personas: string | null;
+    /** Cantidades del mobiliario propuesto (solo ambientes con MOBILIARIO_AMBIENTE). */
+    cantidades: Record<string, number>;
+    /** Solo Roadshow: el mismo ambiente en todas las paradas o adaptado a cada una. */
+    roadshow: 'mantener' | 'adaptar';
   };
   branding: {
     quiere: boolean | null;
@@ -561,7 +574,7 @@ export const estadoInicial = (): EstadoConfigurador => ({
     paradas: [paradaVacia(), paradaVacia()],
   },
   configuracion: { uso: null, sub: null, descripcion: '' },
-  equipamiento: { seleccion: [], otros: '' },
+  equipamiento: { seleccion: [], otros: '', auto: [] },
   cocina: {
     opcion: null,
     servicios: [],
@@ -572,7 +585,15 @@ export const estadoInicial = (): EstadoConfigurador => ({
     necesidades: [],
     notas: '',
   },
-  ambientacion: { quiere: null, opcion: null, descripcion: '', categorias: [], personas: null },
+  ambientacion: {
+    quiere: null,
+    opcion: null,
+    descripcion: '',
+    categorias: [],
+    personas: null,
+    cantidades: {},
+    roadshow: 'mantener',
+  },
   branding: { quiere: null, tipo: null, archivos: null, marca: '', descripcion: '' },
   logistica: {
     localidad: '',
@@ -614,6 +635,108 @@ export const esVisiblePara = (opcion: Opcion, contexto: string | null) =>
   opcion.visible_para.length === 0 || (contexto !== null && opcion.visible_para.includes(contexto));
 
 export const esRoadshow = (estado: EstadoConfigurador) => estado.proyecto.subtipo === ROADSHOW_ID;
+
+/* --------------------------------------------------- Mobiliario (paso 6) */
+
+/**
+ * Propuesta de mobiliario de cada ambiente, segun las guias del paso 6. No es
+ * un catalogo ni un pack cerrado: es un punto de partida que el cliente ajusta
+ * con +/- y que FOODD confirma segun disponibilidad. Las cantidades van por
+ * tramo de capacidad (hasta 25 · 25-50 · 50-100 · mas de 100); "no lo se"
+ * usa el primer tramo. Lo `incluido` no se cuenta.
+ *
+ * Vive en codigo y no en la base de datos: si el cliente anade un ambiente
+ * nuevo desde el panel, simplemente no tendra propuesta de cantidades.
+ */
+export interface Mueble {
+  id: string;
+  nombre: string;
+  icono: string;
+  cantidades?: [number, number, number, number];
+  incluido?: boolean;
+}
+
+export interface MobiliarioAmbiente {
+  claim: string;
+  muebles: Mueble[];
+  idealPara: string[];
+}
+
+const IDEAL_GENERAL = ['Eventos corporativos', 'Bodas', 'Gastronomía / Coffee', 'Activaciones sencillas', 'Eventos de corta duración'];
+
+export const MOBILIARIO_AMBIENTE: Record<string, MobiliarioAmbiente> = {
+  'amb.essential': {
+    claim: 'Una solución sencilla para crear una zona de servicio ordenada alrededor de FOODD.',
+    muebles: [
+      { id: 'mesas_altas', nombre: 'Mesas altas', icono: 'mesa-alta', cantidades: [4, 6, 8, 12] },
+      { id: 'taburetes', nombre: 'Taburetes', icono: 'taburete', cantidades: [8, 12, 16, 24] },
+      { id: 'mesas_auxiliares', nombre: 'Mesas auxiliares', icono: 'mesa-baja', cantidades: [2, 3, 4, 6] },
+      { id: 'iluminacion', nombre: 'Iluminación básica', icono: 'lightbulb', incluido: true },
+    ],
+    idealPara: ['Eventos corporativos', 'Ferias', 'Gastronomía / Coffee', 'Activaciones sencillas', 'Eventos de corta duración'],
+  },
+  'amb.mediterraneo': {
+    claim: 'Una solución natural y acogedora para crear una zona de servicio ordenada alrededor de FOODD.',
+    muebles: [
+      { id: 'mesas_madera', nombre: 'Mesas de madera', icono: 'mesa-baja', cantidades: [2, 4, 8, 12] },
+      { id: 'sillas_fibras', nombre: 'Sillas de fibras', icono: 'silla', cantidades: [4, 8, 16, 24] },
+      { id: 'mesas_auxiliares', nombre: 'Mesas auxiliares', icono: 'mesa-baja', cantidades: [2, 3, 4, 6] },
+      { id: 'vegetacion', nombre: 'Maceteros / vegetación', icono: 'sprout', cantidades: [2, 4, 6, 8] },
+      { id: 'iluminacion', nombre: 'Iluminación cálida', icono: 'lightbulb', incluido: true },
+    ],
+    idealPara: IDEAL_GENERAL,
+  },
+  'amb.lounge': {
+    claim: 'Una experiencia sofisticada y acogedora para crear una zona de servicio ordenada alrededor de FOODD.',
+    muebles: [
+      { id: 'sofas', nombre: 'Sofás / butacas', icono: 'armchair', cantidades: [1, 2, 4, 6] },
+      { id: 'mesas_bajas', nombre: 'Mesas bajas', icono: 'mesa-baja', cantidades: [2, 4, 6, 8] },
+      { id: 'mesas_auxiliares', nombre: 'Mesas auxiliares', icono: 'mesa-baja', cantidades: [2, 3, 4, 6] },
+      { id: 'vegetacion', nombre: 'Maceteros / vegetación', icono: 'sprout', cantidades: [2, 4, 6, 8] },
+      { id: 'iluminacion', nombre: 'Iluminación ambiental', icono: 'lightbulb', incluido: true },
+    ],
+    idealPara: IDEAL_GENERAL,
+  },
+};
+
+const TRAMOS = ['hasta_25', '25_50', '50_100', 'mas_100'];
+
+/** Cantidades de partida para un ambiente y una capacidad. */
+export const propuestaMobiliario = (ambiente: string | null, personas: string | null): Record<string, number> => {
+  const mob = ambiente ? MOBILIARIO_AMBIENTE[ambiente] : undefined;
+  if (!mob) return {};
+  const tramo = Math.max(0, TRAMOS.indexOf(personas ?? ''));
+  return Object.fromEntries(
+    mob.muebles.filter((m) => m.cantidades).map((m) => [m.id, m.cantidades![tramo]!]),
+  );
+};
+
+/** Maximo por pieza: evita pedidos absurdos desde el formulario. */
+export const MAX_POR_MUEBLE = 99;
+
+/** "4 × Mesas altas, 8 × Taburetes, Iluminación básica (incluida)". Vacio si no aplica. */
+export const textoMobiliario = (estado: EstadoConfigurador) => {
+  const { quiere, opcion, cantidades } = estado.ambientacion;
+  const mob = quiere && opcion ? MOBILIARIO_AMBIENTE[opcion] : undefined;
+  if (!mob) return '';
+  return mob.muebles
+    .map((m) => (m.incluido ? `${m.nombre} (incluida)` : cantidades[m.id] ? `${cantidades[m.id]} × ${m.nombre}` : ''))
+    .filter(Boolean)
+    .join(', ');
+};
+
+export const TEXTO_ROADSHOW_AMBIENTACION: Record<EstadoConfigurador['ambientacion']['roadshow'], string> = {
+  mantener: 'Mismo ambiente en todas las paradas',
+  adaptar: 'Adaptar la ambientación según la parada',
+};
+
+/** Equipos (no incluidos de serie) recomendados para una subconfiguracion. */
+export const equiposRecomendados = (catalogo: Catalogo, sub: string | null) =>
+  sub
+    ? opcionesDe(catalogo, 'equipo')
+        .filter((o) => !o.incluido && o.recomendado_para.includes(sub))
+        .map((o) => o.id)
+    : [];
 
 /** El paso 5 solo aparece si la familia de uso elegida lo pide. */
 export const muestraCocina = (estado: EstadoConfigurador, catalogo: Catalogo) => {

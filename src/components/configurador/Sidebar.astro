@@ -61,11 +61,13 @@ const precio = formatearEuros(c.ajustes.precioDesde).replace(',00 €', ' €');
         filas.map((f) => (
           <li data-cf-side-fila={f.paso}>
             <button type="button" data-ir={f.paso}>
-              <Icon name={f.icono} size={22} class="cf-side-icon" />
+              <Icon name={f.icono} size={18} class="cf-side-icon" />
               <span class="cf-side-texto">
                 <span class="cf-side-titulo"><T c={c} k={`side.fila.${f.paso}` as ClaveTexto} /></span>
                 <span class="cf-side-valor" data-cf-side-valor>{t(c, 'side.sinSeleccionar')}</span>
               </span>
+              {/* Solo visible en filas completadas: invita a volver y editar ese paso. */}
+              <span class="cf-side-editar"><Icon name="pencil" size={14} /><span class="sr-only">Editar</span></span>
               <span class="cf-side-estado" aria-hidden="true"><Icon name="tick" size={12} /></span>
             </button>
           </li>

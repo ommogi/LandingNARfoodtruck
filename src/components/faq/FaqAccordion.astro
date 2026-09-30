@@ -5,7 +5,8 @@ import { faqFilters, faqItems } from '../../data/faq';
 
 /**
  * Listado completo de preguntas en dos columnas. El acordeon usa
- * <details>/<summary> nativos: accesible y funcional sin JS.
+ * <details>/<summary> nativos: accesible y funcional sin JS. `name` comun hace
+ * el acordeon exclusivo: abrir una pregunta cierra la que estuviera abierta.
  * Los filtros por categoria y el buscador del hero los gobierna
  * src/scripts/faq.ts; si el JS no carga, se ven todas las preguntas.
  */
@@ -68,7 +69,7 @@ import FaqRespuesta from './FaqRespuesta.astro';
     >
       {
         faqItems.map((faq) => (
-          <details class={item} id={slug(faq.question)} data-category={faq.category}>
+          <details class={item} id={slug(faq.question)} data-category={faq.category} name="faq">
             <summary class="flex cursor-pointer list-none items-center gap-3.5 px-[18px] py-[15px] text-[14.5px] font-semibold hover:text-rust [&::-webkit-details-marker]:hidden">
               <span
                 class="grid size-[26px] flex-none place-items-center rounded-full bg-night font-display text-sm font-bold text-white"

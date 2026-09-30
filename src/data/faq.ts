@@ -59,7 +59,7 @@ export const faqItems: FaqItem[] = [
   {
     question: '¿Por cuánto tiempo puedo alquilarlo?',
     answer:
-      'Por días, por fines de semana o por el periodo que necesites. El formato más habitual es de una jornada completa, pero adaptamos la duración a ferias, rodajes o activaciones de varias semanas.',
+      '**El alquiler mínimo es de 2 días.** A partir de ahí, puedes contratarlo durante el tiempo que necesites: fines de semana, ferias, festivales, roadshows o eventos de varias semanas. Adaptamos la duración a cada proyecto.',
     category: 'alquiler',
   },
   {
@@ -110,7 +110,7 @@ export const faqItems: FaqItem[] = [
   {
     question: '¿Cuántas personas se pueden atender desde el truck?',
     answer:
-      'Hasta 150 personas por hora, según el formato de servicio y la carta que decidas ofrecer. Cuéntanos el número de invitados y te orientamos sobre el ritmo real de servicio.',
+      '**La capacidad depende del tipo de servicio, el menú, el equipamiento y el personal.** El food truck está preparado para trabajar con un flujo ágil tanto en eventos pequeños como de alta afluencia. Cuéntanos qué quieres servir y el número de asistentes, y te ayudaremos a definir la configuración más adecuada.',
     category: 'truck',
   },
   {
@@ -174,7 +174,7 @@ export const faqItems: FaqItem[] = [
   {
     question: '¿Ponéis vosotros la comida o el personal?',
     answer:
-      'No. Nuestro servicio es el alquiler del vehículo equipado. La comida, la carta y el personal de cocina los pones tú o el cátering con el que trabajes.',
+      '**Sí, si lo necesitas.** Puedes alquilar únicamente el food truck y aportar tu propia comida, catering y personal, o contratar también con nosotros la comida y el cocinero. Tú eliges el nivel de servicio que mejor se adapte a tu evento.',
     category: 'evento',
   },
   {

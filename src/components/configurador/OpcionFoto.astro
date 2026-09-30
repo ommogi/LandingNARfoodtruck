@@ -49,7 +49,7 @@ const { c, opcion: o, campo, valor = o.id, cuando, horizontal = false, chips = f
   </span>
   <span class="cf-radio" aria-hidden="true"><Icon name="tick" size={14} /></span>
   <span class="cf-card-body">
-    <span class="cf-card-title">{o.nombre}</span>
+    <span class="cf-card-title is-serif">{o.nombre}</span>
     {o.descripcion && <span class="cf-card-text">{o.descripcion}</span>}
     {
       chips && o.etiquetas.length > 0 && (

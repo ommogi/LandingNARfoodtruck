@@ -1,11 +1,18 @@
 ---
-/** Paso 6 · Ambientacion alrededor de FOODD. */
+/**
+ * Paso 6 · Ambientacion alrededor de FOODD.
+ *
+ * Al elegir un ambiente con propuesta (MOBILIARIO_AMBIENTE) se despliega su
+ * detalle sin salir del paso: capacidad, mobiliario con +/- e "ideal para".
+ * En Roadshow se anade si el ambiente se mantiene en todas las paradas.
+ */
 import Icon from '../Icon.astro';
 import PasoCabecera from './PasoCabecera.astro';
 import Aviso from './Aviso.astro';
 import AnadirOpcion from './AnadirOpcion.astro';
 import T from './T.astro';
-import { opcionesDe, type Catalogo } from '../../data/configurador';
+import { MOBILIARIO_AMBIENTE, opcionesDe, type Catalogo } from '../../data/configurador';
+import { esIcono } from '../icons';
 import { lista, refEdicion, t } from '../../data/configurador-textos';
 
 interface Props {
@@ -26,7 +33,7 @@ const personas = lista(c, 'personasAmbientacion', { conOcultos: Boolean(c.editor
   <div class="cf-grid cf-grid-2" role="group" aria-label="Ambientación">
     <button type="button" class="cf-card cf-card-foto is-horizontal" data-elegir="ambientacion.quiere" data-valor="false" aria-pressed="false">
       <span class="cf-card-body">
-        <span class="cf-card-title"><T c={c} k="ambientacion.soloTitulo" /></span>
+        <span class="cf-card-title is-serif"><T c={c} k="ambientacion.soloTitulo" /></span>
         <span class="cf-card-sub"><T c={c} k="ambientacion.soloSub" /></span>
         <span class="cf-card-text"><T c={c} k="ambientacion.soloTexto" /></span>
       </span>
@@ -37,7 +44,7 @@ const personas = lista(c, 'personasAmbientacion', { conOcultos: Boolean(c.editor
     </button>
     <button type="button" class="cf-card cf-card-foto is-horizontal" data-elegir="ambientacion.quiere" data-valor="true" aria-pressed="false">
       <span class="cf-card-body">
-        <span class="cf-card-title"><T c={c} k="ambientacion.conTitulo" /></span>
+        <span class="cf-card-title is-serif"><T c={c} k="ambientacion.conTitulo" /></span>
         <span class="cf-card-sub"><T c={c} k="ambientacion.conSub" /></span>
         <span class="cf-card-text"><T c={c} k="ambientacion.conTexto" /></span>
       </span>
@@ -54,7 +61,7 @@ const personas = lista(c, 'personasAmbientacion', { conOcultos: Boolean(c.editor
       <p class="cf-h2-sub"><T c={c} k="ambientacion.elegirSub" /></p>
     </div>
 
-    <div class="cf-grid cf-grid-3" role="group" aria-label="Ambiente">
+    <div class="cf-grid cf-grid-3" role="group" aria-label="Ambiente" data-cf-ambientes>
       {
         normales.map((a) => (
           <button
@@ -125,7 +132,90 @@ const personas = lista(c, 'personasAmbientacion', { conOcultos: Boolean(c.editor
       </div>
     </div>
 
-    <div class="cf-campo">
+    {
+      normales
+        .filter((a) => MOBILIARIO_AMBIENTE[a.id])
+        .map((a) => {
+          const mob = MOBILIARIO_AMBIENTE[a.id]!;
+          return (
+            <div class="cf-amb-detalle" data-amb-detalle={a.id} hidden>
+              <div class="cf-amb-cabecera">
+                <div>
+                  <h2 class="cf-h2 is-serif">
+                    <T c={c} k="ambientacion.detalleTitulo" vars={{ nombre: a.nombre.toUpperCase() }} />
+                  </h2>
+                  <p class="cf-h2-sub">{mob.claim}</p>
+                </div>
+                <button type="button" class="cf-btn cf-btn-outline cf-btn-sm" data-amb-cambiar>
+                  <T c={c} k="ambientacion.cambiar" /> <Icon name="pencil" size={16} />
+                </button>
+              </div>
+
+              <div class="cf-amb-cuerpo">
+                <span class="cf-amb-foto">{a.imagen && <img src={a.imagen} alt="" loading="lazy" decoding="async" />}</span>
+
+                <div class="cf-amb-config">
+                  <div class="cf-campo">
+                    <span class="cf-label"><T c={c} k="ambientacion.detallePersonas" /></span>
+                    <span class="cf-card-text"><T c={c} k="ambientacion.detallePersonasNota" /></span>
+                    <div class="cf-pills" role="group" aria-label="Capacidad del espacio">
+                      {personas.map((p) => (
+                        <button type="button" class:list={['cf-pill-btn', p.oculto && 'is-oculta']} data-elegir="ambientacion.personas" data-valor={p.id} aria-pressed="false">
+                          {p.nombre}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div class="cf-amb-propuesta" data-cuando="ambientacion.personas">
+                    <div class="cf-amb-propuesta-cab">
+                      <p>
+                        <strong><T c={c} k="ambientacion.propuestaTitulo" /></strong>{' '}
+                        <T c={c} k="ambientacion.propuestaSub" />
+                      </p>
+                      <button type="button" class="cf-link" data-mueble-restablecer>
+                        <Icon name="refresh" size={14} /> <T c={c} k="ambientacion.restablecer" />
+                      </button>
+                    </div>
+                    <ul class="cf-muebles">
+                      {mob.muebles.map((m) => (
+                        <li class="cf-mueble">
+                          {esIcono(m.icono) && <Icon name={m.icono} size={30} />}
+                          <span class="cf-mueble-nombre">{m.nombre}</span>
+                          {m.incluido ? (
+                            <span class="cf-mueble-incluido"><T c={c} k="ambientacion.incluida" /></span>
+                          ) : (
+                            <span class="cf-contador">
+                              <button type="button" data-mueble={m.id} data-delta="-1" aria-label={`Quitar ${m.nombre.toLowerCase()}`}>
+                                <Icon name="minus" size={16} />
+                              </button>
+                              <output data-mueble-cantidad={m.id} aria-live="polite">0</output>
+                              <button type="button" data-mueble={m.id} data-delta="1" aria-label={`Añadir ${m.nombre.toLowerCase()}`}>
+                                <Icon name="plus" size={16} />
+                              </button>
+                            </span>
+                          )}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+
+                  <div class="cf-amb-ideal">
+                    <p class="cf-label"><T c={c} k="ambientacion.idealPara" /></p>
+                    <ul>
+                      {mob.idealPara.map((uso) => (
+                        <li><Icon name="tick" size={14} /> {uso}</li>
+                      ))}
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            </div>
+          );
+        })
+    }
+
+    <div class="cf-campo" data-cuando="!ambConMobiliario">
       <span class="cf-label"><T c={c} k="ambientacion.personasLabel" /></span>
       <div class="cf-pills" role="group" aria-label="Capacidad del espacio" data-cf-edit={refEdicion(c, 'l:personasAmbientacion')}>
         {
@@ -139,6 +229,30 @@ const personas = lista(c, 'personasAmbientacion', { conOcultos: Boolean(c.editor
       <span class="cf-card-text"><T c={c} k="ambientacion.personasNota" /></span>
     </div>
 
-    <Aviso c={c} k="ambientacion.aviso" />
+    <div class="cf-caja cf-stack" data-cuando="roadshow&ambientacion.opcion">
+      <div>
+        <h2 class="cf-h2 is-serif"><T c={c} k="ambientacion.roadshowTitulo" /></h2>
+        <p class="cf-h2-sub"><T c={c} k="ambientacion.roadshowTexto" /></p>
+      </div>
+      <div class="cf-grid cf-grid-2" role="group" aria-label="Ambientación en las paradas">
+        <button type="button" class="cf-card cf-card-linea" data-elegir="ambientacion.roadshow" data-valor="mantener" aria-pressed="false">
+          <span class="cf-radio" aria-hidden="true"><Icon name="tick" size={14} /></span>
+          <span>
+            <span class="cf-card-title is-normal"><T c={c} k="ambientacion.roadshowMantener" /></span>
+            <span class="cf-card-text"><T c={c} k="ambientacion.roadshowMantenerTexto" /></span>
+          </span>
+        </button>
+        <button type="button" class="cf-card cf-card-linea" data-elegir="ambientacion.roadshow" data-valor="adaptar" aria-pressed="false">
+          <span class="cf-radio" aria-hidden="true"><Icon name="tick" size={14} /></span>
+          <span>
+            <span class="cf-card-title is-normal"><T c={c} k="ambientacion.roadshowAdaptar" /></span>
+            <span class="cf-card-text"><T c={c} k="ambientacion.roadshowAdaptarTexto" /></span>
+          </span>
+        </button>
+      </div>
+      <Aviso c={c} k="ambientacion.roadshowNota" />
+    </div>
+
+    <Aviso c={c} k="ambientacion.aviso" cuando="!roadshow" />
   </div>
 </section>

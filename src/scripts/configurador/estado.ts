@@ -8,8 +8,11 @@
  */
 
 import {
+  equiposRecomendados,
   estadoInicial,
+  MAX_POR_MUEBLE,
   opcionPorId,
+  propuestaMobiliario,
   type Catalogo,
   type EstadoConfigurador,
   type PasoId,
@@ -49,6 +52,12 @@ export const store = {
   estado: restaurar(inicial?.estado),
   pasoGuardado: (inicial?.paso ?? null) as PasoId | null,
 };
+
+/* Sesiones guardadas antes de existir las cantidades: parten de la propuesta. */
+{
+  const a = store.estado.ambientacion;
+  if (a.opcion && !Object.keys(a.cantidades).length) a.cantidades = propuestaMobiliario(a.opcion, a.personas);
+}
 
 type Oyente = () => void;
 const oyentes: Oyente[] = [];
@@ -117,8 +126,30 @@ export const escribir = (ruta: string, valor: unknown, catalogo: Catalogo) => {
   if (ruta === 'configuracion.uso') {
     if (opcionPorId(catalogo, e.configuracion.sub)?.padre !== e.configuracion.uso) e.configuracion.sub = null;
   }
+  if (ruta === 'configuracion.uso' || ruta === 'configuracion.sub') {
+    // Las maquinas recomendadas llegan ya anadidas al paso 4 (el cliente puede
+    // quitarlas). Las que se anadieron solas para la subconfiguracion anterior
+    // se retiran; lo anadido a mano se queda.
+    const eq = e.equipamiento;
+    const previas = new Set(eq.auto);
+    const nuevas = equiposRecomendados(catalogo, e.configuracion.sub).filter(
+      (id) => previas.has(id) || !eq.seleccion.includes(id),
+    );
+    eq.seleccion = [...eq.seleccion.filter((id) => !previas.has(id)), ...nuevas];
+    eq.auto = nuevas;
+  }
+  if (ruta === 'equipamiento.seleccion') {
+    // Quitar o anadir a mano convierte la decision en del cliente.
+    const seleccion = valor as string[];
+    const eq = e.equipamiento;
+    eq.auto = eq.auto.filter((id) => seleccion.includes(id));
+  }
   if (ruta === 'fecha.situacion' || ruta === 'fecha.modo') {
     if (ruta === 'fecha.modo' && valor === 'single') e.fecha.fin = null;
+  }
+  if (ruta === 'ambientacion.opcion' || ruta === 'ambientacion.personas') {
+    // Nuevo ambiente o nueva capacidad: se parte otra vez de la propuesta.
+    e.ambientacion.cantidades = propuestaMobiliario(e.ambientacion.opcion, e.ambientacion.personas);
   }
   if (ruta === 'cocina.personasNoSe' && valor) e.cocina.personas = null;
   if (ruta === 'logistica.asistentesNoSe' && valor) e.logistica.asistentes = null;
@@ -127,6 +158,21 @@ export const escribir = (ruta: string, valor: unknown, catalogo: Catalogo) => {
     e.logistica.fin = '';
   }
 
+  notificar();
+};
+
+/** Sube o baja una pieza del mobiliario propuesto (paso 6). */
+export const ajustarMueble = (id: string, delta: number) => {
+  const cantidades = store.estado.ambientacion.cantidades;
+  if (!(id in cantidades)) return;
+  cantidades[id] = Math.min(MAX_POR_MUEBLE, Math.max(0, (cantidades[id] ?? 0) + delta));
+  notificar();
+};
+
+/** Vuelve a la propuesta del ambiente y la capacidad elegidos. */
+export const restablecerMobiliario = () => {
+  const a = store.estado.ambientacion;
+  a.cantidades = propuestaMobiliario(a.opcion, a.personas);
   notificar();
 };
 
