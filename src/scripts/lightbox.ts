@@ -46,6 +46,9 @@ export const initLightbox = (
     // la miniatura ya descargada en lugar de dejar el visor en blanco.
     image.src = trigger.dataset.full ?? (thumb.currentSrc || thumb.src);
     image.alt = thumb.alt;
+    // Las maquinas son recortes sin fondo: sobre crema, no sobre el negro que
+    // rellena los margenes de las fotos normales.
+    image.classList.toggle('is-sin-fondo', trigger.hasAttribute('data-sin-fondo'));
     caption.textContent = thumb.alt;
     counter.textContent = `${current + 1} / ${triggers.length}`;
     if (live) live.textContent = `Foto ${current + 1} de ${triggers.length}`;
