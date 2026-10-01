@@ -42,8 +42,8 @@ const precio = formatearEuros(c.ajustes.precioDesde).replace(',00 €', ' €');
   </div>
 
   <div class="cf-side-scroll">
+    {/* Compacto y en horizontal: la barra entera (sin la ayuda) cabe en pantalla. */}
     <div class="cf-rental" data-cf-edit={refEdicion(c, 'a:general')}>
-      <p class="cf-rental-title"><T c={c} k="side.rentalTitulo" /></p>
       <img
         src={t(c, 'img.rentalBase')}
         alt=""
@@ -52,8 +52,11 @@ const precio = formatearEuros(c.ajustes.precioDesde).replace(',00 €', ' €');
         data-cf-img="img.rentalBase"
         data-cf-edit={refEdicion(c, 'i:img.rentalBase')}
       />
-      <p class="cf-rental-precio"><T c={c} k="side.desde" vars={{ precio }} /></p>
-      <p class="cf-rental-texto" data-cf-ajuste="textoIncluye">{c.ajustes.textoIncluye}</p>
+      <div class="cf-rental-cab">
+        <p class="cf-rental-title"><T c={c} k="side.rentalTitulo" /></p>
+        <p class="cf-rental-precio"><T c={c} k="side.desde" vars={{ precio }} /></p>
+      </div>
+      <p class="cf-rental-texto" data-cf-ajuste="textoIncluye" title={c.ajustes.textoIncluye}>{c.ajustes.textoIncluye}</p>
     </div>
 
     <ul class="cf-side-lista">
@@ -61,7 +64,7 @@ const precio = formatearEuros(c.ajustes.precioDesde).replace(',00 €', ' €');
         filas.map((f) => (
           <li data-cf-side-fila={f.paso}>
             <button type="button" data-ir={f.paso}>
-              <Icon name={f.icono} size={18} class="cf-side-icon" />
+              <Icon name={f.icono} size={16} class="cf-side-icon" />
               <span class="cf-side-texto">
                 <span class="cf-side-titulo"><T c={c} k={`side.fila.${f.paso}` as ClaveTexto} /></span>
                 <span class="cf-side-valor" data-cf-side-valor>{t(c, 'side.sinSeleccionar')}</span>

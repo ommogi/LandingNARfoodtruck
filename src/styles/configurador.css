@@ -30,7 +30,7 @@
     --cf-err: #b42318;
     --cf-err-bg: #fdecec;
     --cf-serif: 'DM Serif Display', Georgia, 'Times New Roman', serif;
-    --cf-top-h: 76px;
+    --cf-top-h: 64px;
 
     min-height: 100dvh;
     color: var(--color-ink);
@@ -52,7 +52,7 @@
     align-items: center;
     gap: 24px;
     min-height: var(--cf-top-h);
-    padding: 10px 28px;
+    padding: 8px 28px;
     border-bottom: 1px solid var(--cf-linea);
     background: var(--cf-fondo-2);
   }
@@ -119,12 +119,12 @@
   .cf-step-num {
     display: grid;
     place-items: center;
-    width: 34px;
-    height: 34px;
+    width: 28px;
+    height: 28px;
     border: 1.5px solid var(--cf-navy);
     border-radius: 50%;
     background: var(--cf-fondo-2);
-    font-size: 14px;
+    font-size: 12.5px;
     font-weight: 700;
     transition:
       background-color 200ms var(--ease-out),
@@ -137,7 +137,7 @@
 
   .cf-step-label {
     max-width: 100px;
-    font-size: 11.5px;
+    font-size: 11px;
     line-height: 1.2;
     text-align: center;
   }
@@ -202,6 +202,19 @@
 
   .cf-main {
     min-width: 0;
+  }
+
+  /*
+   * En escritorio todo el contenido de los pasos se ve algo mas pequeno, de
+   * forma uniforme (titulos, tarjetas, fotos, campos, botones). `zoom` y no
+   * regla a regla: son diez pasos y un solo factor mantiene las proporciones.
+   * Es seguro porque dentro de .cf-main no hay nada fijo y ningun script lee
+   * posiciones. En movil no se aplica.
+   */
+  @media (min-width: 1101px) {
+    .cf-main {
+      zoom: 0.88;
+    }
   }
 
   .cf-paso {
@@ -296,7 +309,7 @@
     margin: 0 0 10px;
     color: var(--cf-navy);
     font-family: var(--cf-serif);
-    font-size: clamp(34px, 4vw, 58px);
+    font-size: clamp(30px, 3.2vw, 46px);
     font-weight: 400;
     line-height: 1.05;
     letter-spacing: -0.01em;
@@ -315,7 +328,7 @@
   }
 
   .cf-head.is-compacta .cf-title {
-    font-size: clamp(28px, 2.8vw, 40px);
+    font-size: clamp(26px, 2.4vw, 34px);
   }
 
   .cf-head.is-compacta .cf-subtitle {
@@ -2271,7 +2284,7 @@
 
     & .cf-over {
       color: #0b1726;
-      font-size: 16px;
+      font-size: 15px;
       font-weight: 800;
       letter-spacing: 0.06em;
     }
@@ -2296,10 +2309,14 @@
     overscroll-behavior: contain;
   }
 
+  /* Alquiler base en horizontal: foto pequena a la izquierda, nombre y precio
+     a la derecha y el "incluye" debajo en dos lineas como maximo. */
   .cf-rental {
     display: grid;
-    gap: 4px;
-    padding: 10px 12px;
+    grid-template-columns: 92px minmax(0, 1fr);
+    align-items: center;
+    gap: 4px 10px;
+    padding: 8px 10px;
     border: 1px solid var(--cf-linea);
     border-radius: 12px;
     background: #fbfaf8;
@@ -2307,15 +2324,20 @@
     & img {
       width: 100%;
       height: auto;
-      max-height: 92px;
+      max-height: 54px;
       object-fit: contain;
     }
+  }
+
+  .cf-rental-cab {
+    display: grid;
+    gap: 2px;
   }
 
   .cf-rental-title {
     margin: 0;
     color: var(--cf-navy);
-    font-size: 13.5px;
+    font-size: 11.5px;
     font-weight: 700;
     letter-spacing: 0.04em;
     text-transform: uppercase;
@@ -2324,7 +2346,8 @@
   .cf-rental-precio {
     margin: 0;
     color: var(--cf-navy);
-    font-size: 15px;
+    font-size: 14px;
+    line-height: 1.2;
 
     & strong {
       color: var(--color-blue-light);
@@ -2332,10 +2355,16 @@
   }
 
   .cf-rental-texto {
+    display: -webkit-box;
+    grid-column: 1 / -1;
+    overflow: hidden;
     margin: 0;
     color: var(--color-muted);
-    font-size: 11.5px;
-    line-height: 1.4;
+    font-size: 11px;
+    line-height: 1.35;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
   }
 
   .cf-side-lista {
@@ -2349,11 +2378,11 @@
 
     & button {
       display: grid;
-      grid-template-columns: 20px minmax(0, 1fr) 16px 18px;
+      grid-template-columns: 18px minmax(0, 1fr) 16px 18px;
       align-items: center;
       gap: 8px;
       width: 100%;
-      padding: 6px 4px;
+      padding: 4px;
       border: 0;
       color: inherit;
       background: transparent;
@@ -2382,7 +2411,8 @@
   .cf-side-titulo {
     display: block;
     color: var(--cf-navy);
-    font-size: 11.5px;
+    font-size: 10.5px;
+    line-height: 1.25;
     font-weight: 700;
     letter-spacing: 0.03em;
     text-transform: uppercase;
@@ -2392,7 +2422,8 @@
     display: block;
     overflow: hidden;
     color: var(--color-muted);
-    font-size: 11.5px;
+    font-size: 11px;
+    line-height: 1.25;
     text-overflow: ellipsis;
     white-space: nowrap;
   }
@@ -2551,6 +2582,22 @@
   }
 
   /* ------------------------------------------------------------ Responsive */
+
+  /* Ventanas de escritorio muy bajas: las nueve filas siguen cabiendo sin
+     scroll a costa de la foto del alquiler. */
+  @media (max-height: 700px) and (min-width: 1101px) {
+    .cf-rental {
+      grid-template-columns: minmax(0, 1fr);
+
+      & img {
+        display: none;
+      }
+    }
+
+    .cf-side-lista button {
+      padding-block: 2px;
+    }
+  }
 
   @media (max-width: 1280px) {
     .cf-reveal-row {
