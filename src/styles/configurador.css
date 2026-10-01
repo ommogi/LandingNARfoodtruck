@@ -1866,7 +1866,13 @@
 
     /* Las maquinas son recortes sobre blanco: enteras, sin recortar. */
     &:has(img) {
+      aspect-ratio: 4 / 3;
       background: #fff;
+    }
+
+    /* La etiqueta "Recomendado" va arriba: la foto empieza debajo de ella. */
+    &:has(.cf-badge) img {
+      padding-top: 30px;
     }
 
     & img {
@@ -1879,7 +1885,10 @@
 
   /* Foto ampliable: al pasar el raton (o con foco) se ve que se puede ver en grande. */
   .cf-equipo-zoom {
-    position: relative;
+    /* Ocupa exactamente la caja de la foto: si creciera con la imagen, una
+       maquina vertical (botellero, freidora) quedaria cortada. */
+    position: absolute;
+    inset: 0;
     display: block;
     width: 100%;
     height: 100%;
@@ -1889,6 +1898,7 @@
     cursor: zoom-in;
 
     & img {
+      display: block;
       transition: transform 300ms var(--ease-out);
     }
 
