@@ -1055,6 +1055,68 @@
 
   /* ------------------------------------------------------------ Formularios */
 
+  /* ------------------------------------------------------------ Buscador de direcciones (paso 8) */
+
+  .cf-campo.is-buscador {
+    position: relative;
+  }
+
+  .cf-sugerencias {
+    position: absolute;
+    top: calc(100% + 4px);
+    right: 0;
+    left: 0;
+    z-index: 30;
+    margin: 0;
+    padding: 6px;
+    border: 1px solid var(--cf-linea);
+    border-radius: 10px;
+    background: #fff;
+    box-shadow: 0 14px 34px rgb(15 39 71 / 14%);
+    list-style: none;
+
+    & [role='option'] {
+      display: grid;
+      gap: 1px;
+      padding: 8px 10px;
+      border-radius: 7px;
+      color: var(--cf-navy);
+      font-size: 13.5px;
+      cursor: pointer;
+
+      & strong {
+        font-weight: 600;
+      }
+
+      & span {
+        overflow: hidden;
+        color: var(--color-muted);
+        font-size: 12px;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+
+      &:hover,
+      &.is-activa {
+        background: var(--cf-calido);
+      }
+    }
+  }
+
+  .cf-sugerencias-vacio {
+    padding: 8px 10px;
+    color: var(--color-muted);
+    font-size: 13px;
+  }
+
+  /* Atribucion de Google: obligatoria, discreta. */
+  .cf-sugerencias-marca {
+    padding: 4px 10px 2px;
+    color: #9aa3ad;
+    font-size: 10.5px;
+    text-align: right;
+  }
+
   .cf-campo {
     display: grid;
     align-content: start;

@@ -7,6 +7,12 @@ interface ImportMetaEnv {
   readonly PUBLIC_GA4_ID?: string;
   readonly PUBLIC_SUPABASE_URL?: string;
   readonly PUBLIC_SUPABASE_ANON_KEY?: string;
+  /**
+   * Clave de Google (Maps JavaScript API + Places API (New)) para el buscador de
+   * direcciones del configurador. Publica: restringirla por referente en Google
+   * Cloud. Sin ella los campos de direccion son manuales.
+   */
+  readonly PUBLIC_GOOGLE_MAPS_KEY?: string;
   /** Clave que abre precios_configurador() en Supabase. Solo servidor. */
   readonly CONFIGURADOR_PRICING_SECRET?: string;
   /** Ruta secreta del panel (sin barras). Solo servidor. Ver src/lib/admin.ts. */

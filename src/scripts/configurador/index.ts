@@ -11,6 +11,7 @@
  *   envio.ts         paso 10
  *   cajon.ts         barra lateral en movil
  *   animaciones.ts   entradas y micro-interacciones (GSAP)
+ *   direcciones.ts   buscador de direcciones (Google Places)
  *
  * Cada cambio de estado repinta todo: son unos cientos de nodos y el coste es
  * despreciable frente a la claridad de no tener que saber que depende de que.
@@ -28,6 +29,7 @@ import { iniciarEnvio } from './envio';
 import { iniciarCajon } from './cajon';
 import { iniciarPuenteEditor } from './editor-puente';
 import { iniciarAnimaciones } from './animaciones';
+import { iniciarDirecciones } from './direcciones';
 
 const raiz = document.querySelector<HTMLElement>('[data-configurador]');
 
@@ -49,6 +51,7 @@ if (raiz) {
   const pintarEquipamiento = iniciarEquipamiento(raiz);
   const resumen = crearResumen(raiz, catalogo);
   const animarSidebar = iniciarAnimaciones(raiz, { editor: Boolean(catalogo.editor) });
+  const prepararDirecciones = catalogo.editor ? () => {} : iniciarDirecciones(raiz, catalogo);
 
   iniciarCajon(raiz);
   iniciarEnvio(raiz, {
@@ -64,6 +67,7 @@ if (raiz) {
     vista.pintar();
     pintarCalendario();
     pintarParadas();
+    prepararDirecciones();
     pintarEquipamiento();
     resumen.pintarResumen();
     resumen.pintarSidebar(nav.visibles(), nav.alcanzable);

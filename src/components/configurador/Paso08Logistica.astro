@@ -38,6 +38,12 @@ const modos = opcionesDe(c, 'logistica');
           <p class="cf-h2-sub"><T c={c} k="logistica.b1Sub" /></p>
         </div>
         <div class="cf-form-grid">
+          <label class="cf-campo is-ancho">
+            <span class="cf-label"><T c={c} k="logistica.direccion" /></span>
+            <input class="field" data-bind="logistica.direccion" maxlength="160" autocomplete="street-address" />
+            {/* Solo se muestra si hay buscador de Google (scripts/configurador/direcciones.ts). */}
+            <span class="cf-card-text" data-cf-dir-ayuda hidden><T c={c} k="logistica.direccionAyuda" /></span>
+          </label>
           <label class="cf-campo">
             <span class="cf-label"><T c={c} k="logistica.localidad" /> <span class="cf-req">*</span></span>
             <input class="field" data-bind="logistica.localidad" maxlength="80" autocomplete="address-level2" />
@@ -52,10 +58,6 @@ const modos = opcionesDe(c, 'logistica');
           <label class="cf-campo">
             <span class="cf-label"><T c={c} k="logistica.cp" /></span>
             <input class="field" data-bind="logistica.cp" maxlength="5" inputmode="numeric" autocomplete="postal-code" />
-          </label>
-          <label class="cf-campo is-ancho">
-            <span class="cf-label"><T c={c} k="logistica.direccion" /></span>
-            <input class="field" data-bind="logistica.direccion" maxlength="160" autocomplete="street-address" />
           </label>
         </div>
         <div class="cf-fila is-entre">
