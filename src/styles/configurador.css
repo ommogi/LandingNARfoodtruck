@@ -1864,10 +1864,11 @@
     color: var(--cf-navy);
     background: #f4f1ed;
 
-    /* Las maquinas son recortes sobre blanco: enteras, sin recortar. */
+    /* Las maquinas son recortes sin fondo: enteras, sin recortar. */
+    /* Las maquinas son recortes sin fondo: se ven sobre la propia tarjeta. */
     &:has(img) {
       aspect-ratio: 4 / 3;
-      background: #fff;
+      background: transparent;
     }
 
     /* La etiqueta "Recomendado" va arriba: la foto empieza debajo de ella. */

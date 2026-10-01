@@ -67,7 +67,7 @@ export interface GalleryPhoto {
   category: GalleryCategory;
   /** Ocupa el doble de ancho en el collage de escritorio. */
   wide?: boolean;
-  /** Recorte sobre blanco (maquinas): se ve entera, sin recortar. */
+  /** Recorte sin fondo (maquinas): se ve entera, sin recortar. */
   contain?: boolean;
 }
 
