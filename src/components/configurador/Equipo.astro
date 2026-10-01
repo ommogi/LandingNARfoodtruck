@@ -32,7 +32,17 @@ const buscable = `${e.nombre} ${e.descripcion}`.toLowerCase();
   <span class="cf-equipo-media">
     {
       e.imagen ? (
-        <img src={e.imagen} alt="" loading="lazy" decoding="async" />
+        /* La foto se amplia en el visor del paso (scripts/configurador/zoom.ts). */
+        <button
+          type="button"
+          class="cf-equipo-zoom"
+          data-cf-zoom={e.imagen}
+          data-cf-zoom-titulo={e.nombre}
+          aria-label={`Ampliar foto: ${e.nombre}`}
+        >
+          <img src={e.imagen} alt="" loading="lazy" decoding="async" />
+          <span class="cf-equipo-zoom-pista" aria-hidden="true"><Icon name="search" size={16} /> Ampliar</span>
+        </button>
       ) : (
         esIcono(e.icono) && <Icon name={e.icono} size={30} />
       )

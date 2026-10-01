@@ -12,6 +12,7 @@
  *   cajon.ts         barra lateral en movil
  *   animaciones.ts   entradas y micro-interacciones (GSAP)
  *   direcciones.ts   buscador de direcciones (Google Places)
+ *   zoom.ts          visor de las fotos de maquinaria
  *
  * Cada cambio de estado repinta todo: son unos cientos de nodos y el coste es
  * despreciable frente a la claridad de no tener que saber que depende de que.
@@ -30,6 +31,7 @@ import { iniciarCajon } from './cajon';
 import { iniciarPuenteEditor } from './editor-puente';
 import { iniciarAnimaciones } from './animaciones';
 import { iniciarDirecciones } from './direcciones';
+import { iniciarZoom } from './zoom';
 
 const raiz = document.querySelector<HTMLElement>('[data-configurador]');
 
@@ -54,6 +56,7 @@ if (raiz) {
   const prepararDirecciones = catalogo.editor ? () => {} : iniciarDirecciones(raiz, catalogo);
 
   iniciarCajon(raiz);
+  iniciarZoom(raiz);
   iniciarEnvio(raiz, {
     catalogo,
     pasoPendiente: () => {

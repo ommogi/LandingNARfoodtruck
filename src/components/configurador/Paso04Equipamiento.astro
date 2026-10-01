@@ -67,6 +67,15 @@ const categorias = lista(c, 'categoriasEquipo').filter((cat) => extras.some((e) 
     </div>
     <p class="cf-vacio" data-cf-sin-resultados hidden><T c={c} k="equipamiento.sinResultados" /></p>
 
+    {/* Visor de las fotos de maquinaria (scripts/configurador/zoom.ts). */}
+    <dialog class="cf-visor" data-cf-visor aria-labelledby="cf-visor-titulo">
+      <form method="dialog">
+        <button class="cf-visor-cerrar" aria-label="Cerrar"><Icon name="close" size={22} /></button>
+      </form>
+      <img alt="" data-cf-visor-img />
+      <p class="cf-visor-titulo" id="cf-visor-titulo" data-cf-visor-titulo></p>
+    </dialog>
+
     <div class="cf-otro">
       <Icon name="cog" size={28} class="text-rust" />
       <label class="cf-campo">

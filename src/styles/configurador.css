@@ -1877,6 +1877,116 @@
     }
   }
 
+  /* Foto ampliable: al pasar el raton (o con foco) se ve que se puede ver en grande. */
+  .cf-equipo-zoom {
+    position: relative;
+    display: block;
+    width: 100%;
+    height: 100%;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    cursor: zoom-in;
+
+    & img {
+      transition: transform 300ms var(--ease-out);
+    }
+
+    &:hover img,
+    &:focus-visible img {
+      transform: scale(1.06);
+    }
+
+    &:focus-visible {
+      outline: 2px solid var(--color-rust);
+      outline-offset: -2px;
+    }
+  }
+
+  .cf-equipo-zoom-pista {
+    position: absolute;
+    right: 6px;
+    bottom: 6px;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 8px;
+    border-radius: 999px;
+    color: #fff;
+    background: rgb(15 39 71 / 85%);
+    font-size: 11.5px;
+    font-weight: 600;
+    opacity: 0;
+    transform: translateY(4px);
+    transition:
+      opacity 200ms var(--ease-out),
+      transform 200ms var(--ease-out);
+  }
+
+  .cf-equipo-zoom:hover .cf-equipo-zoom-pista,
+  .cf-equipo-zoom:focus-visible .cf-equipo-zoom-pista {
+    opacity: 1;
+    transform: none;
+  }
+
+  /* En tactil no hay hover: la lupa se ve siempre, discreta. */
+  @media (hover: none) {
+    .cf-equipo-zoom-pista {
+      padding: 4px;
+      font-size: 0;
+      opacity: 0.9;
+      transform: none;
+    }
+  }
+
+  .cf-visor {
+    /* El reset de Tailwind quita el centrado nativo del <dialog>. */
+    position: fixed;
+    inset: 0;
+    margin: auto;
+    height: fit-content;
+    width: min(720px, 92vw);
+    padding: 20px 20px 16px;
+    border: 0;
+    border-radius: 16px;
+    background: #fff;
+    box-shadow: 0 30px 80px rgb(0 0 0 / 30%);
+
+    &::backdrop {
+      background: rgb(10 20 30 / 60%);
+    }
+
+    & img {
+      display: block;
+      width: 100%;
+      max-height: 70vh;
+      object-fit: contain;
+    }
+  }
+
+  .cf-visor-cerrar {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    display: grid;
+    place-items: center;
+    width: 38px;
+    height: 38px;
+    border: 0;
+    border-radius: 50%;
+    color: var(--cf-navy);
+    background: #f4f1ed;
+    cursor: pointer;
+  }
+
+  .cf-visor-titulo {
+    margin: 10px 0 0;
+    color: var(--cf-navy);
+    font-family: var(--cf-serif);
+    font-size: 22px;
+    text-align: center;
+  }
+
   .cf-equipo-estado {
     display: flex;
     align-items: center;
