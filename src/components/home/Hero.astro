@@ -26,7 +26,7 @@ const points = [
   class="relative grid min-h-[640px] items-center overflow-hidden bg-[#080808] text-white max-b820:min-h-0 max-b820:items-end"
 >
   {/* En movil: una sola pantalla. La foto llena la mitad de arriba (truck entero) y se funde con el fondo; el contenido compacto va abajo. */}
-  <div class="absolute inset-0 max-b820:bottom-auto max-b820:h-[min(92vw,460px)]" data-anim="hero-media">
+  <div class="absolute inset-0 overflow-hidden max-b820:bottom-auto max-b820:h-[min(92vw,460px)]" data-anim="hero-media">
     <Image
       src={hero}
       alt=""
@@ -48,7 +48,7 @@ const points = [
   >
   </div>
 
-  <div class="container relative z-2 pt-16 pb-[84px] max-b820:pt-[min(76vw,380px)] max-b820:pb-7">
+  <div class="container relative z-2 pt-16 pb-[84px] max-b820:pt-[min(76vw,380px)] max-b820:pb-14">
     <div class="max-w-[630px]" data-anim="hero">
       <p class="eyebrow">Alquiler de food trucks para eventos</p>
       <h1
