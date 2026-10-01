@@ -136,6 +136,12 @@ export const crearNavegacion = (raiz: HTMLElement, catalogo: Catalogo) => {
       const i = v.indexOf(el.dataset.cfNum as PasoId);
       el.textContent = t(catalogo, 'general.pastilla', { n: i + 1, total });
     });
+    // Solo la cifra (tarjetas del resumen): se salta los pasos ocultos.
+    raiz.querySelectorAll<HTMLElement>('[data-cf-num-solo]').forEach((el) => {
+      const i = v.indexOf(el.dataset.cfNumSolo as PasoId);
+      el.textContent = i >= 0 ? String(i + 1) : '';
+      el.hidden = i < 0;
+    });
 
     raiz.querySelectorAll<HTMLElement>('[data-cf-step]').forEach((li) => {
       const paso = li.dataset.cfStep as PasoId;

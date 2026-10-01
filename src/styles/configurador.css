@@ -1928,18 +1928,21 @@
         display: inline-flex;
       }
 
-      /* Deja claro que lo anadido (tambien lo recomendado) se puede quitar. */
-      &:hover,
-      &:focus-visible {
-        border-color: var(--color-rust);
-        background: var(--color-rust);
+      /* Deja claro que lo anadido (tambien lo recomendado) se puede quitar.
+         Solo con raton: en tactil el :hover se queda pegado tras el toque y el
+         equipo recien anadido se leia como "Quitar". */
+      @media (hover: hover) and (pointer: fine) {
+        &:hover {
+          border-color: var(--color-rust);
+          background: var(--color-rust);
 
-        & .cf-equipo-added {
-          display: none;
-        }
+          & .cf-equipo-added {
+            display: none;
+          }
 
-        & .cf-equipo-quitar {
-          display: inline-flex;
+          & .cf-equipo-quitar {
+            display: inline-flex;
+          }
         }
       }
     }
@@ -2071,6 +2074,20 @@
     & h3 {
       flex: 1;
     }
+  }
+
+  /* Numero del paso, como en el stepper de arriba. */
+  .cf-resumen-num {
+    display: grid;
+    flex: none;
+    place-items: center;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    color: #fff;
+    background: var(--cf-navy);
+    font-size: 12px;
+    font-weight: 700;
   }
 
   .cf-resumen-body {

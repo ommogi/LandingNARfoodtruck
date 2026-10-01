@@ -17,9 +17,10 @@ const points = [
 {/* Unica seccion que no usa el degradado crema del body. */}
 <section
   id="inicio"
-  class="relative grid min-h-[640px] items-center overflow-hidden bg-[#080808] text-white max-b820:min-h-[660px]"
+  class="relative grid min-h-[640px] items-center overflow-hidden bg-[#080808] text-white max-b820:min-h-0 max-b820:items-end"
 >
-  <div class="absolute inset-0" data-anim="hero-media">
+  {/* En movil la foto es una franja arriba (se ve el truck entero) y el texto va debajo sobre negro. */}
+  <div class="absolute inset-0 max-b820:bottom-auto max-b820:h-[290px]" data-anim="hero-media">
     <Image
       src={hero}
       alt=""
@@ -28,7 +29,7 @@ const points = [
       loading="eager"
       fetchpriority="high"
       aria-hidden="true"
-      class="size-full object-cover object-center max-b820:object-[62%_center]"
+      class="size-full object-cover object-center max-b820:object-[60%_center]"
     />
   </div>
   {/*
@@ -36,12 +37,12 @@ const points = [
     a la derecha, para que la foto del atardecer luzca y el titular se lea.
   */}
   <div
-    class="absolute inset-0 bg-[linear-gradient(90deg,rgb(0_0_0_/_88%)_0%,rgb(0_0_0_/_70%)_45%,rgb(0_0_0_/_40%)_100%)] max-b820:bg-[rgb(0_0_0_/_72%)]"
+    class="absolute inset-0 bg-[linear-gradient(90deg,rgb(0_0_0_/_88%)_0%,rgb(0_0_0_/_70%)_45%,rgb(0_0_0_/_40%)_100%)] max-b820:bottom-auto max-b820:h-[290px] max-b820:bg-[linear-gradient(180deg,transparent_60%,#080808_100%)]"
     aria-hidden="true"
   >
   </div>
 
-  <div class="container relative z-2 pt-16 pb-[84px] max-b560:pt-[46px] max-b560:pb-16">
+  <div class="container relative z-2 pt-16 pb-[84px] max-b820:pt-[296px] max-b560:pb-16">
     <div class="max-w-[630px]" data-anim="hero">
       <p class="eyebrow">Alquiler de food trucks para eventos</p>
       <h1
@@ -49,7 +50,7 @@ const points = [
       >
         Haz que tu evento sea imposible <em class="block text-rust not-italic">de olvidar.</em>
       </h1>
-      <p class="my-[22px] max-w-[600px] text-lg text-white/90 max-b560:text-base">
+      <p class="my-[22px] max-w-[600px] text-lg text-white/90 max-b820:hidden">
         En {site.name} alquilamos food trucks premium totalmente equipados para bodas, empresas,
         ferias y eventos privados. Nosotros nos encargamos de todo para que tú solo disfrutes.
       </p>

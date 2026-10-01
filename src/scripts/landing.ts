@@ -83,6 +83,28 @@ window.addEventListener(
   { passive: true },
 );
 
+/* --------------------------------------------------- Bloques plegables (movil) */
+
+document.querySelectorAll<HTMLButtonElement>('[data-plegable]').forEach((boton) => {
+  const bloque = document.getElementById(boton.getAttribute('aria-controls') ?? '');
+  if (!bloque) return;
+  boton.addEventListener('click', () => {
+    const abierto = boton.getAttribute('aria-expanded') !== 'true';
+    boton.setAttribute('aria-expanded', String(abierto));
+    bloque.classList.toggle('is-abierto', abierto);
+    boton.querySelector('svg')?.classList.toggle('rotate-180', abierto);
+    if (abierto) {
+      // Lo que estaba plegado no llego a entrar con GSAP: se muestra ya y
+      // ScrollTrigger recalcula posiciones con el bloque abierto.
+      bloque.querySelectorAll<HTMLElement>('[data-reveal]').forEach((el) => {
+        el.style.visibility = 'visible';
+        el.style.opacity = '1';
+      });
+      window.dispatchEvent(new Event('resize'));
+    }
+  });
+});
+
 /* --------------------------------------------------- Analitica de enlaces */
 
 document.querySelectorAll<HTMLElement>('a[data-track]').forEach((el) => {

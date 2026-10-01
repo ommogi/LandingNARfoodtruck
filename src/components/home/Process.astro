@@ -14,10 +14,29 @@ const step = [
 
 <section class="section" aria-labelledby="process-title">
   <div class="container">
-    <SectionHeading id="process-title" title="Así trabajamos" />
+    <div class="max-b820:hidden">
+      <SectionHeading id="process-title" title="Así trabajamos" />
+    </div>
+
+    {/*
+      En movil los cinco pasos ocupaban demasiado: se pliegan tras este boton
+      (src/scripts/landing.ts). En escritorio el boton no existe y la lista
+      se ve siempre.
+    */}
+    <button
+      type="button"
+      class="hidden w-full items-center justify-between rounded-card border border-line bg-white px-5 py-4 font-display text-[22px] font-bold text-night uppercase shadow-card max-b820:flex"
+      aria-expanded="false"
+      aria-controls="process-pasos"
+      data-plegable
+    >
+      Así trabajamos
+      <Icon name="chevron" size={22} class="text-rust transition-transform" />
+    </button>
 
     <ol
-      class="m-0 grid list-none grid-cols-5 gap-[22px] p-0 max-b1100:grid-cols-3 max-b1100:gap-7 max-b820:grid-cols-2 max-b560:grid-cols-1 max-b560:gap-5"
+      id="process-pasos"
+      class="m-0 grid list-none max-b820:mt-6 max-b820:[&:not(.is-abierto)]:hidden grid-cols-5 gap-[22px] p-0 max-b1100:grid-cols-3 max-b1100:gap-7 max-b820:grid-cols-2 max-b560:grid-cols-1 max-b560:gap-5"
     >
       {
         steps.map((step_, i) => (
