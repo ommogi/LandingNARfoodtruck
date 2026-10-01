@@ -10,6 +10,7 @@
  *   resumen.ts       barra lateral, paso 9 y mini resumen del paso 10
  *   envio.ts         paso 10
  *   cajon.ts         barra lateral en movil
+ *   animaciones.ts   entradas y micro-interacciones (GSAP)
  *
  * Cada cambio de estado repinta todo: son unos cientos de nodos y el coste es
  * despreciable frente a la claridad de no tener que saber que depende de que.
@@ -26,6 +27,7 @@ import { crearResumen } from './resumen';
 import { iniciarEnvio } from './envio';
 import { iniciarCajon } from './cajon';
 import { iniciarPuenteEditor } from './editor-puente';
+import { iniciarAnimaciones } from './animaciones';
 
 const raiz = document.querySelector<HTMLElement>('[data-configurador]');
 
@@ -46,6 +48,7 @@ if (raiz) {
   const pintarParadas = iniciarParadas(raiz, catalogo);
   const pintarEquipamiento = iniciarEquipamiento(raiz);
   const resumen = crearResumen(raiz, catalogo);
+  const animarSidebar = iniciarAnimaciones(raiz, { editor: Boolean(catalogo.editor) });
 
   iniciarCajon(raiz);
   iniciarEnvio(raiz, {
@@ -65,6 +68,7 @@ if (raiz) {
     resumen.pintarResumen();
     resumen.pintarSidebar(nav.visibles(), nav.alcanzable);
     nav.pintar();
+    animarSidebar();
   };
 
   alCambiar(pintarTodo);

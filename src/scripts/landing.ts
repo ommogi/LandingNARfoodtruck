@@ -1,7 +1,7 @@
 /**
  * Interacciones comunes a todas las paginas: menu movil, modales accesibles,
- * reveal al hacer scroll, alta del formulario y eventos de analitica. Sin
- * librerias externas (seccion 13 de la guia).
+ * alta del formulario y eventos de analitica. Las animaciones (GSAP) viven en
+ * ./animaciones.
  * El foco, el cierre con Escape y dataLayer viven en ./modal; la validacion y el
  * envio del formulario, en ./lead.
  */
@@ -11,6 +11,7 @@ import { closeModal, onEscape, openModal, setMenu, track } from './modal';
 // Los botones de +/- del campo de invitados. Se importa aqui, que es el script
 // que cargan todas las paginas, porque el campo sale en los formularios.
 import './stepper';
+import './animaciones';
 
 const header = document.querySelector<HTMLElement>('[data-header]');
 const menuButton = document.querySelector<HTMLButtonElement>('[data-menu-button]');
@@ -56,32 +57,13 @@ document.querySelectorAll<HTMLElement>('[data-video-close]').forEach((el) => {
 
 onEscape(closeVideo);
 
-/* --------------------------------------------------- Cabecera y reveal */
+/* --------------------------------------------------- Cabecera */
 
 window.addEventListener(
   'scroll',
   () => header?.classList.toggle('is-scrolled', window.scrollY > 24),
   { passive: true },
 );
-
-const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-const revealTargets = document.querySelectorAll<HTMLElement>('[data-reveal]');
-
-if (reduceMotion || !('IntersectionObserver' in window)) {
-  revealTargets.forEach((el) => el.classList.add('is-visible'));
-} else {
-  const observer = new IntersectionObserver(
-    (entries) => {
-      entries.forEach((entry) => {
-        if (!entry.isIntersecting) return;
-        entry.target.classList.add('is-visible');
-        observer.unobserve(entry.target);
-      });
-    },
-    { threshold: 0.12 },
-  );
-  revealTargets.forEach((el) => observer.observe(el));
-}
 
 /* --------------------------------------------------- Analitica de enlaces */
 

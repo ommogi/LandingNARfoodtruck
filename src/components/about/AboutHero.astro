@@ -12,7 +12,7 @@ import Icon from '../Icon.astro';
   <div
     class="container grid grid-cols-[0.86fr_1.14fr] items-start gap-x-[46px] gap-y-[30px] max-b980:grid-cols-1"
   >
-    <div class="self-center" data-reveal>
+    <div class="self-center" data-anim="hero">
       <p class="eyebrow eyebrow-rust flex items-center gap-2">
         <span class="inline-block" aria-hidden="true">
           <Icon name="star" size={14} fill="currentColor" />
@@ -49,7 +49,7 @@ import Icon from '../Icon.astro';
     </div>
 
     {/* En movil manda la foto: se coloca sobre el texto. */}
-    <div class="max-b980:order-first" data-reveal>
+    <div class="max-b980:order-first" data-anim="hero-media">
       <Image
         src={heroImage}
         alt="Food truck NAR iluminado y abierto durante un evento nocturno"

@@ -125,6 +125,22 @@ try {
         />
       )
     }
+    {/*
+      Animaciones (src/scripts/animaciones.ts). `html.anim` oculta lo que GSAP
+      va a hacer entrar, para que no se vea un parpadeo antes. Solo se pone
+      con JS y sin movimiento reducido; si GSAP no arranca en 2,5 s se quita y
+      todo queda visible. Sin JS, la clase nunca existe.
+    */}
+    <script is:inline>
+      if (!matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        document.documentElement.classList.add('anim');
+        setTimeout(function () {
+          if (!document.documentElement.classList.contains('anim-lista')) {
+            document.documentElement.classList.remove('anim');
+          }
+        }, 2500);
+      }
+    </script>
     <title>{title}</title>
     <meta name="description" content={description} />
     <meta name="theme-color" content="#A63921" />

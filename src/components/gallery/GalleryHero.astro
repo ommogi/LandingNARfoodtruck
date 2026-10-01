@@ -42,7 +42,7 @@ const benefitItem = [
     <div
       class="grid grid-cols-[0.78fr_1.22fr] items-center gap-[clamp(28px,4.5vw,58px)] max-b900:grid-cols-1"
     >
-      <div>
+      <div data-anim="hero">
         <p class="eyebrow flex items-center gap-2 text-night">
           <span class="text-rust" aria-hidden="true">★</span>
           Galería
@@ -61,7 +61,7 @@ const benefitItem = [
       </div>
 
       {/* En movil la fotografia va primero (guia, seccion 4.3). */}
-      <figure class="m-0 aspect-video overflow-hidden rounded-card shadow-card max-b900:order-first">
+      <figure class="m-0 aspect-video overflow-hidden rounded-card shadow-card max-b900:order-first" data-anim="hero-media">
         <Image
           src={galleryHeroImage}
           alt="Interior de acero inoxidable del food truck NAR totalmente equipado"

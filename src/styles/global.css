@@ -648,73 +648,26 @@
  * Las duraciones de UI se quedan por debajo de 300ms.
  */
 
-/* Reveal discreto al hacer scroll. `is-visible` lo pone src/scripts/landing.ts. */
-[data-reveal] {
-  opacity: 0;
-  transform: translateY(18px);
-  transition:
-    opacity 500ms var(--ease-out),
-    transform 500ms var(--ease-out);
-}
-
-[data-reveal].is-visible {
-  opacity: 1;
-  transform: none;
-}
-
 /*
- * Entrada escalonada opt-in para rejillas: se combina con [data-reveal] en el
- * contenedor y escalona sus hijos directos. Es decorativa, asi que solo toca
- * opacidad y desplazamiento y nunca bloquea la interaccion mientras corre.
+ * Entradas al hacer scroll y del hero: las anima GSAP (src/scripts/animaciones.ts).
+ * Aqui solo se declara el estado de partida, y solo bajo `html.anim`, que pone
+ * un script inline de BaseLayout cuando hay JS y no se pide movimiento
+ * reducido. Sin esa clase todo se ve tal cual. `visibility` (y no solo
+ * opacidad) evita que lo oculto reciba foco o clics; GSAP lo restaura con
+ * `autoAlpha`.
  */
-/*
- * El contenedor sigue llevando [data-reveal] porque es el gancho del
- * IntersectionObserver, pero deja de animarse el mismo: quien entra son sus
- * hijos, y superponer las dos animaciones se lee como un rebote.
- */
-[data-reveal][data-reveal-stagger] {
-  opacity: 1;
-  transform: none;
-  transition: none;
-}
+html.anim {
+  & [data-reveal],
+  & [data-reveal-stagger] > *,
+  & [data-anim='hero'] > *,
+  & [data-anim='hero-media'],
+  & [data-anim='imagen'] {
+    visibility: hidden;
+  }
 
-[data-reveal-stagger] > * {
-  opacity: 0;
-}
-
-/* `reveal-in` solo declara `from`: el 100% lo toma del valor de base, asi que
-   este `opacity: 1` es lo que hace que el hijo termine visible. Sin el, la
-   animacion va de 0 a 0 y la tarjeta se queda en blanco. */
-[data-reveal-stagger].is-visible > * {
-  opacity: 1;
-  animation: reveal-in 300ms var(--ease-out) both;
-}
-
-[data-reveal-stagger].is-visible > :nth-child(2) {
-  animation-delay: 60ms;
-}
-
-[data-reveal-stagger].is-visible > :nth-child(3) {
-  animation-delay: 120ms;
-}
-
-[data-reveal-stagger].is-visible > :nth-child(4) {
-  animation-delay: 180ms;
-}
-
-[data-reveal-stagger].is-visible > :nth-child(5) {
-  animation-delay: 240ms;
-}
-
-/* A partir del sexto el retardo se congela: un stagger largo se hace lento. */
-[data-reveal-stagger].is-visible > :nth-child(n + 6) {
-  animation-delay: 300ms;
-}
-
-@keyframes reveal-in {
-  from {
-    opacity: 0;
-    transform: translateY(8px);
+  /* El contenedor escalonado se ve: quien entra son sus hijos. */
+  & [data-reveal][data-reveal-stagger] {
+    visibility: visible;
   }
 }
 
@@ -856,17 +809,6 @@
     scroll-behavior: auto;
   }
 
-  /* src/scripts/landing.ts ya marca estos elementos como visibles al cargar. */
-  [data-reveal] {
-    opacity: 1;
-    transform: none;
-    transition: none;
-  }
-
-  [data-reveal-stagger] > * {
-    opacity: 1;
-    animation: none;
-  }
 
   [role='dialog'] [data-modal-panel] {
     /* El fundido se queda; la escala se va. */

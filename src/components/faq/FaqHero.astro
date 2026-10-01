@@ -20,7 +20,7 @@ const highlights = [
   <div
     class="container grid grid-cols-[0.95fr_1.05fr] items-center gap-[clamp(28px,4.5vw,58px)] max-b900:grid-cols-1"
   >
-    <div>
+    <div data-anim="hero">
       <p class="eyebrow flex items-center gap-2 text-night">
         <span class="text-rust" aria-hidden="true">★</span>
         Preguntas frecuentes
@@ -76,7 +76,7 @@ const highlights = [
     </div>
 
     {/* En movil la fotografia va primero, como en el resto de heros. */}
-    <figure class="m-0 max-b900:order-first">
+    <figure class="m-0 max-b900:order-first" data-anim="hero-media">
       <Image
         class="aspect-video w-full rounded-card object-cover shadow-card"
         src={heroImage}
