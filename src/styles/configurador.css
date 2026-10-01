@@ -1864,10 +1864,16 @@
     color: var(--cf-navy);
     background: #f4f1ed;
 
+    /* Las maquinas son recortes sobre blanco: enteras, sin recortar. */
+    &:has(img) {
+      background: #fff;
+    }
+
     & img {
       width: 100%;
       height: 100%;
-      object-fit: cover;
+      padding: 6px;
+      object-fit: contain;
     }
   }
 

@@ -79,7 +79,10 @@ const card =
                 widths={[400, 700, 1000]}
                 sizes="(max-width: 560px) 100vw, (max-width: 900px) 50vw, 33vw"
                 loading={i < 4 ? 'eager' : 'lazy'}
-                class="size-full object-cover transition-transform duration-400 ease-out group-hover:scale-[1.035] group-focus-visible:scale-[1.035]"
+                class:list={[
+                  'size-full transition-transform duration-400 ease-out group-hover:scale-[1.035] group-focus-visible:scale-[1.035]',
+                  photo.contain ? 'bg-white object-contain p-4' : 'object-cover',
+                ]}
               />
             </button>
           </figure>
