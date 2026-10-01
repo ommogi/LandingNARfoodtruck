@@ -166,17 +166,35 @@ const animarImagenes = () => {
   });
 };
 
-/** Parallax muy suave de la foto del hero de la home, solo en escritorio. */
+/**
+ * Parallax de la foto de fondo del hero de la home. La foto es mas alta que su
+ * caja para poder desplazarla mucho: baja mientras se hace scroll, asi va mas
+ * lenta que la pagina. En movil la foto es una franja: el recorrido es menor.
+ */
 const animarParallax = () => {
+  const seccion = document.querySelector<HTMLElement>('#inicio');
+  const foto = seccion?.querySelector<HTMLElement>('[data-anim="hero-media"] img');
+  if (!seccion || !foto) return;
+
   const mm = gsap.matchMedia();
-  mm.add('(min-width: 821px)', () => {
-    const foto = document.querySelector<HTMLElement>('#inicio [data-anim="hero-media"] img');
-    if (!foto) return;
-    gsap.to(foto, {
-      yPercent: 8,
-      ease: 'none',
-      scrollTrigger: { trigger: '#inicio', start: 'top top', end: 'bottom top', scrub: true },
-    });
+  mm.add({ escritorio: '(min-width: 821px)', movil: '(max-width: 820px)' }, (ctx) => {
+    const { escritorio } = ctx.conditions as { escritorio: boolean };
+    // % de alto extra. Mas sobrante = mas recorrido pero tambien mas zoom (la
+    // foto es object-cover): en movil el truck tiene que seguir viendose entero.
+    const sobra = escritorio ? 40 : 16;
+    // Empieza subida la mitad del sobrante: en reposo el encuadre es el central
+    // (truck completo, como sin parallax).
+    gsap.set(foto, { height: `${100 + sobra}%`, top: `-${sobra / 2}%`, position: 'relative' });
+
+    const scroll = { trigger: seccion, start: 'top top', end: 'bottom top', scrub: true };
+    // Baja mientras la seccion sale de pantalla. El hueco que deja arriba
+    // nunca se ve: la foto avanza mas despacio que el scroll.
+    gsap.fromTo(
+      foto,
+      { yPercent: 0 },
+      { yPercent: (sobra * 100) / (100 + sobra), ease: 'none', scrollTrigger: scroll },
+    );
+    return () => gsap.set(foto, { clearProps: 'height,top,position' });
   });
 };
 
