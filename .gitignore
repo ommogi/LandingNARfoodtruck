@@ -18,5 +18,3 @@ yarn-error.log*
 # macOS
 .DS_Store
 
-# originales sin optimizar (las copias curadas viven en src/assets y public/video)
-img/

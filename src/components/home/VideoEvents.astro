@@ -1,6 +1,6 @@
 ---
 import { Image } from 'astro:assets';
-import poster from '../../assets/video-poster.webp';
+import poster from '../../assets/video-eventos.webp';
 import Icon from '../Icon.astro';
 
 const categories = [
@@ -27,6 +27,7 @@ const category = [
       class="group relative cursor-pointer overflow-hidden rounded-2xl border-0 bg-black p-0 shadow-card print:hidden"
       type="button"
       data-video-open
+      data-video="eventos"
       aria-label="Ver vídeo: descubre cómo lo hacemos"
     >
       <Image

@@ -7,7 +7,7 @@
  * compone a partir del array de la configuracion previa.
  *
  * Las especificaciones tecnicas salen de la homologacion europea del remolque
- * (img/informacion/, ficha EC Type 4m Airstream Food Trailer). No inventar.
+ * (ficha EC Type 4m Airstream Food Trailer del fabricante). No inventar.
  */
 
 import type { ImageMetadata } from 'astro';

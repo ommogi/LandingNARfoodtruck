@@ -38,11 +38,29 @@ const closeVideo = () => {
   closeModal(videoModal);
 };
 
+/**
+ * Cada disparador dice que video abre (data-video="eventos" | "truck"). Se
+ * ofrece WebM (mas ligero) y MP4 de respaldo; el navegador elige el primero
+ * que sabe reproducir. El archivo solo se descarga al abrir el modal.
+ */
+const cargarVideo = (nombre: string) => {
+  if (!videoPlayer || videoPlayer.dataset.cargado === nombre) return;
+  videoPlayer.replaceChildren(
+    ...(['webm', 'mp4'] as const).map((ext) => {
+      const source = document.createElement('source');
+      source.src = `/video/nar-${nombre}.${ext}`;
+      source.type = `video/${ext}`;
+      return source;
+    }),
+  );
+  videoPlayer.dataset.cargado = nombre;
+  videoPlayer.load();
+};
+
 document.querySelectorAll<HTMLElement>('[data-video-open]').forEach((trigger) => {
   trigger.addEventListener('click', () => {
     if (!videoModal || !videoPlayer) return;
-    // El archivo solo se descarga cuando el usuario abre el modal.
-    if (!videoPlayer.src) videoPlayer.src = videoPlayer.dataset.src ?? '';
+    cargarVideo(trigger.dataset.video ?? 'eventos');
     openModal(videoModal, trigger);
     void videoPlayer.play().catch(() => {
       /* El navegador puede bloquear la reproduccion automatica: no es un error. */
