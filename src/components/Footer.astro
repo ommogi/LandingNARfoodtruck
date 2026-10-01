@@ -20,6 +20,8 @@ const year = new Date().getFullYear();
  */
 const column =
   'flex flex-col justify-start text-sm not-italic text-muted max-b1180:text-[13px]';
+/* En movil (3 columnas estrechas) los enlaces bajan un punto y se compactan. */
+const navColumn = `${column} max-b620:text-[12.5px] max-b620:[&>a]:min-h-9`;
 /* El relleno vertical da area tactil sin separar visualmente de mas. */
 const columnLink =
   'flex min-h-10 items-center whitespace-nowrap hover:text-rust';
@@ -38,9 +40,9 @@ const socialIcon = 'transition-transform duration-200 ease-out motion-safe:group
     se retiran (una linea vertical entre filas distintas no separa nada).
   */}
   <div
-    class="container grid grid-cols-[max-content_repeat(3,minmax(max-content,1fr))_max-content_max-content_max-content] items-stretch gap-x-0 gap-y-[30px] py-[34px] [&>*+*]:border-l [&>*+*]:border-line [&>*]:px-[15px] [&>*:first-child]:pl-0 [&>*:last-child]:pr-0 max-b1180:[&>*]:px-2.5 max-b1100:grid-cols-3 max-b1100:items-start max-b1100:gap-x-[30px] max-b1100:gap-y-[34px] max-b1100:[&>*+*]:border-l-0 max-b1100:[&>*]:px-0 max-b620:grid-cols-2 max-b620:text-left"
+    class="container grid grid-cols-[max-content_repeat(3,minmax(max-content,1fr))_max-content_max-content_max-content] items-stretch gap-x-0 gap-y-[30px] py-[34px] [&>*+*]:border-l [&>*+*]:border-line [&>*]:px-[15px] [&>*:first-child]:pl-0 [&>*:last-child]:pr-0 max-b1180:[&>*]:px-2.5 max-b1100:grid-cols-3 max-b1100:items-start max-b1100:gap-x-[30px] max-b1100:gap-y-[34px] max-b1100:[&>*+*]:border-l-0 max-b1100:[&>*]:px-0 max-b620:grid-cols-3 max-b620:gap-x-3 max-b620:gap-y-6 max-b620:text-left"
   >
-    <div class="flex items-center max-b1100:col-span-3 max-b620:col-span-2">
+    <div class="flex items-center max-b1100:col-span-3 max-b620:justify-center">
       <Image
         src={logo}
         alt={site.name}
@@ -53,7 +55,7 @@ const socialIcon = 'transition-transform duration-200 ease-out motion-safe:group
 
     {
       footerNavColumns.map((group) => (
-        <nav class={column} aria-label={group.label}>
+        <nav class={navColumn} aria-label={group.label}>
           {group.items.map((item) => (
             <a class={columnLink} href={item.href}>
               {item.label}
@@ -63,7 +65,8 @@ const socialIcon = 'transition-transform duration-200 ease-out motion-safe:group
       ))
     }
 
-    <div class="flex items-center gap-3.5 text-ink">
+    {/* En movil las redes bajan al final, centradas bajo el lema. */}
+    <div class="flex items-center gap-3.5 text-ink max-b620:order-last max-b620:col-span-3 max-b620:-mt-3 max-b620:justify-center">
       <a
         class="group grid size-11 place-items-center rounded-full transition-[background-color] duration-200 ease-out hover:bg-rust/8"
         href={social.instagram}
@@ -84,14 +87,15 @@ const socialIcon = 'transition-transform duration-200 ease-out motion-safe:group
       </a>
     </div>
 
-    <address class={column}>
+    {/* En movil el contacto es una sola linea centrada (salta si no cabe). */}
+    <address class={`${column} max-b620:col-span-3 max-b620:flex-row max-b620:flex-wrap max-b620:justify-center max-b620:gap-x-4 max-b620:text-center`}>
       <a class={columnLink} href={`mailto:${contact.email}`}>{contact.email}</a>
       <a class={columnLink} href={`tel:${contact.phoneRaw}`}>{contact.phone}</a>
       <span class="flex min-h-10 items-center">{contact.address}</span>
     </address>
 
     <p
-      class="m-0 flex flex-col justify-center font-display text-[17px] leading-[1.25] font-bold tracking-[0.04em] text-night uppercase max-b1100:col-span-3 max-b1100:text-center max-b620:col-span-2"
+      class="m-0 flex flex-col justify-center font-display text-[17px] leading-[1.25] font-bold tracking-[0.04em] text-night uppercase max-b1100:col-span-3 max-b1100:text-center"
     >
       Experiencias<br />sobre ruedas<br />desde {site.foundingYear}
     </p>
@@ -99,10 +103,10 @@ const socialIcon = 'transition-transform duration-200 ease-out motion-safe:group
 
   <div class="bg-night text-white/72">
     <div
-      class="container flex flex-wrap items-center justify-between gap-x-6 gap-y-2.5 py-3.5 text-xs max-b620:justify-start"
+      class="container flex flex-wrap items-center justify-between gap-x-6 gap-y-2.5 py-3.5 text-xs max-b620:justify-center max-b620:text-center"
     >
       <span>© {year} {site.name.toUpperCase()}. Todos los derechos reservados.</span>
-      <nav class="flex flex-wrap gap-x-5" aria-label="Información legal">
+      <nav class="flex flex-wrap gap-x-5 max-b620:justify-center" aria-label="Información legal">
         {
           legalNav.map((item) => (
             <a

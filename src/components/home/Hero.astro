@@ -4,13 +4,19 @@ import hero from '../../assets/hero-home-atardecer.webp';
 import Icon from '../Icon.astro';
 import { site } from '../../config/site';
 
+/* `corto` es la etiqueta de los chips del hero en movil. */
 const points = [
-  { title: 'Food truck premium', text: 'Diseño profesional preparado para eventos.' },
+  { title: 'Food truck premium', corto: 'Premium', text: 'Diseño profesional preparado para eventos.' },
   {
     title: 'Configuración a tu medida',
+    corto: 'A tu medida',
     text: 'Elige equipamiento, ambientación y personalización.',
   },
-  { title: `Cobertura en ${site.areaServedLong}`, text: 'Llevamos NAR hasta donde esté tu evento.' },
+  {
+    title: `Cobertura en ${site.areaServedLong}`,
+    corto: 'Toda España',
+    text: 'Llevamos NAR hasta donde esté tu evento.',
+  },
 ] as const;
 ---
 
@@ -19,8 +25,8 @@ const points = [
   id="inicio"
   class="relative grid min-h-[640px] items-center overflow-hidden bg-[#080808] text-white max-b820:min-h-0 max-b820:items-end"
 >
-  {/* En movil la foto es una franja arriba (se ve el truck entero) y el texto va debajo sobre negro. */}
-  <div class="absolute inset-0 max-b820:bottom-auto max-b820:h-[290px]" data-anim="hero-media">
+  {/* En movil: una sola pantalla. La foto llena la mitad de arriba (truck entero) y se funde con el fondo; el contenido compacto va abajo. */}
+  <div class="absolute inset-0 max-b820:bottom-auto max-b820:h-[min(92vw,460px)]" data-anim="hero-media">
     <Image
       src={hero}
       alt=""
@@ -29,24 +35,24 @@ const points = [
       loading="eager"
       fetchpriority="high"
       aria-hidden="true"
-      class="size-full object-cover object-center max-b820:object-[60%_center]"
+      class="size-full object-cover object-center max-b820:object-[64%_center]"
     />
   </div>
   {/*
     Velo negro solo donde hace falta: denso bajo el texto y casi transparente
-    a la derecha, para que la foto del atardecer luzca y el titular se lea.
+    a la derecha (en movil, arriba), para que la foto luzca y el titular se lea.
   */}
   <div
-    class="absolute inset-0 bg-[linear-gradient(90deg,rgb(0_0_0_/_88%)_0%,rgb(0_0_0_/_70%)_45%,rgb(0_0_0_/_40%)_100%)] max-b820:bottom-auto max-b820:h-[290px] max-b820:bg-[linear-gradient(180deg,transparent_60%,#080808_100%)]"
+    class="absolute inset-0 bg-[linear-gradient(90deg,rgb(0_0_0_/_88%)_0%,rgb(0_0_0_/_70%)_45%,rgb(0_0_0_/_40%)_100%)] max-b820:bottom-auto max-b820:h-[min(92vw,460px)] max-b820:bg-[linear-gradient(180deg,transparent_0%,transparent_55%,rgb(8_8_8_/_70%)_80%,#080808_100%)]"
     aria-hidden="true"
   >
   </div>
 
-  <div class="container relative z-2 pt-16 pb-[84px] max-b820:pt-[296px] max-b560:pb-16">
+  <div class="container relative z-2 pt-16 pb-[84px] max-b820:pt-[min(76vw,380px)] max-b820:pb-7">
     <div class="max-w-[630px]" data-anim="hero">
       <p class="eyebrow">Alquiler de food trucks para eventos</p>
       <h1
-        class="m-0 text-[clamp(44px,5.2vw,76px)] leading-[0.91] font-bold tracking-[-0.02em] max-b820:text-[clamp(40px,10vw,64px)]"
+        class="m-0 text-[clamp(44px,5.2vw,76px)] leading-[0.91] font-bold tracking-[-0.02em] max-b820:text-[clamp(34px,9.4vw,44px)]"
       >
         Haz que tu evento sea imposible <em class="block text-rust not-italic">de olvidar.</em>
       </h1>
@@ -55,34 +61,43 @@ const points = [
         ferias y eventos privados. Nosotros nos encargamos de todo para que tú solo disfrutes.
       </p>
 
+      {/* En movil cada punto es un chip con la etiqueta corta, sin subtitulo. */}
       <ul
-        class="mx-0 mt-7 mb-8 flex list-none gap-[30px] p-0 max-b820:grid max-b820:grid-cols-2 max-b820:gap-4 max-b560:grid-cols-1 max-b560:gap-3"
+        class="mx-0 mt-7 mb-8 flex list-none gap-[30px] p-0 max-b820:mt-5 max-b820:mb-6 max-b820:flex-wrap max-b820:gap-2"
       >
         {
           points.map((point) => (
-            <li class="max-w-[200px] text-[13px] leading-[1.35] max-b560:max-w-none">
-              <strong class="block font-display text-[15px] font-bold tracking-[0.03em] uppercase">
+            <li class="max-w-[200px] text-[13px] leading-[1.35] max-b820:max-w-none max-b820:rounded-full max-b820:border max-b820:border-white/30 max-b820:bg-black/25 max-b820:px-3 max-b820:py-1.5 max-b820:backdrop-blur-sm">
+              <strong class="block font-display text-[15px] font-bold tracking-[0.03em] uppercase max-b820:text-[12px]">
                 <span class="text-rust" aria-hidden="true">+ </span>
-                {point.title}
+                <span class="max-b820:hidden">{point.title}</span>
+                <span class="hidden max-b820:inline">{point.corto}</span>
               </strong>
-              <span class="mt-1 block text-white/80">{point.text}</span>
+              <span class="mt-1 block text-white/80 max-b820:hidden">{point.text}</span>
             </li>
           ))
         }
       </ul>
 
-      <div class="flex flex-wrap gap-3.5 max-b560:grid print:hidden">
+      {/* En movil, una fila: CTA principal a todo el ancho y video como boton de icono. */}
+      <div class="flex flex-wrap gap-3.5 max-b820:grid max-b820:grid-cols-[1fr_auto] max-b820:gap-2.5 print:hidden">
         <a
-          class="button button-primary max-b560:w-full"
+          class="button button-primary max-b820:w-full max-b820:px-3 max-b820:text-[16px]"
           href="/configurador"
           data-track="cta_hero_click"
         >
           <Icon name="calendar" size={20} />
           Configura tu food truck
         </a>
-        <button class="button button-ghost max-b560:w-full" type="button" data-video-open data-video="eventos">
+        <button
+          class="button button-ghost max-b820:w-[50px] max-b820:px-0"
+          type="button"
+          data-video-open
+          data-video="eventos"
+          aria-label="Ver vídeo"
+        >
           <Icon name="play" size={20} />
-          Ver vídeo
+          <span class="max-b820:sr-only">Ver vídeo</span>
         </button>
       </div>
     </div>
