@@ -11,6 +11,7 @@ import { closeModal, onEscape, openModal, setMenu, track } from './modal';
 // Los botones de +/- del campo de invitados. Se importa aqui, que es el script
 // que cargan todas las paginas, porque el campo sale en los formularios.
 import './stepper';
+import './ui/controles';
 import './animaciones';
 
 const header = document.querySelector<HTMLElement>('[data-header]');

@@ -11,6 +11,7 @@
 
 import { validarImagen } from '../data/imagenes';
 import { rutaPanel } from './admin-rutas';
+import './ui/controles';
 
 const status = document.querySelector<HTMLElement>('[data-save-status]');
 const guardarButton = document.querySelector<HTMLButtonElement>('[data-guardar]');

@@ -16,6 +16,7 @@
 import { campo, leerAjustes, leerFila, marcarAjustes, marcarSucia, valor } from './admin-configurador';
 import { validarImagen } from '../data/imagenes';
 import { rutaPanel } from './admin-rutas';
+import './ui/controles';
 
 const editor = document.querySelector<HTMLElement>('[data-editor]');
 const iframe = document.querySelector<HTMLIFrameElement>('[data-ed-iframe]');

@@ -62,7 +62,7 @@ export const iniciarParadas = (raiz: HTMLElement, catalogo: Catalogo) => {
       const li = crear('li', 'cf-parada');
       li.append(crear('span', 'cf-num', String(i + 1).padStart(2, '0')));
       li.append(campoTexto(i, 'ciudad', t(catalogo, 'fecha.ciudad'), 'text', { maxlength: '80', autocomplete: 'off' }));
-      li.append(campoTexto(i, 'fecha', t(catalogo, 'fecha.fechaParada'), 'date', { min: minimo }));
+      li.append(campoTexto(i, 'fecha', t(catalogo, 'fecha.fechaParada'), 'date', { min: minimo, 'data-dp-disponibilidad': '' }));
       const estado = crear('span', 'cf-parada-estado');
       estado.dataset.paradaEstado = String(i);
       li.append(estado);

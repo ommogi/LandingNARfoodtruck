@@ -109,15 +109,15 @@ const leyenda = [
         </p>
 
         <div class="grid gap-3">
-          <div class="grid gap-3 b560:grid-cols-2">
-            <div class="grid gap-1.5">
-              <label class={label} for="rango-desde">Desde</label>
-              <input class={input} id="rango-desde" type="date" data-rango-desde />
-            </div>
-            <div class="grid gap-1.5">
-              <label class={label} for="rango-hasta">Hasta</label>
-              <input class={input} id="rango-hasta" type="date" data-rango-hasta />
-            </div>
+          {/*
+            Un solo calendario de periodo (src/scripts/ui/calendario.ts): el
+            primer clic marca el inicio y el segundo el final. Los dos inputs
+            siguen ahi, ocultos, y src/scripts/admin.ts los lee igual que antes.
+          */}
+          <div class="grid gap-1.5">
+            <label class={label} for="rango-desde">Periodo</label>
+            <input class={input} id="rango-desde" type="date" data-rango-desde data-dp-hasta="#rango-hasta" />
+            <input id="rango-hasta" type="date" data-rango-hasta hidden />
           </div>
 
           <div class="grid gap-1.5">

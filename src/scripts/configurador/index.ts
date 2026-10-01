@@ -32,6 +32,7 @@ import { iniciarPuenteEditor } from './editor-puente';
 import { iniciarAnimaciones } from './animaciones';
 import { iniciarDirecciones } from './direcciones';
 import { iniciarZoom } from './zoom';
+import '../ui/controles';
 
 const raiz = document.querySelector<HTMLElement>('[data-configurador]');
 

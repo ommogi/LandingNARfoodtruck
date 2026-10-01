@@ -8,6 +8,7 @@
  */
 
 import { rutaPanel } from './admin-rutas';
+import './ui/controles';
 
 import {
   DISPONIBILIDAD_VACIA,
