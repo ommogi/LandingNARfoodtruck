@@ -21,7 +21,9 @@ const coverage = [
   site.areaServed,
 ] as const;
 
-const mapSrc = `https://maps.google.com/maps?q=${encodeURIComponent(`${site.locality},España`)}&z=10&output=embed`;
+/* Direccion de la nave de NAR: el mapa se centra en ella con su marcador. */
+const direccionMapa = 'Calle San Vicente Mártir 420, 46017 Valencia, España';
+const mapSrc = `https://maps.google.com/maps?q=${encodeURIComponent(direccionMapa)}&z=15&output=embed`;
 ---
 
 <section class="section pt-0" aria-labelledby="contact-location-title">
