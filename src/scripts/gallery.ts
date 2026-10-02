@@ -4,11 +4,12 @@
  * de la portada.
  */
 
+import { repartirFilas } from '../data/gallery';
 import { clearEnter, enter } from './enter';
 import { initLightbox } from './lightbox';
 import { track } from './modal';
 
-/** Fotos visibles al cargar: dos anchas + seis normales completan el collage. */
+/** Fotos visibles al cargar: una fila de dos anchas y dos de tres normales. */
 const INITIAL_VISIBLE = 8;
 /** Fotos que revela cada pulsacion de "ver mas fotos". */
 const STEP = 6;
@@ -47,8 +48,12 @@ if (grid && filterBar) {
     });
 
     shown = matching.slice(0, visibleLimit);
-    shown.forEach((card) => {
+    // Anchuras para que todas las filas queden completas con lo que se ve.
+    const anchos = repartirFilas(shown.length);
+    shown.forEach((card, i) => {
       card.hidden = false;
+      card.style.setProperty('--cols', String(anchos[i] ?? 2));
+      card.toggleAttribute('data-sola', shown.length % 2 === 1 && i === shown.length - 1);
     });
 
     if (animate) enter(shown.filter((card) => !previous.has(card)), grid);

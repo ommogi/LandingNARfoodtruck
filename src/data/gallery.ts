@@ -65,8 +65,6 @@ export interface GalleryPhoto {
   src: ImageMetadata;
   alt: string;
   category: GalleryCategory;
-  /** Ocupa el doble de ancho en el collage de escritorio. */
-  wide?: boolean;
   /** Recorte sin fondo (maquinas): se ve entera, sin recortar. */
   contain?: boolean;
 }
@@ -79,13 +77,16 @@ export const galleryPhotos: GalleryPhoto[] = [
     src: truckExterior01,
     alt: 'Food truck azul NAR iluminado de noche con la ventana de servicio abierta',
     category: 'truck',
-    wide: true,
+  },
+  {
+    src: eventoGofresNoche,
+    alt: 'Food truck NAR rotulado con su marca de gofres, abierto y sirviendo en un evento nocturno',
+    category: 'event',
   },
   {
     src: interior01,
     alt: 'Vista general del interior profesional en acero inoxidable',
     category: 'interior',
-    wide: true,
   },
   {
     src: truckTrasera,
@@ -148,12 +149,6 @@ export const galleryPhotos: GalleryPhoto[] = [
     category: 'interior',
   },
   {
-    src: eventoGofresNoche,
-    alt: 'Food truck NAR rotulado con su marca de gofres, abierto y sirviendo en un evento nocturno',
-    category: 'event',
-    wide: true,
-  },
-  {
     src: truckVistaDelantera,
     alt: 'Vista frontal del food truck azul NAR con la lanza de enganche',
     category: 'truck',
@@ -177,7 +172,6 @@ export const galleryPhotos: GalleryPhoto[] = [
     src: interiorEncimera1,
     alt: 'Encimera de trabajo de acero inoxidable junto a la ventana de servicio',
     category: 'interior',
-    wide: true,
   },
   {
     src: detalleLucesLed,
@@ -332,3 +326,27 @@ export const galleryFilters: GalleryFilter[] = [
   { value: 'event', label: 'Eventos', icon: 'users' },
   { value: 'equipment', label: 'Equipamiento', icon: 'kitchen' },
 ];
+
+/**
+ * Anchura (en columnas de la rejilla de 6) de cada una de las `n` fotos
+ * visibles, para que todas las filas queden completas: una fila son dos fotos
+ * anchas (3 + 3) o tres normales (2 + 2 + 2). Como 2a + 3b cubre cualquier n
+ * desde 2, no queda ningun hueco sea cual sea el filtro o cuantas se muestren.
+ * La primera fila ancha abre el collage y las demas se reparten entre las
+ * normales. Lo usan el HTML inicial (GalleryGrid.astro) y src/scripts/gallery.ts.
+ */
+export const repartirFilas = (n: number): (2 | 3 | 6)[] => {
+  if (n <= 0) return [];
+  if (n === 1) return [6];
+  const anchas = n % 3 === 2 ? 1 : n % 3 === 1 ? 2 : n >= 12 ? 3 : 0;
+  const normales = (n - anchas * 2) / 3;
+  const filas = anchas + normales;
+  // Filas anchas: la primera arriba y el resto a intervalos regulares.
+  const posiciones = new Set(Array.from({ length: anchas }, (_, j) => Math.round((j * filas) / anchas)));
+  const anchos: (2 | 3)[] = [];
+  for (let fila = 0; fila < filas; fila += 1) {
+    if (posiciones.has(fila)) anchos.push(3, 3);
+    else anchos.push(2, 2, 2);
+  }
+  return anchos;
+};

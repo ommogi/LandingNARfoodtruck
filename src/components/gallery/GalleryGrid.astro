@@ -1,7 +1,7 @@
 ---
 import { Image, getImage } from 'astro:assets';
 import Icon from '../Icon.astro';
-import { galleryFilters, galleryPhotos } from '../../data/gallery';
+import { galleryFilters, galleryPhotos, repartirFilas } from '../../data/gallery';
 
 /**
  * Collage con filtros y "ver mas" (secciones 3.1 y 5 de la guia).
@@ -24,6 +24,9 @@ const filterButton = [
 /* `gallery-card` es el gancho que usa src/scripts/gallery.ts para filtrar. */
 const card =
   'gallery-card m-0 overflow-hidden rounded-[14px] bg-bg-2 shadow-[0_8px_20px_rgb(10_28_38_/_6%)]';
+
+/* Estado inicial ("Todas", 8 fotos): el mismo reparto que aplica el script. */
+const anchosIniciales = repartirFilas(Math.min(8, galleryPhotos.length));
 ---
 
 <section id="galeria" class="pt-[30px] pb-[46px]" aria-labelledby="gallery-title">
@@ -60,9 +63,12 @@ const card =
           <figure
             class:list={[
               card,
-              photo.wide ? 'col-span-3' : 'col-span-2',
-              'max-b900:col-span-1',
+              /* Anchura en --cols: la recalcula src/scripts/gallery.ts para que
+                 las filas cuadren con cada filtro. En tablet (2 columnas) la
+                 ultima foto, si queda sola, ocupa la fila entera. */
+              'col-span-[var(--cols,2)] max-b900:col-span-1 max-b900:data-[sola]:col-span-2 max-b560:data-[sola]:col-span-1',
             ]}
+            style={i < anchosIniciales.length ? `--cols: ${anchosIniciales[i]}` : undefined}
             data-category={photo.category}
           >
             <button
