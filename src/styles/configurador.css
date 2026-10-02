@@ -2727,6 +2727,94 @@
 
   /* ------------------------------------------------------------ Responsive */
 
+  /*
+   * Escritorio grande (monitores de 1500 px o mas de ancho y altura holgada):
+   * la version compacta de la barra lateral se quedaba diminuta y el cuerpo,
+   * limitado a 1500 px, dejaba mucho vacio. Aqui todo crece un punto. Con
+   * 820 px de alto o mas las nueve filas siguen cabiendo sin scroll.
+   */
+  @media (min-width: 1500px) and (min-height: 820px) {
+    .cf-cuerpo {
+      grid-template-columns: minmax(0, 1fr) 340px;
+      gap: 36px;
+      max-width: 1720px;
+    }
+
+    .cf-side {
+      gap: 12px;
+      padding: 18px;
+    }
+
+    .cf-side-head .cf-over {
+      font-size: 17px;
+    }
+
+    .cf-rental {
+      grid-template-columns: 120px minmax(0, 1fr);
+      padding: 12px 14px;
+
+      & img {
+        max-height: 66px;
+      }
+    }
+
+    .cf-rental-title {
+      font-size: 12.5px;
+    }
+
+    .cf-rental {
+      grid-template-columns: 96px minmax(0, 1fr);
+    }
+
+    .cf-rental-precio {
+      font-size: 14.5px;
+
+      & .cf-t {
+        white-space: nowrap;
+      }
+    }
+
+    .cf-rental-texto {
+      font-size: 12px;
+    }
+
+    .cf-side-lista button {
+      grid-template-columns: 22px minmax(0, 1fr) 16px 20px;
+      gap: 10px;
+      padding: 7px 6px;
+    }
+
+    .cf-side-icon {
+      width: 19px;
+      height: 19px;
+    }
+
+    .cf-side-titulo {
+      font-size: 12px;
+    }
+
+    .cf-side-valor {
+      font-size: 12.5px;
+    }
+
+    .cf-side-estado {
+      width: 20px;
+      height: 20px;
+    }
+
+    .cf-ayuda {
+      padding: 14px;
+
+      & .cf-card-text {
+        font-size: 13px;
+      }
+    }
+
+    .cf-ayuda-titulo {
+      font-size: 16px;
+    }
+  }
+
   /* Ventanas de escritorio muy bajas: las nueve filas siguen cabiendo sin
      scroll a costa de la foto del alquiler. */
   @media (max-height: 700px) and (min-width: 1101px) {
