@@ -1,5 +1,7 @@
 ---
+import { Image } from 'astro:assets';
 import Icon from '../Icon.astro';
+import mapaValencia from '../../assets/mapa-valencia.webp';
 import { site } from '../../config/site';
 
 /**
@@ -8,7 +10,8 @@ import { site } from '../../config/site';
  * El iframe de Google Maps es la unica peticion a terceros de la web, y ya no
  * se carga sola: el `src` vive en `data-src` hasta que src/scripts/consent.ts
  * confirma que el usuario acepto la categoria de mapas. Mientras tanto se ve
- * el marcador con el boton para cargarlo.
+ * una imagen propia y difuminada del mapa de Valencia (OpenStreetMap, alojada
+ * aqui: no llama a nadie) con el aviso y el boton para cargar el de Google.
  */
 const coverage = [
   'Eventos privados',
@@ -59,21 +62,32 @@ const mapSrc = `https://maps.google.com/maps?q=${encodeURIComponent(`${site.loca
       {/* Se oculta en cuanto hay consentimiento. Sin JS se queda visible: es
           la version honesta, porque el mapa tampoco podria cargarse. */}
       <div
-        class="grid min-h-[300px] place-items-center p-6 text-center"
+        class="relative grid size-full min-h-[300px] place-items-center overflow-hidden p-6 text-center"
         data-consent-placeholder
       >
-        <div class="grid justify-items-center gap-3">
-          <span class="grid size-11 place-items-center rounded-full bg-rust/10 text-rust">
+        <Image
+          src={mapaValencia}
+          alt=""
+          widths={[480, 900]}
+          sizes="(max-width: 900px) 100vw, 40vw"
+          loading="lazy"
+          class="absolute inset-0 size-full scale-105 object-cover"
+        />
+        <span class="absolute inset-0 bg-white/35" aria-hidden="true"></span>
+        <div class="relative grid max-w-[340px] justify-items-center gap-3 rounded-2xl bg-white/90 px-6 py-5 shadow-card backdrop-blur-sm">
+          <span class="grid size-11 place-items-center rounded-full bg-rust text-white">
             <Icon name="pin" size={22} />
           </span>
-          <p class="m-0 max-w-[320px] text-sm text-muted">
-            El mapa lo sirve Google, que recibirá tu dirección IP y datos del navegador. Necesitamos
-            tu permiso para cargarlo.
+          <p class="m-0 text-[13.5px] leading-[1.5] text-muted">
+            Este mapa interactivo es de Google Maps. Al cargarlo, Google recibirá tu IP y datos del
+            navegador.
           </p>
-          <button class="button button-line min-h-[44px] px-5 text-[15px]" type="button" data-consent-open>
-            Ver el mapa
+          <button class="button button-primary min-h-[44px] px-5 text-[15px]" type="button" data-consent-open>
+            <Icon name="pin" size={18} />
+            Cargar mapa
           </button>
         </div>
+        <span class="absolute right-2 bottom-1.5 text-[10px] text-night/60">© OpenStreetMap</span>
       </div>
     </div>
 
