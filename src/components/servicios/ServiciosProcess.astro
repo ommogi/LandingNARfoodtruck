@@ -49,13 +49,31 @@ const step = [
 
 <section class="section" aria-labelledby="servicios-process-title">
   <div class="container">
-    <SectionHeading id="servicios-process-title" title="Un servicio 360° para cada evento" />
-    <p class="mx-auto -mt-6 mb-[34px] max-w-[620px] text-center text-[15px] text-muted">
-      Desde la idea inicial hasta el último invitado, cuidamos cada detalle.
-    </p>
+    <div class="max-b820:hidden">
+      <SectionHeading id="servicios-process-title" title="Un servicio 360° para cada evento" />
+      <p class="mx-auto -mt-6 mb-[34px] max-w-[620px] text-center text-[15px] text-muted">
+        Desde la idea inicial hasta el último invitado, cuidamos cada detalle.
+      </p>
+    </div>
+
+    {/*
+      En movil los seis pasos ocupaban demasiado: se pliegan tras este boton,
+      igual que "Asi trabajamos" de la home (src/scripts/landing.ts).
+    */}
+    <button
+      type="button"
+      class="hidden w-full items-center justify-between gap-3 rounded-card border border-line bg-white px-5 py-4 text-left font-display text-[22px] leading-[1.05] font-bold text-night uppercase shadow-card max-b820:flex"
+      aria-expanded="false"
+      aria-controls="servicios-pasos"
+      data-plegable
+    >
+      Un servicio 360° para cada evento
+      <Icon name="chevron" size={22} class="flex-none text-rust transition-transform" />
+    </button>
 
     <ol
-      class="m-0 grid list-none grid-cols-6 gap-[18px] p-0 max-b1100:grid-cols-3 max-b1100:gap-7 max-b820:grid-cols-2 max-b560:grid-cols-1 max-b560:gap-5"
+      id="servicios-pasos"
+      class="m-0 grid list-none max-b820:mt-6 max-b820:[&:not(.is-abierto)]:hidden grid-cols-6 gap-[18px] p-0 max-b1100:grid-cols-3 max-b1100:gap-7 max-b820:grid-cols-2 max-b560:grid-cols-1 max-b560:gap-5"
     >
       {
         steps.map((item, i) => (
